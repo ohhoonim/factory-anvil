@@ -1,0 +1,64 @@
+{
+  "name": "bizui-library",
+  "private": false,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "dist/bizui-library-index.umd.js",
+  "module": "dist/bizui-library-index.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/bizui-library-index.es.js",
+      "require": "./dist/bizui-library-index.umd.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/bizui-library-react.es.js",
+      "require": "./dist/bizui-library-react.cjs.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:vanilla && npm run build:react && npm run build:types ",
+    "build:vanilla": "vite build",
+    "build:react": "vite build --config vite.config.react.ts",
+    "build:types": "tsc",
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "lit": "^3.3.2",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^5.1.2",
+    "@lit/react": "^1.0.8",
+    "@storybook/addon-a11y": "^10.3.5",
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-vitest": "^10.3.5",
+    "@storybook/web-components-vite": "^10.3.5",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/browser-playwright": "^4.1.4",
+    "@vitest/coverage-v8": "^4.1.4",
+    "lit": "^3.3.2",
+    "playwright": "^1.59.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "storybook": "^10.3.5",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.4",
+    "vitest": "^4.1.4"
+  },
+  "overrides": {
+    "@storybook/web-components": "10.3.5",
+    "lit": "^3.3.2"
+  }
+}

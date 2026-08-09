@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   <div id="grid-container" style="height: 400px; overflow-y: auto; border: 1px solid #ccc; position: relative;">
+    <div id="grid-phantom" style="position: absolute; left: 0; top: 0; right: 0;"></div>
+    <div id="grid-content" style="position: absolute; left: 0; top: 0; right: 0;"></div>
+</div>
+<div id="grid-container" class="grid-viewport">
+    <div id="grid-phantom" class="grid-phantom"></div>
+    <div id="grid-content" class="grid-content"></div>
+</div>
+
+<style>
+.grid-viewport {
+    height: 400px;
+    overflow: auto;
+    position: relative;
+    border: 1px solid #ccc;
+    will-change: transform;
+    --row-height: 40px;
+    /* 6단계: repeating-linear-gradient 기반 얼룩무늬 배경으로 스타일/레이아웃 재계산 절감 */
+    background: repeating-linear-gradient(
+        to bottom,
+        #ffffff 0px,
+        #ffffff var(--row-height),
+        #f9f9f9 var(--row-height),
+        #f9f9f9 calc(var(--row-height) * 2)
+    );
+}
+
+.grid-phantom {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    pointer-events: none;
+}
+
+.grid-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+}
+
+.grid-row {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 40px;
+    box-sizing: border-box;
+    display: flex;
+    white-space: nowrap;
+}
+
+.grid-cell {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    box-sizing: border-box;
+    border-right: 1px solid #eee;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    background-repeat: no-repeat;
+    background-position: 4px center;
+    background-size: 14px 14px;
+}
+
+/* 7단계: 셀 경량화를 위한 Data URI SVG 아이콘 사용 */
+.grid-cell.has-icon {
+    padding-left: 22px;
+}
+.type-string { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234A90E2"><path d="M13 6h-2v8h2V6zm4 0h-2v8h2V6zM7 6h2v8H7V6z"/></svg>'); }
+.type-number { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2350E3C2"><path d="M7 11h2v2H7zM11 11h2v2h-2zM15 11h2v2h-2z"/></svg>'); }
+.type-objectId { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23F5A623"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>'); }
+</style>
+
+<script>
+class HighPerformanceGrid {
+    constructor(containerId, rawData, columns, options = {}) {
+        this.container = document.getElementById(containerId);
+        this.phantom = document.getElementById('grid-phantom');
+        this.content = document.getElementById('grid-content');
+        
+        this.rowHeight = options.rowHeight || 40;
+        this.container.style.setProperty('--row-height', `${this.rowHeight}px`);
+
+        // 2단계: 섀도 테이블 구축
+        this.shadowTable = this.buildShadowTable(rawData, columns);
+        this.columns = columns;
+
+        // 4단계: 수평 가상화를 위한 누적 합 및 이진 탐색 준비
+        this.colWidths = columns.map(c => c.width || 120);
+        this.colOffsets = [];
+        this.buildColumnOffsets();
+
+        // 수직/수평 가상화 매개변수 (양방향 버퍼 지정)
+        this.vBuffer = 5;
+        this.hBuffer = 200;
+        
+        // 5단계: 프레임 예산 및 스크롤 추적 변수
+        this.lastScrollTop = -1;
+        this.lastScrollLeft = -1;
+        this.lastScrollTime = performance.now();
+        this.isTicking = false;
+        
+        // Render state tracking (Handsontable 기법)
+        this.renderedVRange = { start: -1, end: -1 };
+        this.renderedHRange = { start: -1, end: -1 };
+
+        // 8단계: 위치 기반 DOM 객체 풀 (Slot tracking)
+        this.rowPool = new Map();
+        this.visibleRowsCount = Math.ceil(this.container.clientHeight / this.rowHeight) + (this.vBuffer * 2);
+        this.visibleColsCount = 0; 
+        
+        this.initDOMPool();
+        this.initLayout();
+        this.bindEvents();
+        this.render(true);
+    }
+
+    // 2단계: 섀도 테이블
+    buildShadowTable(rawData, columns) {
+        return rawData.map((doc, rowIndex) => {
+            const shadowRow = { _raw: doc, _rowKey: rowIndex };
+            for (const col of columns) {
+                const rawVal = this.getValueByPath(doc, col.path);
+                const type = this.detectType(rawVal);
+                shadowRow[col.key] = {
+                    displayStr: this.formatDisplayString(rawVal, type),
+                    type: type,
+                    raw: rawVal
+                };
+            }
+            return shadowRow;
+        });
+    }
+
+    getValueByPath(obj, path) {
+        if (!path) return undefined;
+        return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined) ? acc[key] : undefined, obj);
+    }
+
+    detectType(val) {
+        if (val === null || val === undefined) return 'null';
+        if (typeof val === 'number') return 'number';
+        if (typeof val === 'string') {
+            if (/^[0-9a-fA-F]{24}$/.test(val)) return 'objectId';
+            return 'string';
+        }
+        if (typeof val === 'object') return 'object';
+        return typeof val;
+    }
+
+    formatDisplayString(val, type) {
+        if (val === null || val === undefined) return '';
+        if (type === 'object') return JSON.stringify(val).slice(0, 50);
+        const str = String(val);
+        return str.length > 100 ? str.slice(0, 100) + '...' : str;
+    }
+
+    // 4단계: 누적 합 알고리즘
+    buildColumnOffsets() {
+        this.colOffsets = new Array(this.colWidths.length);
+        let acc = 0;
+        for (let i = 0; i < this.colWidths.length; i++) {
+            this.colOffsets[i] = acc;
+            acc += this.colWidths[i];
+        }
+        this.totalWidth = acc;
+    }
+
+    // 4단계: 이진 탐색
+    binarySearchColumn(x) {
+        let low = 0;
+        let high = this.colOffsets.length - 1;
+        while (low <= high) {
+            const mid = Math.floor((low + high) / 2);
+            const offset = this.colOffsets[mid];
+            const width = this.colWidths[mid];
+            
+            if (x >= offset && x < offset + width) {
+                return mid;
+            } else if (x < offset) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return Math.max(0, Math.min(low, this.colOffsets.length - 1));
+    }
+
+    initDOMPool() {
+        // 8단계: 위치 기반 키를 가지는 풀 생성
+        for (let i = 0; i < this.visibleRowsCount; i++) {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'grid-row';
+            this.rowPool.set(i, {
+                element: rowEl,
+                cells: new Map(),
+                activeRowIndex: -1
+            });
+        }
+    }
+
+    initLayout() {
+        // 3단계: 유령 스크롤 영역
+        this.phantom.style.height = `${this.shadowTable.length * this.rowHeight}px`;
+        this.phantom.style.width = `${this.totalWidth}px`;
+    }
+
+    // 5단계: 수동적 이벤트 리스너 및 rAF
+    bindEvents() {
+        this.container.addEventListener('scroll', () => {
+            if (!this.isTicking) {
+                requestAnimationFrame((timestamp) => {
+                    this.onScroll(timestamp);
+                    this.isTicking = false;
+                });
+                this.isTicking = true;
+            }
+        }, { passive: true });
+
+        // 9단계: 이벤트 위임 방식의 툴팁
+        this.container.addEventListener('mouseover', (e) => {
+            const cell = e.target.closest('.grid-cell');
+            if (cell && cell.dataset.raw) {
+                cell.title = cell.dataset.raw;
+            }
+        }, { passive: true });
+    }
+
+    onScroll(timestamp) {
+        const scrollTop = this.container.scrollTop;
+        const scrollLeft = this.container.scrollLeft;
+
+        // 5단계: 속도 감지기 (10px/ms 이상 시 렌더링 스킵)
+        const dt = Math.max(1, timestamp - this.lastScrollTime);
+        const dy = Math.abs(scrollTop - this.lastScrollTop);
+        const velocity = dy / dt;
+        
+        this.lastScrollTime = timestamp;
+        this.lastScrollTop = scrollTop;
+        this.lastScrollLeft = scrollLeft;
+
+        if (velocity > 10) {
+            return; 
+        }
+
+        this.render(false);
+    }
+
+    render(force) {
+        const scrollTop = this.container.scrollTop;
+        const scrollLeft = this.container.scrollLeft;
+        const viewportHeight = this.container.clientHeight;
+        const viewportWidth = this.container.clientWidth;
+
+        // 3단계: 수직 인덱스 산출
+        let startRow = Math.max(0, Math.floor(scrollTop / this.rowHeight) - this.vBuffer);
+        let endRow = Math.min(this.shadowTable.length - 1, Math.ceil((scrollTop + viewportHeight) / this.rowHeight) + this.vBuffer);
+
+        // 4단계: 수평 인덱스 산출
+        let startCol = this.binarySearchColumn(Math.max(0, scrollLeft - this.hBuffer));
+        let endCol = this.binarySearchColumn(Math.min(this.totalWidth, scrollLeft + viewportWidth + this.hBuffer));
+
+        // 5단계: 빠른 종료 (Fast Exit)
+        if (!force && 
+            startRow >= this.renderedVRange.start && endRow <= this.renderedVRange.end &&
+            startCol >= this.renderedHRange.start && endCol <= this.renderedHRange.end) {
+            return;
+        }
+
+        this.renderedVRange = { start: startRow, end: endRow };
+        this.renderedHRange = { start: startCol, end: endCol };
+
+        // 6단계: translate3d를 통한 하드웨어 가속
+        this.content.style.transform = `translate3d(${this.colOffsets[startCol]}px, ${startRow * this.rowHeight}px, 0)`;
+
+        // 8단계: 위치 기반 DOM 재활용 루프
+        const totalRowsToRender = endRow - startRow + 1;
+        
+        for (let slot = 0; slot < this.visibleRowsCount; slot++) {
+            const poolItem = this.rowPool.get(slot);
+            const rowEl = poolItem.element;
+
+            if (slot < totalRowsToRender) {
+                const targetRowIndex = startRow + slot;
+                const rowData = this.shadowTable[targetRowIndex];
+
+                if (poolItem.activeRowIndex !== targetRowIndex || force) {
+                    poolItem.activeRowIndex = targetRowIndex;
+                    // 6단계: top 대신 translate3d 적용
+                    rowEl.style.transform = `translate3d(0, ${slot * this.rowHeight}px, 0)`;
+                    
+                    if (!rowEl.parentNode) {
+                        this.content.appendChild(rowEl);
+                    }
+
+                    this.renderCells(poolItem, rowData, startCol, endCol);
+                }
+            } else {
+                poolItem.activeRowIndex = -1;
+                if (rowEl.parentNode) {
+                    rowEl.parentNode.removeChild(rowEl);
+                }
+            }
+        }
+    }
+
+    renderCells(poolItem, rowData, startCol, endCol) {
+        const rowEl = poolItem.element;
+        const activeCellKeys = new Set();
+
+        for (let colIdx = startCol; colIdx <= endCol; colIdx++) {
+            const col = this.columns[colIdx];
+            const cellKey = col.key;
+            activeCellKeys.add(cellKey);
+
+            let cellEl = poolItem.cells.get(cellKey);
+            
+            // 셀 DOM이 없을 경우에만 신규 생성 후 할당
+            if (!cellEl) {
+                cellEl = document.createElement('div');
+                poolItem.cells.set(cellKey, cellEl);
+                rowEl.appendChild(cellEl);
+            }
+
+            const cellData = rowData[cellKey];
+            const relativeLeft = this.colOffsets[colIdx] - this.colOffsets[startCol];
+
+            // 6단계: left 오프셋 대신 translate3d 활용
+            cellEl.className = `grid-cell has-icon type-${cellData.type}`;
+            cellEl.style.transform = `translate3d(${relativeLeft}px, 0, 0)`;
+            cellEl.style.width = `${this.colWidths[colIdx]}px`;
+            cellEl.textContent = cellData.displayStr;
+            cellEl.dataset.raw = String(cellData.raw);
+        }
+
+        // 사용 범위를 벗어난 셀 DOM 정리
+        for (const [key, cellEl] of poolItem.cells.entries()) {
+            if (!activeCellKeys.has(key)) {
+                if (cellEl.parentNode) {
+                    cellEl.parentNode.removeChild(cellEl);
+                }
+                poolItem.cells.delete(key);
+            }
+        }
+    }
+}
+
+// 초기화 예시
+const sampleColumns = [
+    { key: 'id', path: '_id', width: 200 },
+    { key: 'name', path: 'profile.name', width: 150 },
+    { key: 'age', path: 'profile.age', width: 100 }
+];
+
+const sampleData = Array.from({ length: 100000 }, (_, i) => ({
+    _id: `${(i + 1).toString(16).padStart(24, '0')}`,
+    profile: {
+        name: `User-${i + 1}`,
+        age: 20 + (i % 40)
+    }
+}));
+
+new HighPerformanceGrid('grid-container', sampleData, sampleColumns, { rowHeight: 40 });
+</script>
+</body>
+</html>
