@@ -1,61 +1,47 @@
-# Biz-UI 컴포넌트 개발 가이드 (Skill)
+## Biz-UI 웹 컴포넌트 개발 공정
 
-Biz-UI 라이브러리 내 신규 컴포넌트 제작 및 프레임워크 래퍼 구성을 위한 표준 절차와 컨벤션을 정의합니다.
+### Phase 1. 요구사항 정의 및 표준 검토
 
+- **1-1. 태그 명명 규칙 명시**: 커스텀 엘리먼트 태그명을 `biz-component-name` 규격으로 확정합니다.
+- **1-2. 디자인 토큰 네임스페이스 정의**: CSS Custom Properties 네임스페이스를 `-biz-component-name-*` (예: `-biz-input-height-md`) 규칙으로 정의합니다.
+- **1-3. React 이벤트 매핑 명세 정의**: 커스텀 이벤트와 React 전용 Prop 명칭(예: `clear` -> `onClear`)을 사전 정의합니다.
 
-## 1. 컴포넌트 디렉터리 및 파일 구조 규칙
+### Phase 2. 사전 환경 및 구조 정의
 
-모든 UI 컴포넌트는 `src/components/ComponentName/` 경로에 배치되며 아래 구조를 엄격히 준수합니다.
+- `src/components/ComponentName/` 경로에 디렉터리를 생성하고 아래 표준 7종 파일을 구성합니다:
+    - `ComponentName.ts` (코어 템플릿)
+    - `ComponentName.css` (전용 스타일)
+    - `ComponentName.wc.ts` (웹 컴포넌트 등록)
+    - `ComponentName.react.ts` (React 래퍼)
+    - `ComponentName.stories.ts` (Storybook 및 접근성)
+    - `ComponentName.test.ts` (단위/통합 테스트)
+    - `index.ts` (모듈 내보내기)
 
-```text
-src/components/ComponentName/
-├── ComponentName.ts         # 코어 템플릿 (Lit 기반 순수 함수 템플릿)
-├── ComponentName.css        # 컴포넌트 전용 스타일시트
-├── ComponentName.wc.ts      # LitElement 기반 커스텀 엘리먼트 등록
-├── ComponentName.react.ts   # React 전용 래퍼 (@lit/react 사용)
-├── ComponentName.stories.ts # Storybook 스토리 및 문서화
-├── ComponentName.test.ts    # Vitest / Playwright 단위 및 통합 테스트
-└── index.ts                 # 개별 컴포넌트 통합 내보내기
+### Phase 3. 컴포넌트 코어 및 로직 개발
 
-```
+- **1단계: 코어 템플릿 구현 (`ComponentName.ts`)**
+    - Lit 기반 순수 함수 템플릿을 구현하고 외부 노출명은 `ComponentNameTemplate`으로 지정합니다.
+    - 정의서의 슬롯(`label-slot`, `start-slot`, `end-slot`, `helper-text-slot` 등) 구조를 구현합니다.
+- **2단계: 웹 컴포넌트 등록 (`ComponentName.wc.ts`)**
+    - `LitElement`를 상속하여 클래스를 정의하고 `biz-component-name` 태그명으로 커스텀 엘리먼트를 등록합니다.
+    - Props, State, ARIA 속성(`aria-invalid`, `aria-describedby` 등) 및 커스텀 이벤트를 바인딩합니다.
+- **스타일링 적용 (`ComponentName.css`)**
+    - 루트 클래스명 `biz-component-name` 적용 및 `-biz-component-name-*` 스타일 토큰을 바인딩합니다.
 
-## 2. 컴포넌트 구현 단계별 가이드라인
+### Phase 4. 프레임워크 바인딩 및 모듈 노출
 
-### 1단계: 코어 템플릿 구현 (`ComponentName.ts`)
+- **3단계: React 래퍼 제작 (`ComponentName.react.ts`)**
+    - `@lit/react`의 `createComponent`를 활용해 React 컴포넌트를 구성합니다.
+    - 사전 정의된 React 이벤트 Prop 명칭(예: `onInput`, `onChange`, `onClear`)과 웹 컴포넌트 이벤트를 1:1 매핑합니다.
+- **4단계: 모듈 내보내기 설정 (`index.ts` & `src/react.ts`)**
+    - `src/components/ComponentName/index.ts`에서 컴포넌트, 래퍼, 관련 타입을 내보냅니다.
+    - `src/react.ts` 통합 진입점에 신규 생성된 React 래퍼를 내보내도록 추가합니다.
 
-* UI 구조와 로직을 포함하는 순수 Lit 템플릿을 구현합니다.
-* 파일 외부 제공 시 `ComponentNameTemplate` 명칭으로 내보냅니다.
+### Phase 5. 검증 및 품질 관리 (QA)
 
-### 2단계: 웹 컴포넌트 등록 (`ComponentName.wc.ts`)
-
-* `LitElement`를 상속하여 웹 컴포넌트 클래스를 정의합니다.
-* 커스텀 엘리먼트 태그명은 `biz-component-name` 패턴을 따릅니다.
-* 코어 템플릿에 Props 및 이벤트를 전달하도록 바인딩합니다.
-
-### 3단계: React 래퍼 제작 (`ComponentName.react.ts`)
-
-* `@lit/react` 패키지의 `createComponent`를 활용합니다.
-* 웹 컴포넌트를 React 컴포넌트로 래핑하고 적절한 Prop 타입 및 이벤트를 매핑합니다.
-
-### 4단계: 모듈 내보내기 설정 (`index.ts` 및 통합 진입점)
-
-* `src/components/ComponentName/index.ts`에 컴포넌트 및 관련 타입을 정의합니다.
-* `src/react.ts`에 새로 생성한 React 래퍼를 내보내도록 추가합니다.
-
----
-
-## 3. 스타일링 컨벤션
-
-* CSS 파일은 컴포넌트와 동일 디렉터리에 위치시킵니다.
-* 루트 클래스 및 주요 스타일 명명 시 `biz-component-name` 또는 `component-name` 패턴을 적용합니다.
-
----
-
-## 4. 검증 및 품질 관리
-
-* **Storybook 문서화**: `ComponentName.stories.ts`를 작성하여 다양한 상태(State)와 시연 환경을 제공하고 `@storybook/addon-a11y` 기반 접근성을 검증합니다.
-* **Vitest & Playwright**: 단위 테스트 및 브라우저 통합 테스트를 수행합니다.
-
-```
-
-```
+- **Storybook 문서화 및 접근성 검증 (`ComponentName.stories.ts`)**
+    - Variants(`Outlined`, `Filled`, `Standard`), Sizes, States별 시연 환경을 구축합니다.
+    - `@storybook/addon-a11y`를 실행하여 ARIA 및 키보드 네비게이션 접근성을 검증합니다.
+- **단위 및 통합 테스트 (`ComponentName.test.ts`)**
+    - Vitest를 사용하여 비즈니스 로직 및 이벤트 방출을 검증합니다.
+    - Playwright를 사용하여 브라우저 환경 통합 테스트 및 키보드 인터랙션을 검증합니다.
