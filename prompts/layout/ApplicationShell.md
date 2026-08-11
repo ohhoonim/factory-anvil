@@ -1,3 +1,5 @@
+# ApplicationShell 요구사항 정의서
+
 ## 1. 기본 구조 및 레이아웃 (Layout Architecture)
 
 ### 1.1. 기본 구성 요소 (Core Elements)

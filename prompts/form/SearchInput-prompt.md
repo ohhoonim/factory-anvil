@@ -1,0 +1,264 @@
+# SearchInput Biz-UI 웹 컴포넌트 개발 프롬프트 체인
+
+---
+
+## [Prompt 1] 1단계: 컨텍스트 및 요구사항 전달 프롬프트
+
+````text
+[역할 정의]
+당신은 Biz-UI 라이브러리의 웹 컴포넌트 전문 개발자입니다. 
+제공하는 요구사항 정의서를 바탕으로 Biz-UI 표준 개발 규격을 엄격히 준수하여 코드 생성을 준비하세요.
+
+[Biz-UI 개발 컨벤션]
+1. 디렉터리 구조: 모든 파일은 `src/components/SearchInput/` 아래에 위치합니다.
+2. 표준 파일 구성 (7종):
+   - SearchInput.ts (코어 Lit 템플릿)
+   - SearchInput.css.ts (Lit css 태그드 템플릿 기반 전용 스타일)
+   - SearchInput.wc.ts (LitElement 기반 웹 컴포넌트 클래스)
+   - SearchInput.react.ts (@lit/react 기반 React 래퍼)
+   - SearchInput.stories.ts (Storybook 문서 및 a11y 검증)
+   - SearchInput.test.ts (Vitest 및 Playwright 테스트)
+   - index.ts (통합 export)
+3. 네임스페이스 및 명명 규칙:
+   - 커스텀 엘리먼트 태그명: `biz-search-input`
+   - CSS Design Token / Custom Properties: `--biz-search-input-*`
+   - 루트 CSS 클래스명: `biz-search-input`
+   - Lit 코어 템플릿 export 명칭: `SearchInputTemplate`
+   - Lit 스타일 export 변수명: `export const searchInputStyles = css`...``
+   - React Event Handler 매핑: Custom Event `clear` -> React Prop `onClear`
+
+[작성 대상 컴포넌트 정보]
+- 컴포넌트 명칭 (PascalCase): SearchInput
+- 커스텀 엘리먼트 태그명 (kebab-case): biz-search-input
+- Lit 스타일 변수명 (camelCase): searchInputStyles
+
+[요구사항 정의서]
+---
+# SearchInput 요구사항 정의서
+
+검색어 입력 및 즉시 검색을 위한 전용 검색 필드 구조
+## 1. 기본 구조 및 레이아웃 (Layout Architecture)
+
+### 1.1. 기본 구성 요소 (Core Elements)
+
+- `Label`: 상단 또는 좌측에 위치하는 입력 필드 명칭 영역
+- `Search Icon`: 좌측 internal slot에 위치하여 검색 필드임을 직관적으로 나타내는 아이콘 영역
+- `Input Control`: 검색 키워드 입력을 수신하는 필드
+- `Clear Button`: 우측 internal slot에 위치하여 입력된 검색어를 한 번에 삭제하는 초기화 버튼
+- `Search Action Button`: 우측 internal slot 또는 외부에 위치하여 검색을 실행하는 전용 버튼
+- `Helper Text / Error Message`: 하단 안내 문구 및 유효성 검사 에러 메시지 영역
+
+### 1.2. 형태 옵션 (Variants)
+
+- `Outlined`: 테두리 중심 스타일
+- `Filled`: 배경색 중심 스타일
+- `Standard`: 하단 경계선 스타일
+
+### 1.3. 크기 옵션 (Sizes)
+
+- `Small` / `Medium` / `Large`
+
+### 1.4. 레이아웃 제어 (Layout Properties)
+
+- `full-width`: 부모 요소 너비 100% 확장 여부
+
+## 2. 슬롯 및 하위 구성 (Slot System & Sub-components)
+
+|**슬롯명 (Slot Name)**|**설명 (Description)**|**비고 (Remarks)**|
+|---|---|---|
+|`label-slot`|상단/좌측 레이블 영역|표준 `<label>` 태그 충돌 방지|
+|`start-slot`|최좌측 내부 주입 영역 (기본 검색 아이콘 위치)|RTL 대응 고려 명명|
+|`end-slot`|최우측 내부 주입 영역 (초기화 및 검색 실행 버튼 등)||
+|`search-button-slot`|외부 연동 검색 실행 버튼 주입 영역|기본 버튼 대체 가능|
+|`helper-text-slot`|하단 안내/에러 메시지 영역||
+
+## 3. 컴포넌트 API 및 상태 (Properties, States & Events)
+
+### 3.1. 속성 (Properties / Attributes)
+
+| **속성명**              | **타입**    | **기본값**        | **설명**                  |
+| -------------------- | --------- | -------------- | ----------------------- |
+| `value`              | `string`  | `''`           | 검색 입력 필드 값              |
+| `placeholder`        | `string`  | `'검색어를 입력하세요'` | 플레이스홀더 텍스트              |
+| `clearable`          | `boolean` | `true`         | 입력값 초기화(Clear) 버튼 노출 여부 |
+| `show-search-button` | `boolean` | `false`        | 우측 검색 실행 버튼 노출 여부       |
+| `loading`            | `boolean` | `false`        | 검색 처리 중 스피너 노출 여부       |
+| `required`           | `boolean` | `false`        | 필수 입력 여부                |
+| `readonly`           | `boolean` | `false`        | 읽기 전용 여부                |
+| `disabled`           | `boolean` | `false`        | 비활성화 여부                 |
+| `error`              | `boolean` | `false`        | 유효성 에러 상태 여부            |
+
+### 3.2. 상태 (States)
+
+- **Hover**: 마우스 오버 시 시각적 피드백
+- **Focus / Focus-visible**: 포커스 진입 및 키보드 포커스 링 표시
+- **Active / Searching**: 검색 실행 클릭 또는 Enter 키 입력 시 상태
+- **Disabled**: 비활성화 (인터랙션 및 검색 불가, 시각적 Dim 처리)
+- **Readonly**: 읽기 전용 (검색어 수정 및 검색 실행 불가, 복사 가능)
+- **Error**: 유효성 검사 실패 (시각적 에러 강조)
+- **Loading**: 비동기 검색 처리 중 스피너 표시 (아이콘 영역 대체)
+
+### 3.3. 이벤트 (Events)
+
+|**이벤트명**|**상세 (Detail)**|**발생 시점**|
+|---|---|---|
+|`input`|`{ value: string }`|값 변경 시 실시간 방출|
+|`change`|`{ value: string }`|값 변경 후 포커스 해제 시 방출|
+|`search`|`{ value: string }`|Enter 키 입력 또는 검색 버튼 클릭 시 방출|
+|`clear`|`void`|초기화 버튼 클릭 시 방출|
+|`focus`|`FocusEvent`|포커스 진입 시 방출|
+|`blur`|`FocusEvent`|포커스 해제 시 방출|
+
+## 4. 스타일링 및 디자인 토큰 (Styling & CSS Variables)
+
+```CSS
+:host {
+  /* Layout & Sizing */
+  --ui-search-input-height-sm: 32px;
+  --ui-search-input-height-md: 40px;
+  --ui-search-input-height-lg: 48px;
+  --ui-search-input-padding-x: 12px;
+  --ui-search-input-padding-y: 8px;
+  --ui-search-input-border-radius: 4px;
+
+  /* Colors - Base */
+  --ui-search-input-bg-color: #ffffff;
+  --ui-search-input-border-color: #d1d5db;
+  --ui-search-input-text-color: #111827;
+  --ui-search-input-placeholder-color: #9ca3af;
+  --ui-search-input-icon-color: #6b7280;
+
+  /* Colors - Interactive States */
+  --ui-search-input-hover-border-color: #9ca3af;
+  --ui-search-input-focus-border-color: #2563eb;
+  --ui-search-input-focus-ring-color: rgba(37, 99, 235, 0.2);
+
+  /* Colors - Error & Disabled */
+  --ui-search-input-error-color: #dc2626;
+  --ui-search-input-disabled-bg-color: #f3f4f6;
+  --ui-search-input-disabled-text-color: #9ca3af;
+}
+```
+
+## 5. 웹 접근성 (Accessibility & WAI-ARIA)
+
+### 5.1. ARIA 속성 바인딩
+
+- **`role="searchbox"`**: 일반 입력 필드와 구분하여 검색 전용 입력 랜드마크 기능 수행
+- **`aria-invalid`**: `error` 속성 활성화 시 `'true'`로 연동
+- **`aria-required`**: `required` 속성 활성화 시 `'true'`로 연동
+- **`aria-describedby`**: `helper-text-slot` 영역의 ID와 입력 필드를 연결하여 스크린 리더 안내
+- **`aria-label`** (버튼): 초기화 버튼에 "검색어 삭제", 검색 버튼에 "검색 실행" 접근성 레이블 부여
+
+### 5.2. 키보드 인터랙션 (Keyboard Navigation)
+
+- **`Tab`**: 포커스 이동 순서 준수 (입력 필드 -> 초기화 버튼 -> 검색 버튼 순으로 진입)
+- **`Enter`**: 입력 필드 내에서 Enter 키 입력 시 `search` 이벤트 트리거
+- **`Escape`**: 입력 필드에 값이 존재할 때 Escape 키 입력 시 검색어 초기화 (`clear` 이벤트 방출)
+
+### 5.3. 스크린 리더 대응
+
+- 검색어 초기화 실행 시 스크린 리더에 "검색어가 지워졌습니다"를 음성으로 안내하고, `loading` 상태 전환 시 `aria-busy="true"`를 적용하여 현재 검색 작업이 진행 중임을 인지시킵니다.
+---
+
+위 컨텍스트와 요구사항을 완벽히 이해했음을 확인하고, 다음 단계(코어 템플릿 및 스타일 생성) 진행 준비가 되었음을 알려주세요. 아직 코드를 작성하지 마세요.
+````
+
+---
+
+## [Prompt 2] 2단계: 코어 템플릿 및 스타일 생성 프롬프트
+
+````text
+[요청 사항]
+1단계에서 전달받은 요구사항 정의서를 바탕으로 Biz-UI 컴포넌트의 코어 템플릿(`SearchInput.ts`)과 전용 Lit 스타일시트(`SearchInput.css.ts`) 코드를 작성해 주세요.
+
+[작성 조건 - SearchInput.ts]
+1. Lit의 html 태그드 템플릿을 사용하는 순수 함수 템플릿 형태로 구현하세요.
+2. 템플릿 함수는 `SearchInputTemplate` 명칭으로 export 하세요.
+3. 요구사항 정의서 2절의 슬롯 명세(`label-slot`, `start-slot`, `end-slot`, `helper-text-slot` 등)를 올바르게 배치하세요.
+4. 속성(Properties), 상태(States), 이벤트 핸들러 바인딩 구조를 템플릿 내에 반영하세요.
+
+[작성 조건 - SearchInput.css.ts]
+1. `import { css } from 'lit';` 구문을 작성하세요.
+2. 스타일은 `export const searchInputStyles = css`...`` 형태의 Lit css 태그드 템플릿 모듈로 생성하세요.
+3. `:host` 블록 내에 `--biz-search-input-*` 형태의 CSS Custom Properties(디자인 토큰)를 기본값과 함께 정의하세요.
+4. 루트 클래스명은 `biz-search-input`으로 지정하세요.
+5. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 스타일을 작성하세요.
+6. 요구사항 정의서 1.3절의 Sizes(`Small`, `Medium`, `Large`) 규격 스타일을 작성하세요.
+7. 요구사항 정의서 3.2절의 States(`Hover`, `Focus`, `Active`, `Disabled`, `Readonly`, `Error`, `Loading` 등) 시각 효과를 반영하세요.
+
+[출력 형식]
+- 파일별 경로(`src/components/SearchInput/SearchInput.ts`, `src/components/SearchInput/SearchInput.css.ts`)를 명시하고 해당 코드 블록만 출력하세요.
+- 코드를 작성한 후 3단계(웹 컴포넌트 클래스 생성) 진행 준비가 되었음을 알려주고 대기하세요.
+````
+
+---
+
+## [Prompt 3] 3단계: 웹 컴포넌트 클래스 생성 프롬프트
+
+````text
+[요청 사항]
+1단계의 요구사항 정의서와 2단계에서 작성된 코어 템플릿/스타일을 바탕으로 웹 컴포넌트 클래스 파일(`SearchInput.wc.ts`) 코드를 작성해 주세요.
+
+[작성 조건 - SearchInput.wc.ts]
+1. `LitElement`를 상속받아 클래스를 구현하고, `@customElement('biz-search-input')` 디코레이터를 사용하여 커스텀 엘리먼트로 등록하세요.
+2. 2단계에서 생성한 `SearchInputTemplate` 및 `SearchInput.css.ts`의 `searchInputStyles`를 임포트하세요.
+3. 정적 클래스 속성으로 `static styles = searchInputStyles;` 구문을 사용하여 스타일을 연결하고, `render()` 메서드에 `SearchInputTemplate`을 바인딩하세요.
+4. 요구사항 정의서 3.1절의 속성(Properties/Attributes)을 Lit의 `@property` 및 `@state` 디코레이터로 정의하세요.
+5. 요구사항 정의서 3.3절의 이벤트(`input`, `change`, `clear` 등)를 발생시키는 내부 이벤트 핸들러 및 `CustomEvent` 방출 메서드를 구현하세요. (`bubbles: true`, `composed: true`, `detail` 객체 구성 준수)
+6. 요구사항 정의서 5.1절의 ARIA 속성 바인딩(`aria-invalid`, `aria-required`, `aria-describedby`, `aria-disabled` 등)을 렌더링 로직 및 섀도 DOM 내부 엘리먼트에 연동하세요.
+7. 요구사항 정의서 5.2절의 키보드 인터랙션(`Tab`, `Escape`, `Enter` 등) 이벤트 리스너를 구현하세요.
+
+[출력 형식]
+- 파일 경로(`src/components/SearchInput/SearchInput.wc.ts`)를 명시하고 해당 코드 블록만 출력하세요.
+- 코드를 작성한 후 4단계(React 래퍼 및 모듈 내보내기 작성) 진행 준비가 되었음을 알려주고 대기하세요.
+````
+
+---
+
+## [Prompt 4] 4단계: React 래퍼 및 모듈 내보내기 생성 프롬프트
+
+````text
+[요청 사항]
+1~3단계에서 작성된 요구사항 정의서 및 웹 컴포넌트 코드를 바탕으로 React 래퍼 파일(`SearchInput.react.ts`), 컴포넌트 통합 모듈(`index.ts`), 그리고 패키지 통합 진입점(`src/react.ts`) 구문을 작성해 주세요.
+
+[작성 조건 - SearchInput.react.ts]
+1. `@lit/react` 패키지의 `createComponent` 함수를 사용하여 React 컴포넌트를 정의하세요.
+2. 3단계에서 생성한 `SearchInputWc` 클래스와 커스텀 엘리먼트 태그명(`biz-search-input`)을 연결하세요.
+3. 요구사항 정의서 3.3절의 커스텀 이벤트와 React Event Handler Prop(예: `input` -> `onInput`, `change` -> `onChange`, `clear` -> `onClear` 등)을 `events` 옵션 객체에 1:1로 정확히 매핑하세요.
+
+[작성 조건 - index.ts]
+1. `src/components/SearchInput/index.ts` 경로에 작성하세요.
+2. 코어 템플릿(`SearchInputTemplate`), 스타일(`searchInputStyles`), 웹 컴포넌트 클래스(`SearchInputWc`), React 래퍼 컴포넌트(`SearchInput`), 그리고 주요 TypeScript Interface/Type들을 모두 export 하세요.
+
+[작성 조건 - src/react.ts]
+1. 패키지 루트의 `src/react.ts` 진입점에 신규 생성된 React 래퍼 컴포넌트를 re-export 하는 구문을 작성해 주세요. (예: `export * from './components/SearchInput/SearchInput.react';`)
+
+[출력 형식]
+- 각 파일별 경로(`src/components/SearchInput/SearchInput.react.ts`, `src/components/SearchInput/index.ts`, `src/react.ts`)를 명시하고 해당 코드 블록만 출력하세요.
+- 코드를 작성한 후 5단계(Storybook 및 테스트 코드 생성) 진행 준비가 되었음을 알려주고 대기하세요.
+````
+
+---
+
+## [Prompt 5] 5단계: Storybook 및 테스트 코드 생성 프롬프트
+
+````text
+[요청 사항]
+1~4단계에서 작성된 코드와 요구사항 정의서를 바탕으로 컴포넌트 품질 관리를 위한 Storybook 문서 파일(`SearchInput.stories.ts`)과 단위/통합 테스트 파일(`SearchInput.test.ts`) 코드를 작성해 주세요.
+
+[작성 조건 - SearchInput.stories.ts]
+1. Storybook v7+ CSF 3.0 명세를 준수하여 기본 Meta 및 Stories를 구현하세요.
+2. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 및 1.3절의 Sizes(`Small`, `Medium`, `Large`)를 시연하는 Story를 작성하세요.
+3. 요구사항 정의서 3.2절의 주요 States(`Disabled`, `Readonly`, `Error`, `Loading` 등)를 시연하는 Story를 작성하세요.
+4. `@storybook/addon-a11y` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
+
+[작성 조건 - SearchInput.test.ts]
+1. Vitest 및 Playwright 환경에서 실행 가능한 테스트 스위트를 구현하세요.
+2. [단위 테스트]: Properties 변경에 따른 DOM 반영, 3.3절 커스텀 이벤트(`input`, `change`, `clear` 등) 방출 여부 및 `detail` 데이터 검증을 수행하세요.
+3. [통합 및 접근성 테스트]: 5.1절 ARIA 속성(`aria-invalid`, `aria-describedby` 등) 바인딩 및 5.2절 키보드 네비게이션(`Tab`, `Escape`, `Enter` 등) 동작을 브라우저 상에서 검증하는 시나리오를 구현하세요.
+
+[출력 형식]
+- 각 파일별 경로(`src/components/SearchInput/SearchInput.stories.ts`, `src/components/SearchInput/SearchInput.test.ts`)를 명시하고 해당 코드 블록만 출력하세요.
+- 모든 코드 작성이 완료되면 전체 개발 공정(Phase 1~5)이 성공적으로 종료되었음을 최종 안내해 주세요.
+````
