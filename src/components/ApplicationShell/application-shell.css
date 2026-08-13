@@ -1,7 +1,4 @@
-import { css } from "lit";
-
-export const applicationShellStyles = css`
-  :host {
+:root {
     --biz-application-shell-header-height: 64px;
     --biz-application-shell-footer-height: 48px;
     --biz-application-shell-sidebar-width: 256px;
@@ -119,4 +116,4 @@ export const applicationShellStyles = css`
     z-index: calc(var(--biz-application-shell-overlay-z-index) - 1);
   }
 
-`;
+  

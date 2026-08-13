@@ -3,7 +3,7 @@ import { html } from 'lit';
 import './TextInput.wc';
 
 const meta: Meta = {
-  title: 'Components/TextInput',
+  title: 'Components/Forms/TextInput',
   component: 'biz-text-input',
   tags: ['autodocs'],
   argTypes: {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApplicationShell</title>
+    <link rel="stylesheet" href="application-shell.css" />
+</head>
+<body>
+    
+    <a href="#main-content" class="biz-application-shell__skip-link">
+    Skip to main content
+  </a>
+  <div class="biz-application-shell biz-application-shell--variant-default biz-application-shell--sticky-header biz-application-shell--fixed-sidebar ">
+      <header class="biz-application-shell__header" role="banner">
+        <slot name="header-slot">header 영역</slot>
+      </header>
+    <div class="biz-application-shell__body">
+        <div
+          class="biz-application-shell__overlay"
+          onclick="alert('body>overlay 클릭')"
+        ></div>
+        <aside
+          class="biz-application-shell__sidebar"
+          role="navigation"
+          aria-expanded="true"
+          onkeydown="alert('aside keydown')"
+        >
+          <slot name="sidebar-slot">사이드바 입니다.</slot>
+        </aside>
+
+      <main
+        id="main-content"
+        class="biz-application-shell__content"
+        role="main"
+        tabindex="-1"
+      >
+        <slot name="content-slot">메인 컨텐츠 영역</slot>
+      </main>
+    </div>
+
+      <footer class="biz-application-shell__footer" role="contentinfo">
+        <slot name="footer-slot">풋터 영역</slot>
+      </footer>
+  </div>
+
+
+</body>
+</html>
