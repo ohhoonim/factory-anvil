@@ -4,3 +4,4 @@ export * from './components/TextInput/TextInput.react';
 export * from './components/ApplicationShell/ApplicationShell.react';
 export * from './components/PasswordInput/PasswordInput.react';
 export * from './components/MultilineTextInput/MultilineTextInput.react';
+export * from './components/SearchInput/SearchInput.react';
