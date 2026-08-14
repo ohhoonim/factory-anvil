@@ -1,0 +1,1 @@
+export { BizPasswordInput } from './PasswordInput.wc';
