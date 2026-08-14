@@ -3,3 +3,4 @@ export * from './examples/Breadcrumb/Breadcrumb.react';
 export * from './components/TextInput/TextInput.react';
 export * from './components/ApplicationShell/ApplicationShell.react';
 export * from './components/PasswordInput/PasswordInput.react';
+export * from './components/MultilineTextInput/MultilineTextInput.react';
