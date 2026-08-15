@@ -3,7 +3,7 @@ import { html } from "lit";
 import './NumberInput.wc';
 
 const meta: Meta = {
-  title: 'Components/NumberInput',
+  title: 'Components/Forms/NumberInput',
   component: 'biz-number-input',
   tags: ['autodocs'],
   argTypes: {

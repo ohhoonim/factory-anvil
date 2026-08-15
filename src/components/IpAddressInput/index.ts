@@ -1,0 +1,1 @@
+export { BizIpAddressInput as IpAddressInputWc } from './IpAddressInput.wc';
