@@ -1,0 +1,1 @@
+export { BizNumberInput } from './NumberInput.wc';
