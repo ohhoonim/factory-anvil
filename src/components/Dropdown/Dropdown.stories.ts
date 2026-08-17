@@ -12,7 +12,7 @@ const mockOptions = [
 ];
 
 const meta: Meta<BizDropdown> = {
-  title: 'Components/Dropdown',
+  title: 'Components/Forms/Dropdown',
   component: 'biz-dropdown',
   tags: ['autodocs'],
   argTypes: {
