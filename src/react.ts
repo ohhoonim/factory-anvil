@@ -1,5 +1,4 @@
 export * from './examples/Breadcrumb/Breadcrumb.react';
-// Other react wrappers will be added here
 export * from './components/TextInput/TextInput.react';
 export * from './components/ApplicationShell/ApplicationShell.react';
 export * from './components/PasswordInput/PasswordInput.react';
@@ -18,3 +17,4 @@ export * from './components/TimePicker/TimePicker.react';
 export * from './components/DateTimePicker/DateTimePicker.react';
 export * from './components/DateRangePicker/DateRangePicker.react';
 export * from './components/Slider/Slider.react';
+export * from './components/TransferList/TransferList.react';

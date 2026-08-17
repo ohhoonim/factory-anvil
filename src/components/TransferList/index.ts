@@ -1,0 +1,1 @@
+export { BizTransferList } from './TransferList.wc';
