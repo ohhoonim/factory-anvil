@@ -26,7 +26,7 @@
 1. 디렉터리 구조: 모든 파일은 `src/components/{ComponentName}/` 아래에 위치합니다.
 2. 표준 파일 구성 (7종):
    - {ComponentName}.ts (코어 Lit 템플릿)
-   - {ComponentName}.css (컴포넌트 전용 스타일)
+   - {ComponentName}.css.ts (컴포넌트 전용 스타일)
    - {ComponentName}.wc.ts (LitElement 기반 웹 컴포넌트 클래스)
    - {ComponentName}.react.ts (@lit/react 기반 React 래퍼)
    - {ComponentName}.stories.ts (Storybook 문서 및 a11y 검증)
@@ -69,7 +69,7 @@
 3. 요구사항 정의서 2절의 슬롯 명세(`label-slot`, `start-slot`, `end-slot`, `helper-text-slot` 등)를 올바르게 배치하세요.
 4. 속성(Properties), 상태(States), 이벤트 핸들러 바인딩 구조를 템플릿 내에 반영하세요.
 
-[작성 조건 - {ComponentName}.css]
+[작성 조건 - {ComponentName}.css.ts]
 1. `:host` 블록 내에 `--biz-{component-name}-*` 형태의 CSS Custom Properties(디자인 토큰)를 기본값과 함께 정의하세요.
 2. 루트 클래스명은 `biz-{component-name}`으로 지정하세요.
 3. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 스타일을 작성하세요.
