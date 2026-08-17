@@ -8,3 +8,4 @@ export * from './components/SearchInput/SearchInput.react';
 export * from './components/NumberInput/NumberInput.react';
 export * from './components/IpAddressInput/IpAddressInput.react';
 export * from './components/Dropdown/Dropdown.react';
+export * from './components/Chip/Chip.react';
