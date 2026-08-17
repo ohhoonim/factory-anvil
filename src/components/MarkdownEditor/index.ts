@@ -1,0 +1,1 @@
+export { BizMarkdownEditor } from './MarkdownEditor.wc';

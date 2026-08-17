@@ -21,3 +21,4 @@ export * from './components/TransferList/TransferList.react';
 export * from './components/Rating/Rating.react';
 export * from './components/FileUploader/FileUploader.react';
 export * from './components/ImageUpload/ImageUpload.react';
+export * from './components/MarkdownEditor/MarkdownEditor.react';
