@@ -18,3 +18,4 @@ export * from './components/DateTimePicker/DateTimePicker.react';
 export * from './components/DateRangePicker/DateRangePicker.react';
 export * from './components/Slider/Slider.react';
 export * from './components/TransferList/TransferList.react';
+export * from './components/Rating/Rating.react';
