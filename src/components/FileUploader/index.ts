@@ -1,0 +1,1 @@
+export { FileUploader as FileUploaderWc } from './FileUploader.wc';
