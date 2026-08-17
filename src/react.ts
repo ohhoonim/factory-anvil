@@ -13,3 +13,4 @@ export * from './components/Checkbox/Checkbox.react';
 export * from './components/CheckboxGroup/CheckboxGroup.react';
 export * from './components/RadioButton/RadioButton.react';
 export * from './components/RadioButtonGroup/RadioButtonGroup.react';
+export * from './components/DatePicker/DatePicker.react';
