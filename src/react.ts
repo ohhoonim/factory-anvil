@@ -17,3 +17,4 @@ export * from './components/DatePicker/DatePicker.react';
 export * from './components/TimePicker/TimePicker.react';
 export * from './components/DateTimePicker/DateTimePicker.react';
 export * from './components/DateRangePicker/DateRangePicker.react';
+export * from './components/Slider/Slider.react';

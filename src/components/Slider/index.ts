@@ -1,0 +1,1 @@
+export { BizSlider } from './Slider.wc';
