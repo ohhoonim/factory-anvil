@@ -3,7 +3,7 @@ import { html } from "lit";
 import { BizDateTimePicker } from "./DateTimePicker.wc";
 
 const meta: Meta<BizDateTimePicker> = {
-  title: 'Components/DateTimePicker',
+  title: 'Components/Forms/DateTimePicker',
   component: 'biz-date-time-picker',
   tags: ['autodocs'],
   argTypes: {

@@ -1,0 +1,1 @@
+export { DateRangePicker as DateRangePickerWc } from './DateRangePicker.wc.ts';
