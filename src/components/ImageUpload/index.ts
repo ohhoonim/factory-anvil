@@ -1,0 +1,1 @@
+export { ImageUpload as ImageUploadWc } from './ImageUpload.wc';
