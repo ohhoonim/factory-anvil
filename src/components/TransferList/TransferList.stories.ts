@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import './TransferList.wc';
-import type { BizTransferList } from './TransferList.wc';
+import './TransferList.wc.js';
+import type { BizTransferList } from './TransferList.wc.js';
 
 const mockSourceData = [
   { key: '1', label: 'Item 1' },

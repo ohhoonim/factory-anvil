@@ -22,3 +22,4 @@ export * from './components/Rating/Rating.react';
 export * from './components/FileUploader/FileUploader.react';
 export * from './components/ImageUpload/ImageUpload.react';
 export * from './components/MarkdownEditor/MarkdownEditor.react';
+export * from './components/PageHeader/PageHeader.react';
