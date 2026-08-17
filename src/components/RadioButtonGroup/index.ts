@@ -1,0 +1,1 @@
+export { BizRadioButtonGroup } from './RadioButtonGroup.wc';
