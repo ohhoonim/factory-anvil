@@ -15,3 +15,4 @@ export * from './components/RadioButton/RadioButton.react';
 export * from './components/RadioButtonGroup/RadioButtonGroup.react';
 export * from './components/DatePicker/DatePicker.react';
 export * from './components/TimePicker/TimePicker.react';
+export * from './components/DateTimePicker/DateTimePicker.react';
