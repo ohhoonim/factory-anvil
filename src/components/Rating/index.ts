@@ -1,0 +1,1 @@
+export { BizRating } from './Rating.wc';
