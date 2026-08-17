@@ -11,3 +11,4 @@ export * from './components/Dropdown/Dropdown.react';
 export * from './components/Chip/Chip.react';
 export * from './components/Checkbox/Checkbox.react';
 export * from './components/CheckboxGroup/CheckboxGroup.react';
+export * from './components/RadioButton/RadioButton.react';
