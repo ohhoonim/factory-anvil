@@ -10,6 +10,14 @@ Biz-UI는 백오피스용 웹 컴포넌트 라이브러리입니다.
 * Storybook
 * Vitest
 
+## clone 후 npm 설치 방법
+
+install을 할 때 `--legacy-peer-deps` 옵션을 붙여줘야합니다. 
+
+```sh
+$ npm install --legacy-peer-deps
+```
+
 ## 🏭 개발 공정
 
 반드시 숙지하고 상세 내용은 `biz-ui-skill.md` 파일을 참고하십시오
