@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import { PageHeader } from './PageHeader.wc';
+import '../Breadcrumb/Breadcrumb.wc'
 
 const meta: Meta<PageHeader> = {
   title: 'Components/Layout/PageHeader',
@@ -73,10 +74,20 @@ export const States: Story = {
   `,
 };
 
+const breadargs = {
+    items: [
+      { label: 'Home', href: '/' },
+      { label: 'Library', href: '/library' },
+      { label: 'Data' }
+    ],
+  };
+
 export const WithSlots: Story = {
   render: () => html`
     <biz-page-header variant="filled">
-      <span slot="breadcrumb-slot">Home > Settings > Profile</span>
+      <span slot="breadcrumb-slot">
+        <biz-breadcrumb .items=${breadargs.items} ></biz-breadcrumb>
+      </span>
       <span slot="title-slot"><h1 style="margin: 0; color: #2563eb;">커스텀 타이틀 슬롯</h1></span>
       <span slot="subtitle-slot">슬롯을 통한 서브 타이틀 렌더링</span>
       <span slot="meta-status-slot" style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Active</span>

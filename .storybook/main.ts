@@ -10,6 +10,7 @@ const config: StorybookConfig = {
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
+    '@storybook/addon-interactions', // 인터랙션 테스트용 애드온
   ],
   "framework": "@storybook/web-components-vite"
 };
