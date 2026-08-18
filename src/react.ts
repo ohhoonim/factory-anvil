@@ -1,4 +1,4 @@
-export * from './examples/Breadcrumb/Breadcrumb.react';
+export * from './components/Breadcrumb/Breadcrumb.react';
 export * from './components/TextInput/TextInput.react';
 export * from './components/ApplicationShell/ApplicationShell.react';
 export * from './components/PasswordInput/PasswordInput.react';
@@ -23,3 +23,4 @@ export * from './components/FileUploader/FileUploader.react';
 export * from './components/ImageUpload/ImageUpload.react';
 export * from './components/MarkdownEditor/MarkdownEditor.react';
 export * from './components/PageHeader/PageHeader.react';
+export * from './components/ContentContainer/ContentContainer.react';
