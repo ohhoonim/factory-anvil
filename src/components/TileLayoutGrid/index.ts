@@ -1,0 +1,1 @@
+export { TileLayoutGrid as TileLayoutGridWc } from './TileLayoutGrid.wc';
