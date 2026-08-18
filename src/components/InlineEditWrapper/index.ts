@@ -1,0 +1,1 @@
+export { InlineEditWrapper as InlineEditWrapperWc } from './InlineEditWrapper.wc';
