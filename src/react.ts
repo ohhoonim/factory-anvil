@@ -27,3 +27,4 @@ export * from './components/ContentContainer/ContentContainer.react';
 export * from './components/CardContainer/CardContainer.react';
 export * from './components/SplitPane/SplitPane.react';
 export * from './components/TileLayoutGrid/TileLayoutGrid.react';
+export * from './components/FormWrapper/FormWrapper.react';
