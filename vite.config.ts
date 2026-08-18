@@ -22,6 +22,13 @@ export default defineConfig({
         },
       },
     },
+    // rollupOptions: {
+    //   // Lit을 외부화하지 않고 번들에 포함시킵니다.
+    //   external: [],
+    //   output: {
+    //     globals: {},
+    //   },
+    // },
     outDir: 'dist',
   },
 });
