@@ -4,7 +4,7 @@ import type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb';
 import './Breadcrumb.wc';
 
 const meta: Meta<BreadcrumbProps> = {
-  title: 'Examples/Breadcrumb',
+  title: 'Components/Forms/Breadcrumb',
   render: (args) => html`
     <biz-breadcrumb 
       .items=${args.items} 

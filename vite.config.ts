@@ -6,6 +6,7 @@ export default defineConfig({
     dedupe: ['lit', 'lit-html', 'lit-element'],
   },
   build: {
+    minify: 'esbuild',
     emptyOutDir: true,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
@@ -22,13 +23,6 @@ export default defineConfig({
         },
       },
     },
-    // rollupOptions: {
-    //   // Lit을 외부화하지 않고 번들에 포함시킵니다.
-    //   external: [],
-    //   output: {
-    //     globals: {},
-    //   },
-    // },
     outDir: 'dist',
   },
 });

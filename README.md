@@ -33,6 +33,13 @@ $ npm run storybook
 
 ## 🏗️ 빌드
 
+신규 추가 컴포넌트가 있을 경우, 빌드 전 src/generate-index.js 를 실행하여 components 내의 index.ts 파일을 업데이트 해줍니다. 
+
+```sh
+# 실행방법, (프로젝트 루트에서)
+$ node src/generate-index.js 
+```
+
 빌드 과정에서 코어 라이브러리와 프레임워크 전용 래퍼(React)에 대한 진입점이 각각 생성됩니다.
 
 - 순수 웹 컴포넌트: bizui-library/index: 순수 웹 컴포넌트
@@ -45,6 +52,21 @@ $ npm run storybook
     "build:react": "vite build --config vite.config.react.ts",
     "build:types": "tsc",
   },
+```
+
+## 🛖 index.html
+
+storybook 없이 html 에서 사용하는 방법은 index.html 파일을 참고하십시오. Lit 라이브러리는 build 파일과 별개로 추가해주어야 합니다. 
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "lit": "https://esm.run/lit",
+      "lit/directives/repeat.js": "https://esm.run/lit/directives/repeat.js"
+    }
+  }
+</script>
 ```
 
 ## 📌 주요 파일
