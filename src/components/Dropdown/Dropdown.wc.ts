@@ -1,4 +1,4 @@
-import { LitElement, html, type TemplateResult } from 'lit';
+import { LitElement, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { dropdownStyles } from './Dropdown.css.js';
 import { DropdownTemplate, type DropdownOption } from './Dropdown.js';

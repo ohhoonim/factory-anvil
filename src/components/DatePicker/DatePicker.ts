@@ -43,16 +43,6 @@ export const DatePickerTemplate = (options: DatePickerTemplateOptions) => {
     return new Date(year, month, 1).getDay();
   };
 
-  const formatDateString = (date: Date): string => {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return options.format
-      .replace('YYYY', String(yyyy))
-      .replace('MM', mm)
-      .replace('DD', dd);
-  };
-
   const isSameDay = (d1: Date | null, d2: Date | null) => {
     if (!d1 || !d2) return false;
     return (

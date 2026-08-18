@@ -4,16 +4,59 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>quickstart-lit-library</title>
-    
+    <script type="importmap">
+      {
+        "imports": {
+          "lit": "https://esm.run/lit",
+          "lit/directives/repeat.js": "https://esm.run/lit/directives/repeat.js"
+        }
+      }
+    </script>
+    <script src="dist/bizui-library-index.es.js" type="module"></script>
   </head>
   <body>
-    <div id="app"></div>
-    
-    <script type="module">
-      import { render, html } from "lit";
-      import * as Components from "./src/components/index.ts";
+    <!-- <biz-toast-manager id="toast"></biz-toast-manager>
+    <script>
+      let toast = document.querySelector('#toast');
+      toast.toasts = [
+      { id: 1, message: 'Success Message', type: 'success' },
+      { id: 2, message: 'Error Message', type: 'error' },
+      { id: 3, message: 'Info Message', type: 'info' }
+    ];
+      console.log(toast.toasts);
 
-      
+    </script> -->
+    
+    <biz-application-shell
+      variant="default"
+    >
+      <div slot="header-slot" style="padding: 1rem; font-weight: bold">
+        Header Content
+      </div>
+      <div slot="sidebar-slot" style="padding: 1rem; color: #fff">
+        <nav aria-label="Main Navigation">
+          <ul>
+            <li><a href="#link1" style="color: #fff">Menu Item 1</a></li>
+            <li><a href="#link2" style="color: #fff">Menu Item 2</a></li>
+          </ul>
+        </nav>
+        <button id="sidebarCollapsedButton">toggle</button>
+      </div>
+      <div>
+        <h1>Main Content Area</h1>
+        <p>This is the main content of the application shell.</p>
+      </div>
+      <div slot="footer-slot" style="padding: 1rem; text-align: center">
+        Footer Content
+      </div>
+    </biz-application-shell>
+    <script>
+      let button = document.querySelector("#sidebarCollapsedButton");
+      button.addEventListener("click", e => {
+        let shell = document.querySelector("biz-application-shell");
+        shell.sidebarCollapsed = !shell.sidebarCollapsed;
+      });
+
     </script>
   </body>
 </html>

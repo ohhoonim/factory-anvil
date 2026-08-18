@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { CheckboxTemplate } from './Checkbox.ts';
 import { checkboxStyles } from './Checkbox.css.ts';
