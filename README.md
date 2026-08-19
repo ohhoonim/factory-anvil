@@ -86,3 +86,88 @@ storybook 없이 html 에서 사용하는 방법은 index.html 파일을 참고�
 - .storybook/preview.ts: Storybook 전역 파라미터 및 데코레이터 설정 파일입니다.
 - vitest.config.ts: 브라우저 테스트 설정을 포함한 Vitest 설정 파일입니다.
 - src/index.ts: 모든 컴포넌트를 내보내는 메인 진입점 파일입니다.
+
+--- --------------------------------------------------
+
+## VSCode Custom Data 적용하기
+
+> 아래 내용이 길지만 컴포넌트가 신규 추가되었을때 '분석기 실행 및 파일생성'과 '변환 실행 및 결과 파일 생성' 만 순서대로 실행한 후, 생성된 vscode-html-custom-data.json 파일을 factory-blast.git에 넣어주면 됩니다. 
+
+### 1단계: Custom Elements Manifest (CEM) 자동 생성
+
+#### 패키지 설치
+
+Lit 컴포넌트 프로젝트 디렉토리에서 분석기 패키지를 설치합니다.
+
+```bash
+npm install -D @custom-elements-manifest/analyzer
+```
+
+#### 분석기 실행 및 파일 생성
+
+Lit 컴포넌트 소스코드 경로를 지정하여 `custom-elements.json` 메타데이터 파일을 추출합니다.
+
+```bash
+npx cem analyze --litelement --globs "src/**/*.ts"
+```
+
+### 2단계: VSCode HTML Custom Data 포맷 변환
+
+#### 변환 플러그인 설치
+
+CEM 메타데이터를 VSCode 규격 포맷으로 변환해주는 패키지를 설치합니다.
+
+```bash
+npm install -D cem-plugin-vs-code-custom-data-generator --legacy-peer-deps
+```
+
+#### 설정 파일 생성 (`cem.config.mjs`)
+
+프로젝트 루트 경로에 CEM 분석기 설정 파일을 생성하고 변환 플러그인을 등록합니다.
+
+```jsx
+import { generateCustomData } from 'cem-plugin-vs-code-custom-data-generator';
+
+export default {
+  globs: ['src/**/*.ts'],
+  litelement: true,
+  plugins: [
+    generateCustomData({
+      htmlFileName: 'vscode-html-custom-data.json'
+    })
+  ]
+};
+```
+
+#### 변환 실행 및 결과 파일 생성
+
+설정 파일을 적용하여 CEM 분석을 실행하면 `vscode-html-custom-data.json` 파일이 자동으로 추출됩니다.
+
+```bash
+npx --legacy-peer-deps cem analyze
+```
+
+### 3단계: 프로젝트 환경 설정 (settings.json)
+
+#### 1. `.vscode/settings.json` 파일 생성 및 설정
+
+2단계에서 생성된 `vscode-html-custom-data.json` 파일 경로를 VSCode 설정에 등록합니다.
+
+Leptos 프로젝트(또는 작업 영역) 루트 경로의 `.vscode/settings.json` 파일에 아래 설정을 추가합니다.
+
+```json
+{
+  "html.customData": [
+    "./vscode-html-custom-data.json"
+  ]
+}
+```
+
+> **참고:** Web Component 프로젝트와 Leptos 프로젝트가 서로 다른 폴더에 위치한 경우, `vscode-html-custom-data.json` 파일을 Leptos 프로젝트 루트로 복사해오거나 상대 경로/절대 경로를 적절히 지정해 주어야 합니다.
+> 
+
+#### 2. VSCode 개발 환경 적용 확인
+
+1. VSCode 명령 팔레트(`Command` + `Shift` + `P`)를 엽니다.
+2. `Developer: Reload Window` (개발자: 창 다시 로드)를 실행하여 Custom Data 설정을 새로고침합니다.
+3. Leptos 프로젝트의 HTML 영역에서 커스텀 태그(예: `<my-element`)를 입력하고 `Option` + `Esc` 또는 `Control` + `Space`를 눌러 태그 및 속성(Attributes) 자동완성 목록이 뜨는지 확인합니다. (RSX 영역에서는 동작하지 않네요 🤔))
