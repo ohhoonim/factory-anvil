@@ -3,6 +3,15 @@ import { customElement, property } from "lit/decorators.js";
 import { PasswordInputTemplate } from "./PasswordInput";
 import { passwordInputStyles } from "./PasswordInput.css";
 
+/**
+ * @element biz-password-input
+ * 
+ * @slot label-slot
+ * @slot start-slot
+ * @slot toggle-icon-slot
+ * @slot end-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-password-input')
 export class BizPasswordInput extends LitElement {
   static styles = passwordInputStyles;

@@ -3,6 +3,15 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ratingStyles } from './Rating.css';
 import { RatingTemplate } from './Rating';
 
+/**
+ * @element biz-rating
+ * 
+ * @slot icon-empty-slot
+ * @slot icon-half-slot isHalf == true
+ * @slot icon-filled-slot
+ * @slot value-label-slot
+ * @slot biz-rating__helper
+ */
 @customElement('biz-rating')
 export class BizRating extends LitElement {
   static styles = ratingStyles;

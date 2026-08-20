@@ -3,6 +3,16 @@ import { customElement, property } from "lit/decorators.js";
 import { type ContentContainerTemplateHost, ContentContainerTemplate } from "./ContentContainer";
 import { contentContainerStyles } from "./ContentContainer.css";
 
+/**
+ * @element biz-content-container
+ * 
+ * @slot loading-slot loading == true  일 때 
+ * @slot empty-slot loading=false && empty=true 일 때
+ * @slot header-slot
+ * @slot footer-slot
+ * @slot (default) 
+ * 
+ */
 @customElement('biz-content-container')
 export class ContentContainer extends LitElement implements ContentContainerTemplateHost {
   static styles = contentContainerStyles;

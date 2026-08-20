@@ -3,6 +3,16 @@ import { customElement, property, state } from "lit/decorators.js";
 import { IpAddressInputTemplate } from "./IpAddressInput";
 import { ipAddressInputStyles } from "./IpAddressInput.css";
 
+/**
+ * @element biz-ip-address-input
+ * 
+ * @slot separator-slot
+ * @slot label-slot
+ * @slot prefix-slot
+ * @slot suffix-slot
+ * @slot helper-text-slot
+ * 
+ */
 @customElement('biz-ip-address-input')
 export class BizIpAddressInput extends LitElement {
   static styles = ipAddressInputStyles;

@@ -3,6 +3,14 @@ import { customElement, property, state } from "lit/decorators.js";
 import { applicationShellStyles } from "./ApplicationShell.css";
 import { ApplicationShellTemplate } from "./ApplicationShell";
 
+/**
+ * @element biz-application-shell
+ * 
+ * @slot  header-slot
+ * @slot  sidebar-slot
+ * @slot  content-slot
+ * @slot  footer-slot
+ */
 @customElement('biz-application-shell')
 export class ApplicationShell extends LitElement {
   static styles = applicationShellStyles;

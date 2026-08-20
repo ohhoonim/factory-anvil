@@ -28,7 +28,8 @@
     "build:react": "vite build --config vite.config.react.ts",
     "build:types": "tsc --skipLibCheck",
     "preview": "vite preview",
-    "storybook": "storybook dev -p 6006",
+    "analyze": "cem analyze --litelement",
+    "storybook": "npm run analyze && storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "peerDependencies": {

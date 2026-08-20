@@ -3,6 +3,10 @@ import { customElement, property } from 'lit/decorators.js';
 import { BreadcrumbTemplate, type BreadcrumbItem } from './Breadcrumb';
 import { breadcrumbStyles } from './Breadcrumb.css';
 
+/**
+ * @element biz-breadcrumb
+ * @slot (no)
+ */
 @customElement('biz-breadcrumb')
 export class BreadcrumbWC extends LitElement {
   static styles = breadcrumbStyles;

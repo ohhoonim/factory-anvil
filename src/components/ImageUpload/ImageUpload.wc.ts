@@ -3,6 +3,7 @@ import { customElement, property, state, query } from 'lit/decorators.js';
 import { imageUploadStyles } from './ImageUpload.css';
 import { ImageUploadTemplate } from './ImageUpload';
 
+
 export interface CropResult {
   file?: File | Blob;
   url: string;
@@ -18,6 +19,16 @@ export interface CropResult {
 export type ImageUploadOutputType = 'blob' | 'file' | 'base64';
 export type ImageUploadShape = 'square' | 'circle';
 
+/**
+ * @element biz-image-upload
+ * 
+ * @slot label-slot
+ * @slot preview-mask-slot
+ * @slot drop-zone-slot
+ * @slot helper-text-slot
+ * @slot crop-toolbar-slot
+ * @slot crop-footer-slot
+ */
 @customElement('biz-image-upload')
 export class ImageUpload extends LitElement {
   static styles = [imageUploadStyles];

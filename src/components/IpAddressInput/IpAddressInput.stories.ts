@@ -5,6 +5,7 @@ import './IpAddressInput.wc';
 const meta: Meta = {
   title: 'Components/Forms/IpAddressInput',
   component: 'biz-ip-address-input',
+  tags: ["autodocs"],
   argTypes: {
     value: { control: 'text' },
     type: {

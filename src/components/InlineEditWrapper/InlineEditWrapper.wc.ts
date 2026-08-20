@@ -3,6 +3,13 @@ import { customElement, property, state } from "lit/decorators.js";
 import { InlineEditWrapperTemplate } from "./InlineEditWrapper";
 import { inlineEditWrapperStyles } from "./InlineEditWrapper.css";
 
+/**
+ * @element biz-inline-edit-wrapper
+ * 
+ * @slot view-slot
+ * @slot actions-slot
+ * @slot (default)
+ */
 @customElement('biz-inline-edit-wrapper')
 export class InlineEditWrapper extends LitElement {
   static styles = inlineEditWrapperStyles;

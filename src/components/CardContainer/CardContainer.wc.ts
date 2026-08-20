@@ -3,6 +3,13 @@ import { CardContainerTemplate } from "./CardContainer";
 import { customElement, property } from "lit/decorators.js";
 import { cardContainerStyles } from "./CardContainer.css";
 
+/**
+ * @element biz-card-container
+ * 
+ * @slot header-slot
+ * @slot footer-slot
+ * @slot (default) (slot 속성이 없는 자식 노드) 
+ */
 @customElement('biz-card-container')
 export class CardContainer extends LitElement {
   static styles = cardContainerStyles;

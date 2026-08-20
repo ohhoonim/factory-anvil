@@ -8,6 +8,20 @@ export interface PresetObject {
   range: [Date, Date];
 }
 
+/**
+ * @element biz-date-range-picker
+ * 
+ * @slot label-slot
+ * @slot prefix-slot
+ * @slot start-slot
+ * @slot separator-slot
+ * @slot end-slot
+ * @slot suffix-slot
+ * @slot header-slot
+ * @slot presets-slot
+ * @slot footer-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-date-range-picker')
 export class DateRangePicker extends LitElement {
   static styles = dateRangePickerStyles;

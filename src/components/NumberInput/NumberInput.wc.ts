@@ -3,6 +3,16 @@ import { customElement, property, state } from "lit/decorators.js";
 import { NumberInputTemplate } from "./NumberInput";
 import { numberInputStyles } from "./NumberInput.css";
 
+/**
+ * @element biz-number-input
+ * 
+ * @slot decrement-icon-slot
+ * @slot increment-icon-slot
+ * @slot label-slot
+ * @slot prefix-slot
+ * @slot suffix-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-number-input')
 export class BizNumberInput extends LitElement {
   static styles = numberInputStyles;

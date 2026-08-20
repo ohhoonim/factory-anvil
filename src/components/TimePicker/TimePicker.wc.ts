@@ -8,6 +8,17 @@ import type {
 } from './TimePicker.ts';
 import { TimePickerTemplate } from './TimePicker.ts';
 
+/**
+ * @element biz-time-picker
+ * 
+ * @slot label-slot
+ * @slot prefix-slot
+ * @slot suffix-slot
+ * @slot header-slot
+ * @slot option-item-slot
+ * @slot footer-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-time-picker')
 export class BizTimePicker extends LitElement {
   static styles = timePickerStyles;

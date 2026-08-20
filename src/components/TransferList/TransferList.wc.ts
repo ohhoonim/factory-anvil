@@ -3,6 +3,15 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { transferListStyles } from './TransferList.css.js';
 import { TransferListTemplate, type ListItem, type TransferListContext } from './TransferList.js';
 
+/**
+ * @element biz-transfer-list
+ * 
+ * @slot ${headerSlotName} 사용자 정의
+ * @slot ${emptySlotName} 사용자 정의
+ * @slot item-slot
+ * @slot footer-slot
+ * @slot action-controls-slot
+ */
 @customElement('biz-transfer-list')
 export class BizTransferList extends LitElement {
   static override styles = transferListStyles;

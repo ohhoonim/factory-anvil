@@ -3,6 +3,14 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { MultilineTextInputTemplate } from './MultilineTextInput.js';
 import { multilineTextInputStyles } from './MultilineTextInput.css.js';
 
+/**
+ * @element biz-multiline-text-input
+ * 
+ * @slot label-slot
+ * @slot header-extra-slot
+ * @slot helper-text-slot
+ * @slot footer-extra-slot
+ */
 @customElement('biz-multiline-text-input')
 export class BizMultilineTextInput extends LitElement {
   static styles = multilineTextInputStyles;

@@ -3,6 +3,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { TextInputTemplate } from './TextInput.js';
 import { textInputStyles } from './TextInput.css.js';
 
+/**
+ * @element biz-text-input
+ * 
+ * @slot label-slot
+ * @slot start-slot
+ * @slot end-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-text-input')
 export class BizTextInput extends LitElement {
   static styles = textInputStyles;

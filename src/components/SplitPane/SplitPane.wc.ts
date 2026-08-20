@@ -3,7 +3,13 @@ import { splitPaneStyles } from "./SplitPane.css";
 import { customElement, property, state } from "lit/decorators.js";
 import { SplitPaneTemplate } from "./SplitPane";
 
-
+/**
+ * @element biz-split-pane
+ * 
+ * @slot pane-1-slot
+ * @slot resizer-slot
+ * @slot pane-2-slot
+ */
 @customElement('biz-split-pane')
 export class BizSplitPane extends LitElement {
   static styles = splitPaneStyles;

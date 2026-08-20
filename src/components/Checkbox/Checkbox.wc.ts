@@ -3,6 +3,16 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { CheckboxTemplate } from './Checkbox.ts';
 import { checkboxStyles } from './Checkbox.css.ts';
 
+/**
+ * @element biz-checkbox
+ * @slot start-slot
+ * @slot icon-slot
+ * @slot label-slot
+ * @slot end-slot
+ * @slot description-slot
+ * @slot helper-text-slot description-slot 내부
+ * @slot (default) label-slot 내부 
+ */
 @customElement('biz-checkbox')
 export class BizCheckbox extends LitElement {
   static styles = checkboxStyles;

@@ -3,6 +3,19 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { dropdownStyles } from './Dropdown.css.js';
 import { DropdownTemplate, type DropdownOption } from './Dropdown.js';
 
+/**
+ * @element biz-dropdown
+ * 
+ * @slot tag-slot
+ * @slot label-slot
+ * @slot prefix-slot
+ * @slot suffix-slot
+ * @slot header-slot
+ * @slot empty-slot
+ * @slot option-slot
+ * @slot footer-slot
+ * @slot helper-text-wrapper
+ */
 @customElement('biz-dropdown')
 export class BizDropdown extends LitElement {
   static styles = dropdownStyles;
