@@ -3,6 +3,15 @@ import { customElement, property, state } from "lit/decorators.js";
 import { SearchInputTemplate } from "./SearchInput";
 import { searchInputStyles } from "./SearchInput.css";
 
+/**
+ * @element biz-search-input
+ * 
+ * @slot label-slot
+ * @slot start-slot
+ * @slot end-slot
+ * @slot search-button-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-search-input')
 export class SearchInputWC extends LitElement {
   static styles = searchInputStyles;

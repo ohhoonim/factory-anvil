@@ -3,6 +3,17 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { SliderTemplate } from './Slider';
 import { sliderStyles } from './Slider.css';
 
+/**
+ * @element biz-slider
+ * 
+ * @slot label-slot
+ * @slot prefix-icon-slot
+ * @slot tooltip-slot
+ * @slot tooltip-slot
+ * @slot tick-label-slot
+ * @slot suffix-icon-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-slider')
 export class BizSlider extends LitElement {
   static styles = sliderStyles;

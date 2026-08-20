@@ -3,6 +3,17 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { datePickerStyles } from './DatePicker.css.js';
 import { DatePickerTemplate } from './DatePicker.js';
 
+/**
+ * @element biz-date-picker
+ * 
+ * @slot date-cell-slot
+ * @slot label-slot
+ * @slot prefix-slot
+ * @slot suffix-slot
+ * @slot helper-text-slot
+ * @slot header-slot
+ * @slot footer-slot
+ */
 @customElement('biz-date-picker')
 export class BizDatePicker extends LitElement {
   static styles = datePickerStyles;

@@ -3,6 +3,16 @@ import { customElement, property, state, query } from "lit/decorators.js";
 import { FileUploaderTemplate } from "./FileUploader";
 import { fileUploaderStyles } from "./FileUploader.css";
 
+/**
+ * @element biz-file-uploader
+ * 
+ * @slot label-slot
+ * @slot upload-button-slot
+ * @slot drop-zone-content-slot
+ * @slot upload-button-slot
+ * @slot file-item-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-file-uploader')
 export class FileUploader extends LitElement {
   static styles = fileUploaderStyles;

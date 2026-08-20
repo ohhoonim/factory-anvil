@@ -3,6 +3,13 @@ import { customElement, property, state } from "lit/decorators.js";
 import { TileLayoutGridTemplate } from "./TileLayoutGrid";
 import { tileLayoutGridStyles } from "./TileLayoutGrid.css";
 
+/**
+ * @element biz-tile-layout-grid
+ * 
+ * @slot header-slot
+ * @slot (default)
+ * @slot empty-slot
+ */
 @customElement('biz-tile-layout-grid')
 export class TileLayoutGrid extends LitElement {
   static styles = tileLayoutGridStyles;

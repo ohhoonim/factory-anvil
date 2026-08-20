@@ -3,6 +3,10 @@ import { customElement, property } from 'lit/decorators.js';
 import { DialogTemplate } from './Dialog';
 import { dialogStyles } from './Dialog.css';
 
+
+/**
+ * @element biz-dialog
+ */
 @customElement('biz-dialog')
 export class DialogWC extends LitElement {
   static styles = dialogStyles;

@@ -3,6 +3,13 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { RadioButtonTemplate } from './RadioButton.ts';
 import { radioButtonStyles } from './RadioButton.css.ts';
 
+/**
+ * @element biz-radio-button
+ * 
+ * @slot icon-slot
+ * @slot (default)
+ * @slot description-slot
+ */
 @customElement('biz-radio-button')
 export class RadioButton extends LitElement {
   static styles = radioButtonStyles;

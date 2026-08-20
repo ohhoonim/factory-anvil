@@ -5,6 +5,13 @@ import { CheckboxGroupTemplate } from './CheckboxGroup.js';
 
 let instanceCounter = 0;
 
+/**
+ * @element biz-checkbox-group
+ * @slot label-slot
+ * @slot helper-text-slot
+ * @slot (default) 
+ */
+
 @customElement('biz-checkbox-group')
 export class CheckboxGroup extends LitElement {
   static styles = checkboxGroupStyles;

@@ -3,6 +3,13 @@ import { customElement, property, state } from "lit/decorators.js";
 import { RadioButtonGroupTemplate } from "./RadioButtonGroup";
 import { radioButtonGroupStyles } from "./RadioButtonGroup.css";
 
+/**
+ * @element biz-radio-button-group
+ * 
+ * @slot label-slot
+ * @slot (default)
+ * @slot helper-text-slot
+ */
 @customElement('biz-radio-button-group')
 export class BizRadioButtonGroup extends LitElement {
   static styles = radioButtonGroupStyles;

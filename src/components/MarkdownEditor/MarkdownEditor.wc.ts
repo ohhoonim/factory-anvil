@@ -3,6 +3,16 @@ import { customElement, property, state } from "lit/decorators.js";
 import { MarkdownEditorTemplate } from "./MarkdownEditor";
 import { markdownEditorStyles } from "./MarkdownEditor.css";
 
+/**
+ * @element biz-markdown-editor
+ * 
+ * @slot toolbar-left-slot
+ * @slot toolbar-right-slot
+ * @slot editor-header-slot
+ * @slot preview-header-slot
+ * @slot custom-preview-slot
+ * @slot statusbar-slot
+ */
 @customElement('biz-markdown-editor')
 export class BizMarkdownEditor extends LitElement {
   static styles = markdownEditorStyles;

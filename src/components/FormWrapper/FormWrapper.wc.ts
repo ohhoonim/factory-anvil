@@ -2,7 +2,15 @@ import { LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { FormWrapperTemplate } from "./FormWrapper";
 import { formWrapperStyles } from "./FormWrapper.css";
-
+/**
+ * @element 
+ * 
+ * @slot label-slot
+ * @slot extra-slot
+ * @slot helper-text-slot
+ * @slot helper-text-slot
+ * @slot (default)
+ */
 @customElement('biz-form-wrapper')
 export class BizFormWrapper extends LitElement {
   static styles = formWrapperStyles;

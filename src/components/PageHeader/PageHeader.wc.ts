@@ -3,6 +3,15 @@ import { customElement, property, state } from "lit/decorators.js";
 import { PageHeaderTemplate } from "./PageHeader";
 import { pageHeaderStyles } from "./PageHeader.css";
 
+/**
+ * @element biz-page-header
+ * 
+ * @slot breadcrumb-slot
+ * @slot title-slot
+ * @slot meta-status-slot
+ * @slot extra-actions-slot
+ * @slot subtitle-slot
+ */
 @customElement('biz-page-header')
 export class PageHeader extends LitElement {
   static styles = pageHeaderStyles;

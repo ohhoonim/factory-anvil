@@ -2,7 +2,15 @@ import { customElement, property, state } from "lit/decorators.js";
 import { ChipTemplate } from "./Chip";
 import { LitElement } from "lit";
 import { chipStyles } from "./Chip.css";
-
+/**
+ * @element biz-chip
+ * 
+ * @slot label-slot
+ * @slot start-slot
+ * @slot chip-item-slot
+ * @slot end-slot
+ * @slot helper-text-slot
+ */
 @customElement('biz-chip')
 export class BizChip extends LitElement {
   static styles = chipStyles;

@@ -3,6 +3,18 @@ import { customElement, property, state } from "lit/decorators.js";
 import { DateTimePickerTemplate } from "./DateTimePicker";
 import { dateTimePickerStyles } from "./DateTimePicker.css";
 
+/**
+ * @element biz-date-time-picker
+ * 
+ * @slot label-slot
+ * @slot prefix-slot
+ * @slot suffix-slot
+ * @slot helper-text-slot
+ * @slot header-slot
+ * @slot date-cell-slot
+ * @slot time-option-slot
+ * @slot footer-slot
+ */
 @customElement('biz-date-time-picker')
 export class BizDateTimePicker extends LitElement {
   static styles = dateTimePickerStyles;

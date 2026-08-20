@@ -1,4 +1,7 @@
-import type { Preview } from '@storybook/web-components-vite'
+import { Preview, setCustomElementsManifest } from '@storybook/web-components-vite'
+import customElements from '../custom-elements.json'
+
+setCustomElementsManifest(customElements)
 
 const preview: Preview = {
   parameters: {
