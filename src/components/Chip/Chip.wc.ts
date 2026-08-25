@@ -1,6 +1,6 @@
 import { customElement, property, state } from "lit/decorators.js";
 import { ChipTemplate } from "./Chip";
-import { LitElement } from "lit";
+import { LitElement } from 'lit';
 import { chipStyles } from "./Chip.css";
 /**
  * @element biz-chip

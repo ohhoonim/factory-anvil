@@ -1,7 +1,7 @@
-import { createComponent } from "@lit/react";
-import React from "react";
+import { createComponent } from '@lit/react';
+import React from 'react';
 
-import { CardContainer as CardContainerWc } from "./CardContainer.wc";
+import { BizCardContainer as CardContainerWc } from "./CardContainer.wc";
 
 export const CardContainer = createComponent({
   tagName: 'biz-card-container',

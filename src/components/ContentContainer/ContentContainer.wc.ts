@@ -1,4 +1,4 @@
-import { LitElement, type PropertyValues } from "lit";
+import { LitElement, type PropertyValues } from 'lit';
 import { customElement, property } from "lit/decorators.js";
 import { type ContentContainerTemplateHost, ContentContainerTemplate } from "./ContentContainer";
 import { contentContainerStyles } from "./ContentContainer.css";

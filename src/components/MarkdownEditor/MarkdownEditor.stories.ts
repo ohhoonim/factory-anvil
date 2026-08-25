@@ -1,7 +1,7 @@
-import { html } from "lit";
+import { html } from 'lit';
 
 import {BizMarkdownEditor } from './MarkdownEditor.wc';
-import type { Meta, StoryObj } from "@storybook/web-components";
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 
 const meta: Meta<BizMarkdownEditor> = {
   title: 'Components/Forms/MarkdownEditor',

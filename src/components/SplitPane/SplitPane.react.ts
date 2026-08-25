@@ -1,6 +1,6 @@
-import { createComponent } from "@lit/react";
+import { createComponent } from '@lit/react';
 import { BizSplitPane } from "./SplitPane.wc";
-import React from "react";
+import React from 'react';
 
 export const SplitPane = createComponent({
   tagName: 'biz-split-pane',

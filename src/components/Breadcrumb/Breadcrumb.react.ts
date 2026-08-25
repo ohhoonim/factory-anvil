@@ -1,10 +1,10 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { BreadcrumbWC } from './Breadcrumb.wc';
+import { BizBreadcrumb } from './Breadcrumb.wc';
 
 export const Breadcrumb = createComponent({
   tagName: 'biz-breadcrumb',
-  elementClass: BreadcrumbWC,
+  elementClass: BizBreadcrumb,
   react: React,
   events: {
     onPathClick: 'path-click',

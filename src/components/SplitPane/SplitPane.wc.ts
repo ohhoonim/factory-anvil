@@ -1,4 +1,4 @@
-import { LitElement } from "lit";
+import { LitElement } from 'lit';
 import { splitPaneStyles } from "./SplitPane.css";
 import { customElement, property, state } from "lit/decorators.js";
 import { SplitPaneTemplate } from "./SplitPane";

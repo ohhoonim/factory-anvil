@@ -1,1 +1,1 @@
-export { ApplicationShell as ApplicationShellWc } from './ApplicationShell.wc';
+export { BizApplicationShell as ApplicationShellWc } from './ApplicationShell.wc';

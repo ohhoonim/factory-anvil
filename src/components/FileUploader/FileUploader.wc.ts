@@ -1,4 +1,4 @@
-import { LitElement } from "lit";
+import { LitElement } from 'lit';
 import { customElement, property, state, query } from "lit/decorators.js";
 import { FileUploaderTemplate } from "./FileUploader";
 import { fileUploaderStyles } from "./FileUploader.css";

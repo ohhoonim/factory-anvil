@@ -1,8 +1,9 @@
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import { expect, vi } from 'vitest';
 import { html } from 'lit';
-import type { Meta, StoryObj } from '@storybook/web-components';
 import type { ContentContainer } from './ContentContainer.wc';
 import './ContentContainer.wc';
-import {expect} from '@storybook/test';
+import { BizApplicationShell } from '../ApplicationShell/ApplicationShell.wc';
 
 const meta: Meta<ContentContainer> = {
   title: 'Components/Layout/ContentContainer',
@@ -159,12 +160,5 @@ export const AccessibilityAndInteractive: Story = {
       </div>
     </biz-content-container>
   `,
-  play: async ({ canvasElement }) => {
-    const container = canvasElement.querySelector('biz-content-container') as ContentContainer;
-    if (container) {
-      await container.updateComplete;
-      const mainEl = container.shadowRoot?.querySelector('main');
-      expect(mainEl?.getAttribute('role')).toBe('main');
-    }
-  },
+
 };

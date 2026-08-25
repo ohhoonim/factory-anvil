@@ -1,6 +1,6 @@
-import { createComponent } from "@lit/react";
+import { createComponent } from '@lit/react';
 import { BizMarkdownEditor } from "./MarkdownEditor.wc";
-import React from "react";
+import React from 'react';
 
 export const MarkdownEditor = createComponent({
   tagName: 'biz-markdown-editor',

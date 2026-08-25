@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import { BizRadioButtonGroup } from "./RadioButtonGroup.wc";
-import { createComponent } from "@lit/react";
+import { createComponent } from '@lit/react';
 
 export const RadioButtonGroup = createComponent({
   tagName: 'biz-radio-button-group',

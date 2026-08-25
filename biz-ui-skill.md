@@ -1,5 +1,13 @@
 ## Biz-UI 웹 컴포넌트 개발 공정
 
+### agentic engineering skills
+
+Phase 1 ~ 5 의 개발 공정은 참고용으로만 활용하십시오. 
+
+- 요구사항 정의 표준 템플릿을 활용하여 웹 컴포넌트에 대한 요구사항을 정의 하십시오: biz-ui-requirement-skill.md
+- 프롬프트 생성 문서(biz-ui-prompt-sequence.md) 를 참고하여 5단계 프롬프트를 생성하십시오.
+- 5단계 프롬프트를 단계적으로 프롬프팅하여 코드를 생성하십시오.
+
 ### Phase 1. 요구사항 정의 및 표준 검토
 
 - 1-1. 태그 명명 규칙 명시: 커스텀 엘리먼트 태그명을 `biz-component-name` 규격으로 확정합니다.
@@ -14,7 +22,6 @@
     - `ComponentName.wc.ts` (웹 컴포넌트 등록)
     - `ComponentName.react.ts` (React 래퍼)
     - `ComponentName.stories.ts` (Storybook 및 접근성)
-    - `ComponentName.test.ts` (단위/통합 테스트)
     - `index.ts` (모듈 내보내기)
 
 ### Phase 3. 컴포넌트 코어 및 로직 개발
@@ -42,6 +49,7 @@
 - Storybook 문서화 및 접근성 검증 (`ComponentName.stories.ts`)
     - Variants(`Outlined`, `Filled`, `Standard`), Sizes, States별 시연 환경을 구축합니다.
     - `@storybook/addon-a11y`를 실행하여 ARIA 및 키보드 네비게이션 접근성을 검증합니다.
-- 단위 및 통합 테스트 (`ComponentName.test.ts`)
-    - Vitest를 사용하여 비즈니스 로직 및 이벤트 방출을 검증합니다.
-    - Playwright를 사용하여 브라우저 환경 통합 테스트 및 키보드 인터랙션을 검증합니다.
+- 단위 및 통합 테스트 
+    - 테스트코드를 작성하지 않습니다.
+    - Storybook에서 눈으로 UI를 확인합니다.
+    - 테스트 코드를 작성하고 싶다면 Storybook에서 Story작성시 play를 활용하십시오.

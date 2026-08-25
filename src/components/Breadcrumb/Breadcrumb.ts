@@ -5,14 +5,13 @@ export interface BreadcrumbItem {
   href?: string;
 }
 
-export interface BreadcrumbProps {
+export interface BreadcrumbHost {
   items: BreadcrumbItem[];
   separator?: string ;
   onPathClick?: (item: BreadcrumbItem) => void;
 }
 
-/** Primary UI component for hierarchical navigation */
-export const BreadcrumbTemplate = ({ items, separator='/', onPathClick }: BreadcrumbProps) => {
+export const BreadcrumbTemplate = ({ items, separator='/', onPathClick }: BreadcrumbHost) => {
 
   const handleClick = (e: Event, item: BreadcrumbItem) => {
     e.preventDefault();

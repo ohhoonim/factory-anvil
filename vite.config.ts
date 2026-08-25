@@ -9,7 +9,7 @@ export default defineConfig({
     minify: 'esbuild',
     emptyOutDir: true,
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'),
+      entry: path.resolve(import.meta.dirname, 'src/index.ts'),
       name: 'BizUI',
       formats: ['es', 'umd'],
       fileName: (format) => `bizui-library-index.${format}.js`,

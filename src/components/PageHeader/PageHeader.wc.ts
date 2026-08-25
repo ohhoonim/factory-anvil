@@ -1,4 +1,4 @@
-import { LitElement } from "lit";
+import { LitElement } from 'lit';
 import { customElement, property, state } from "lit/decorators.js";
 import { PageHeaderTemplate } from "./PageHeader";
 import { pageHeaderStyles } from "./PageHeader.css";

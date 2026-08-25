@@ -4,6 +4,9 @@ import { CartTemplate, type CartItem } from './Cart';
 import { cartStyles } from './Cart.css';
 
 
+/**
+ * @element shop-cart
+ */
 @customElement('shop-cart')
 export class CartWC extends LitElement {
     static styles = cartStyles;

@@ -1,11 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from "lit";
-import type { ApplicationShellContext } from './ApplicationShell';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import { html } from 'lit';
+import type { ApplicationShellHost } from './ApplicationShell';
 import './ApplicationShell.wc';
 
-type variantType = 'default' | 'full-width' | 'minimal';
+type Args = Required<ApplicationShellHost> & {
+   headerSlot: string;
+   sidebarSlot: string;
+   contentSlot: string;
+   footerSlot: string;
+};
 
-const meta: Meta<ApplicationShellContext> = {
+const meta: Meta<Args> = {
   title: 'Components/Layout/ApplicationShell',
   component: 'biz-application-shell',
   tags: ['autodocs'],
@@ -36,7 +41,7 @@ const meta: Meta<ApplicationShellContext> = {
   },
   render: (args) => html`
     <biz-application-shell
-      .variant=${args.variant as variantType }
+      .variant=${args.variant}
       ?sidebar-collapsed=${args.sidebarCollapsed}
       ?sticky-header=${args.stickyHeader}
       ?fixed-sidebar=${args.fixedSidebar}
@@ -60,7 +65,7 @@ const meta: Meta<ApplicationShellContext> = {
 };
 
 export default meta;
-type Story = StoryObj<ApplicationShellContext>;
+type Story = StoryObj<Args>;
 
 export const Default: Story = {
   args: {

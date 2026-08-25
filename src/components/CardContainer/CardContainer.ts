@@ -1,8 +1,8 @@
-import { html } from "lit";
+import { html } from 'lit';
 import { classMap } from "lit/directives/class-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 
-export interface CardContainerProps {
+export interface CardContainerHost {
   variant?: 'outlined' | 'filled' | 'elevated';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
@@ -14,7 +14,7 @@ export interface CardContainerProps {
   onCardClick?: (event: MouseEvent) => void;
 }
 
-export const CardContainerTemplate = (props: CardContainerProps) => {
+export const CardContainerTemplate = (host: CardContainerHost) => {
   const {
     variant = 'outlined',
     size = 'medium',
@@ -25,7 +25,7 @@ export const CardContainerTemplate = (props: CardContainerProps) => {
     loading = false,
     ariaLabelledby,
     onCardClick,
-  } = props;
+  } = host;
 
   const handleClick = (event: MouseEvent) => {
     if (disabled || loading) return;

@@ -1,18 +1,11 @@
-import { LitElement } from "lit";
+import { LitElement } from 'lit';
 import { customElement, property, state } from "lit/decorators.js";
 import { applicationShellStyles } from "./ApplicationShell.css";
-import { ApplicationShellTemplate } from "./ApplicationShell";
+import { ApplicationShellTemplate, type ApplicationShellHost } from "./ApplicationShell";
 
-/**
- * @element biz-application-shell
- * 
- * @slot  header-slot
- * @slot  sidebar-slot
- * @slot  content-slot
- * @slot  footer-slot
- */
+
 @customElement('biz-application-shell')
-export class ApplicationShell extends LitElement {
+export class BizApplicationShell extends LitElement implements ApplicationShellHost {
   static styles = applicationShellStyles;
 
   @property({ type: String })
@@ -78,10 +71,6 @@ export class ApplicationShell extends LitElement {
     this.sidebarCollapsed = !this.sidebarCollapsed;
   }
 
-  public toggleMobileDrawer() {
-    this.mobileDrawerOpen = !this.mobileDrawerOpen;
-  }
-
   private dispatchSidebarToggleEvent() {
     this.dispatchEvent(
       new CustomEvent('sidebar-toggle', {
@@ -91,10 +80,6 @@ export class ApplicationShell extends LitElement {
       })
     );
   }
-
-  private handleOverlayClick = () => {
-    this.mobileDrawerOpen = false;
-  };
 
   private handleSidebarKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape' && this.mobileDrawerOpen) {
@@ -114,9 +99,6 @@ export class ApplicationShell extends LitElement {
       sidebarCollapsed: this.sidebarCollapsed,
       stickyHeader: this.stickyHeader,
       fixedSidebar: this.fixedSidebar,
-      mobileDrawerOpen: this.mobileDrawerOpen,
-      handleOverlayClick: this.handleOverlayClick,
-      handleSidebarKeyDown: this.handleSidebarKeyDown
     });
   }
 }

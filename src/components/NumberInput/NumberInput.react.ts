@@ -1,5 +1,5 @@
-import { createComponent } from "@lit/react";
-import React from "react";
+import { createComponent } from '@lit/react';
+import React from 'react';
 import { BizNumberInput } from "./NumberInput.wc";
 
 export const NumberInput = createComponent({
