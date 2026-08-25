@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -13,7 +13,7 @@
     <script type="importmap">
       {
         "imports": {
-          'lit': "https://esm.run/lit",
+          "lit": "https://esm.run/lit",
           "lit/directives/repeat.js": "https://esm.run/lit/directives/repeat.js"
         }
       }
@@ -32,10 +32,8 @@
       console.log(toast.toasts);
 
     </script> -->
-    
-    <biz-application-shell
-      variant="default"
-    >
+
+    <biz-application-shell variant="default">
       <div slot="header-slot" style="padding: 1rem; font-weight: bold">
         Header Content
       </div>
@@ -57,12 +55,12 @@
       </div>
     </biz-application-shell>
     <script>
-      let button = document.querySelector("#sidebarCollapsedButton");
-      button.addEventListener("click", e => {
-        let shell = document.querySelector("biz-application-shell");
-        shell.sidebarCollapsed = !shell.sidebarCollapsed;
-      });
+      let button = document.querySelector('#sidebarCollapsedButton');
+      let shell = document.querySelector('biz-application-shell');
 
+      button.addEventListener('click', () => {
+        shell.toggleSidebar();
+      });
     </script>
   </body>
 </html>
