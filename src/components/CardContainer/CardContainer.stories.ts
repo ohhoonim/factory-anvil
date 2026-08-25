@@ -1,13 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite'; 
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './CardContainer.wc';
 import { html } from 'lit';
 import type { CardContainerHost } from './CardContainer';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { fn } from 'storybook/test';
 
 type Args = Required<CardContainerHost> & {
-  contents: string ;
-  headerSlot?: string ;
-  footerSlot?: string ;
+  contents: string;
+  headerSlot?: string;
+  footerSlot?: string;
+  "full-width": boolean;
+  "bordered-divider": boolean;
+  "aria-labelledby"?: string;
 };
 const meta: Meta<Args> = {
   title: 'Components/Layout/CardContainer',
@@ -22,11 +26,23 @@ const meta: Meta<Args> = {
       control: { type: 'select' },
       options: ['small', 'medium', 'large'],
     },
-    fullWidth: { control: 'boolean' },
-    borderedDivider: { control: 'boolean' },
-    hoverable: { control: 'boolean' },
+    fullWidth: { table: { disable: true } },
+    "full-width": { 
+      control: 'boolean' ,
+      description: '너비 100% 확장 여부' 
+    },
+    borderedDivider: { table: { disable: true } },
+    "bordered-divider": { 
+      control: 'boolean' ,
+      description: 'Header, Body, Footer 사이 구분선 적용 여부',
+    },
+    hoverable: { control: 'boolean' ,
+      description: '마우스 오버 시 인터랙션 스타일 적용 여부',
+    },
     disabled: { control: 'boolean' },
     loading: { control: 'boolean' },
+    ariaLabelledby: { table: { disable: true } },
+    "aria-labelledby": { control: 'boolean' },
     contents: {
       name: 'default (slot)',
       control: { type: 'text' },
@@ -44,7 +60,7 @@ const meta: Meta<Args> = {
       control: { type: 'text' },
       description: '카드 하단 ',
       table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
-    }
+    },
   },
   args: {
     variant: 'outlined',
@@ -70,9 +86,9 @@ const meta: Meta<Args> = {
       ?loading=${args.loading}
       aria-labelledby="card-title"
     >
-      ${args.headerSlot ? html`<div slot="header-slot">${unsafeHTML(args.headerSlot)} </div>`: ''}
+      ${args.headerSlot ? html`<div slot="header-slot">${unsafeHTML(args.headerSlot)} </div>` : ''}
       ${unsafeHTML(args.contents)}
-      ${args.footerSlot ? html`<div slot="footer-slot">${unsafeHTML(args.footerSlot)}</div>`: ''}
+      ${args.footerSlot ? html`<div slot="footer-slot">${unsafeHTML(args.footerSlot)}</div>` : ''}
       
     </biz-card-container>
   `,
@@ -122,11 +138,20 @@ export const Sizes: Story = {
 };
 
 export const States: Story = {
-  render: () => html`
+
+  render: (args) => html`
     <div style="display: flex; gap: 16px; flex-wrap: wrap;">
       <biz-card-container hoverable>
         <div slot="header-slot"><strong>Hoverable State</strong></div>
         <p>마우스 오버 및 포커스 시 인터랙션 피드백을 제공합니다.</p>
+      </biz-card-container>
+      <biz-card-container hoverable @card-click=${
+        (e: MouseEvent) => {
+          alert(JSON.stringify(e.detail));
+        }
+      }>
+        <div slot="header-slot"><strong>Click 이벤트</strong></div>
+        <p>카드 클릭시 card-click 이벤트를 발행합니다.</p>
       </biz-card-container>
       <biz-card-container disabled>
         <div slot="header-slot"><strong>Disabled State</strong></div>
