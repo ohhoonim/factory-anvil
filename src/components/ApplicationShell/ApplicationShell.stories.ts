@@ -2,12 +2,18 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import type { ApplicationShellHost } from './ApplicationShell';
 import './ApplicationShell.wc';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import type { BizApplicationShell } from './ApplicationShell.wc';
 
 type Args = Required<ApplicationShellHost> & {
-   headerSlot: string;
-   sidebarSlot: string;
-   contentSlot: string;
-   footerSlot: string;
+  headerSlot: string;
+  sidebarSlot: string;
+  contentSlot: string;
+  footerSlot: string;
+  "sidebar-collapsed": object;
+  "sticky-header": object;
+  "fixed-sidebar": object;
+  toggleSidebar: object;
 };
 
 const meta: Meta<Args> = {
@@ -15,6 +21,12 @@ const meta: Meta<Args> = {
   component: 'biz-application-shell',
   tags: ['autodocs'],
   argTypes: {
+    toggleSidebar: {
+      name: 'toggleSidebar()',
+      description: 'sidebar 상태를 토글해준다',
+      control: false, 
+      table: {category: 'method', type: { summary: '() => void'}}
+    },
     variant: {
       control: 'select',
       options: ['default', 'full-width', 'minimal'],
@@ -22,22 +34,69 @@ const meta: Meta<Args> = {
     },
     sidebarCollapsed: {
       control: 'boolean',
-      description: '사이드바 축소 상태 여부'
+      description: '사이드바 축소 상태 여부',
     },
     stickyHeader: {
-      control: 'boolean',
-      description: '헤더 상단 고정 여부'
+      table: {disable: true},
     },
     fixedSidebar: {
+      table: {disable: true},
+    },
+    'sidebar-collapsed': { table: { disable: true } },
+    'sticky-header': {
       control: 'boolean',
-      description: '사이드바 좌측 고정 및 내부 스크롤 적용 여부'
-    }
+      description: '헤더 상단 고정 여부',
+    },
+    'fixed-sidebar': {
+      control: 'boolean',
+      description: '사이드바 좌측 고정 및 내부 스크롤 적용 여부',
+    },
+    headerSlot: {
+      name: "header-slot",
+      control: { type: 'text' },
+      description: '레이아웃 상단 헤더',
+      table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
+    },
+    sidebarSlot: {
+      name: "sidebar-slot",
+      control: { type: 'text' },
+      description: '왼쪽 메뉴',
+      table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
+    },
+    contentSlot: {
+      name: "content-slot",
+      control: { type: 'text' },
+      description: '컨텐츠 영역',
+      table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
+    },
+    footerSlot: {
+      name: "footer-slot",
+      control: { type: 'text' },
+      description: '하단 footer 영역',
+      table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
+    },
   },
   args: {
     variant: 'default',
     sidebarCollapsed: false,
     stickyHeader: true,
-    fixedSidebar: true
+    fixedSidebar: true,
+    headerSlot: '<div style="padding: 1rem; font-weight: bold;">Header Content</div>',
+    sidebarSlot: `<div slot="sidebar-slot">
+        <div style="width:100%; height: 100vh;padding: 1rem; color: #fff;">
+          <nav aria-label="Main Navigation">
+            <ul>
+              <li><a href="#link1" style="color: #fff;">Menu Item 1</a></li>
+              <li><a href="#link2" style="color: #fff;">Menu Item 2</a></li>
+            </ul>
+          </nav>
+        </div>` ,
+    contentSlot: ` 
+      <div slot="content-slot" style="padding: 2rem;">
+        <h1>Main Content Area</h1>
+        <p>This is the main content of the application shell.</p>
+      </div>`,
+    footerSlot: `<div style="padding: 1rem; text-align: center;">Footer Content</div>`,
   },
   render: (args) => html`
     <biz-application-shell
@@ -46,20 +105,10 @@ const meta: Meta<Args> = {
       ?sticky-header=${args.stickyHeader}
       ?fixed-sidebar=${args.fixedSidebar}
     >
-      <div slot="header-slot" style="padding: 1rem; font-weight: bold;">Header Content</div>
-      <div slot="sidebar-slot" style="padding: 1rem; color: #fff;">
-        <nav aria-label="Main Navigation">
-          <ul>
-            <li><a href="#link1" style="color: #fff;">Menu Item 1</a></li>
-            <li><a href="#link2" style="color: #fff;">Menu Item 2</a></li>
-          </ul>
-        </nav>
-      </div>
-      <div slot="content-slot" style="padding: 2rem;">
-        <h1>Main Content Area</h1>
-        <p>This is the main content of the application shell.</p>
-      </div>
-      <div slot="footer-slot" style="padding: 1rem; text-align: center;">Footer Content</div>
+     ${args.headerSlot ? html`<div slot="header-slot">${unsafeHTML(args.headerSlot)}</div>` : ''} 
+     ${args.sidebarSlot ? html`<div slot="sidebar-slot">${unsafeHTML(args.sidebarSlot)}</div>` : ''} 
+     ${args.contentSlot ? html`<div slot="content-slot">${unsafeHTML(args.contentSlot)}</div>` : ''} 
+     ${args.footerSlot ? html`<div slot="footer-slot">${unsafeHTML(args.footerSlot)}</div>` : ''} 
     </biz-application-shell>
   `
 };
@@ -90,4 +139,20 @@ export const SidebarCollapsed: Story = {
   args: {
     sidebarCollapsed: true
   }
+};
+
+export const MethodExample: StoryObj = {
+  render: () => {
+    const handleToggle = () => {
+      const shell = document.querySelector<BizApplicationShell>('biz-application-shell');
+      shell?.toggleSidebar();
+    };
+
+    return html`
+      <button @click=${handleToggle} style="margin-bottom: 1rem;">
+        외부에서 toggleSidebar() 호출
+      </button>
+      <biz-application-shell></biz-application-shell>
+    `;
+  },
 };
