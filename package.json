@@ -62,7 +62,6 @@
     "vitest": "^4.1.4"
   },
   "overrides": {
-    "@storybook/web-components-vite": "10.3.5",
     "lit": "^3.3.2",
     "vite-plugin-barrel": {
       "vite": "$vite"

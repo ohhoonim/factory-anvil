@@ -11,6 +11,18 @@ const config: StorybookConfig = {
     "@storybook/addon-docs",
     "@storybook/addon-a11y",
   ],
-  "framework": '@storybook/web-components-vite'
+  "framework": '@storybook/web-components-vite',
+  async viteFinal(config) {
+    const { mergeConfig } = await import('vite');
+    return mergeConfig(config, {
+      optimizeDeps: {
+        include: [
+          'lz-string',
+          'aria-query',
+          '@storybook/addon-vitest > @testing-library/dom',
+        ],
+      },
+    });
+  },
 };
 export default config;

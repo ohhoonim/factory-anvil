@@ -4,6 +4,7 @@ import type { ApplicationShellHost } from './ApplicationShell';
 import './ApplicationShell.wc';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import type { BizApplicationShell } from './ApplicationShell.wc';
+import  {expect, userEvent, within}  from 'storybook/test';
 
 type Args = Required<ApplicationShellHost> & {
   headerSlot: string;
@@ -154,5 +155,28 @@ export const MethodExample: StoryObj = {
       </button>
       <biz-application-shell></biz-application-shell>
     `;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: '외부에서 toggleSidebar() 호출' });
+    const shell = canvasElement.querySelector<BizApplicationShell>('biz-application-shell')!;
+
+    // 초기 상태 검증
+    expect(shell.sidebarCollapsed).toBe(false);
+
+    // 버튼 클릭 및 Lit 비동기 업데이트 대기
+    await userEvent.click(button);
+    await shell.updateComplete;
+
+    // toggleSidebar() 실행 후 상태 검증
+    expect(shell.sidebarCollapsed).toBe(true);
+    expect(shell.hasAttribute('sidebar-collapsed')).toBe(true);
+
+    // 재클릭 테스트
+    await userEvent.click(button);
+    await shell.updateComplete;
+
+    expect(shell.sidebarCollapsed).toBe(false);
+    expect(shell.hasAttribute('sidebar-collapsed')).toBe(false);
   },
 };
