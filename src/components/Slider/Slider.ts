@@ -1,4 +1,4 @@
-import { html } from "lit";
+import { html } from 'lit';
 
 export const SliderTemplate = (host: any) => {
   const isRange = host.mode === 'range';

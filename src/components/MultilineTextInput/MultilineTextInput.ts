@@ -1,4 +1,4 @@
-import { html, nothing } from "lit";
+import { html, nothing } from 'lit';
 
 export const MultilineTextInputTemplate = (host: any) => {
   const currentLength = host.value ? host.value.length : 0;

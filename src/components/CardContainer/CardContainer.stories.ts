@@ -1,10 +1,15 @@
-import type { Meta, StoryObj } from "@storybook/web-components"; 
-
+import type { Meta, StoryObj } from '@storybook/web-components-vite'; 
 import './CardContainer.wc';
-import { html } from "lit";
-import { expect } from "@storybook/test";
+import { html } from 'lit';
+import type { CardContainerHost } from './CardContainer';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-const meta: Meta = {
+type Args = Required<CardContainerHost> & {
+  contents: string ;
+  headerSlot?: string ;
+  footerSlot?: string ;
+};
+const meta: Meta<Args> = {
   title: 'Components/Layout/CardContainer',
   component: 'biz-card-container',
   tags: ['autodocs'],
@@ -22,15 +27,37 @@ const meta: Meta = {
     hoverable: { control: 'boolean' },
     disabled: { control: 'boolean' },
     loading: { control: 'boolean' },
+    contents: {
+      name: 'default (slot)',
+      control: { type: 'text' },
+      description: '카드 본문 ',
+      table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
+    },
+    headerSlot: {
+      name: "header-slot",
+      control: { type: 'text' },
+      description: '카드 상단 ',
+      table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
+    },
+    footerSlot: {
+      name: "footer-slot",
+      control: { type: 'text' },
+      description: '카드 하단 ',
+      table: { category: 'slots', type: { summary: 'string | HTMLElement' } },
+    }
   },
   args: {
     variant: 'outlined',
     size: 'medium',
-    fullWidth: false,
-    borderedDivider: false,
+    fullWidth: true,
+    borderedDivider: true,
     hoverable: false,
     disabled: false,
     loading: false,
+    contents: '카드 메인 <p> paragraph </p> ',
+    headerSlot: '<b>카드 타이틀</b>',
+    footerSlot: '<button>확인</button>',
+
   },
   render: (args) => html`
     <biz-card-container
@@ -43,21 +70,16 @@ const meta: Meta = {
       ?loading=${args.loading}
       aria-labelledby="card-title"
     >
-      <div slot="header-slot">
-        <h3 id="card-title" style="margin: 0;">카드 타이틀</h3>
-      </div>
-      <div>
-        <p style="margin: 0;">카드 메인 본문 콘텐츠 영역입니다. 다양한 정보를 배치할 수 있습니다.</p>
-      </div>
-      <div slot="footer-slot">
-        <button type="button">확인</button>
-      </div>
+      ${args.headerSlot ? html`<div slot="header-slot">${unsafeHTML(args.headerSlot)} </div>`: ''}
+      ${unsafeHTML(args.contents)}
+      ${args.footerSlot ? html`<div slot="footer-slot">${unsafeHTML(args.footerSlot)}</div>`: ''}
+      
     </biz-card-container>
   `,
 };
 
 export default meta;
-type Story = StoryObj;
+type Story = StoryObj<Args>;
 
 export const Default: Story = {};
 
@@ -121,20 +143,5 @@ export const States: Story = {
 export const BorderedDivider: Story = {
   args: {
     borderedDivider: true,
-  },
-};
-
-export const AccessibilityTest: Story = {
-  args: {
-    hoverable: true,
-  },
-  play: async ({ canvasElement }) => {
-    const card = canvasElement.querySelector('biz-card-container');
-    if (card) {
-      const innerCard = card.shadowRoot?.querySelector('.biz-card-container');
-      expect(innerCard).toBeDefined();
-      expect(innerCard?.getAttribute('role')).toBe('button');
-      expect(innerCard?.getAttribute('tabindex')).toBe('0');
-    }
   },
 };

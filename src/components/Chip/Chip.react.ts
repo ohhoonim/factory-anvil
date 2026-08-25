@@ -1,6 +1,6 @@
-import { createComponent } from "@lit/react";
+import { createComponent } from '@lit/react';
 import { BizChip } from "./Chip.wc";
-import React from "react";
+import React from 'react';
 
 export const Chip = createComponent({
   tagName: 'biz-chip',

@@ -1,6 +1,6 @@
-import { createComponent } from "@lit/react";
+import { createComponent } from '@lit/react';
 import { FileUploader as FileUploaderWc } from "./FileUploader.wc";
-import React from "react";
+import React from 'react';
 
 export const FileUploader = createComponent({
     tagName: 'biz-file-uploader',

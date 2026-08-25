@@ -12,10 +12,8 @@ Biz-UI는 백오피스용 웹 컴포넌트 라이브러리입니다.
 
 ## clone 후 npm 설치 방법
 
-install을 할 때 `--legacy-peer-deps` 옵션을 붙여줘야합니다. 
-
 ```sh
-$ npm install --legacy-peer-deps
+$ npm install 
 ```
 
 ## 🏭 개발 공정
@@ -70,7 +68,7 @@ storybook 없이 html 에서 사용하는 방법은 index.html 파일을 참고�
 <script type="importmap">
   {
     "imports": {
-      "lit": "https://esm.run/lit",
+      'lit': "https://esm.run/lit",
       "lit/directives/repeat.js": "https://esm.run/lit/directives/repeat.js"
     }
   }
@@ -89,6 +87,6 @@ storybook 없이 html 에서 사용하는 방법은 index.html 파일을 참고�
 
 --- --------------------------------------------------
 
-## VSCode Custom Data 적용하기
+## VSCode Custom Data 적용
 
 storybook 실행시 `vscode-html-custom-data.json` 파일이 생성됩니다. 이 파일을 복사하여 웹 애플리케이션 프로젝트에 붙여넣으면 vscode에서 html 태그 완성 기능을 사용할 수 있습니다. 

@@ -1,4 +1,4 @@
-import { LitElement } from "lit";
+import { LitElement } from 'lit';
 import { customElement, property, state } from "lit/decorators.js";
 import { SearchInputTemplate } from "./SearchInput";
 import { searchInputStyles } from "./SearchInput.css";

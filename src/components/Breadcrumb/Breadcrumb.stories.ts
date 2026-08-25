@@ -1,10 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
-import type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb';
+import type { BreadcrumbHost, BreadcrumbItem } from './Breadcrumb';
 import './Breadcrumb.wc';
 
-const meta: Meta<BreadcrumbProps> = {
+type Args = Required<BreadcrumbHost>;
+
+const meta: Meta<Args> = {
   title: 'Components/Forms/Breadcrumb',
+  tags: ["autodocs"],
   render: (args) => html`
     <biz-breadcrumb 
       .items=${args.items} 
@@ -26,7 +29,7 @@ const meta: Meta<BreadcrumbProps> = {
 };
 
 export default meta;
-type Story = StoryObj<BreadcrumbProps>;
+type Story = StoryObj<Args>;
 
 export const Default: Story = {
   args: {

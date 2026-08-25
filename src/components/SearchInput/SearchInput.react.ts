@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import { SearchInputWC } from "./SearchInput.wc";
-import { createComponent } from "@lit/react";
+import { createComponent } from '@lit/react';
 
 export const SearchInput = createComponent({
   tagName: 'biz-search-input',

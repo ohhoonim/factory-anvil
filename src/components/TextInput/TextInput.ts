@@ -1,4 +1,4 @@
-import { html } from "lit";
+import { html } from 'lit';
 
 export const TextInputTemplate = (context: any) => html`
   <div class="biz-text-input ${context.variant || 'outlined'} ${context.size || 'medium'} ${context.fullWidth ? 'full-width' : ''} ${context.disabled ? 'disabled' : ''} ${context.readonly ? 'readonly' : ''} ${context.error ? 'error' : ''} ${context.loading ? 'loading' : ''}">

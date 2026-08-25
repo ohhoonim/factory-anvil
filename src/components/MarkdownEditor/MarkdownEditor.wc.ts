@@ -1,4 +1,4 @@
-import { LitElement, type PropertyValues } from "lit";
+import { LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state } from "lit/decorators.js";
 import { MarkdownEditorTemplate } from "./MarkdownEditor";
 import { markdownEditorStyles } from "./MarkdownEditor.css";

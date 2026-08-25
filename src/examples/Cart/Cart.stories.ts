@@ -1,5 +1,4 @@
-
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import type { CartItem, CartProps } from './Cart';
 import './Cart.wc';

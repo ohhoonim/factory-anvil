@@ -1,4 +1,4 @@
-import { LitElement } from "lit";
+import { LitElement } from 'lit';
 import { customElement, property } from "lit/decorators.js";
 import { PasswordInputTemplate } from "./PasswordInput";
 import { passwordInputStyles } from "./PasswordInput.css";

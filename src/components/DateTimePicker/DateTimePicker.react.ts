@@ -1,6 +1,6 @@
-import { createComponent } from "@lit/react";
+import { createComponent } from '@lit/react';
 import { BizDateTimePicker } from "./DateTimePicker.wc";
-import React from "react";
+import React from 'react';
 
 export const DateTimePicker = createComponent({
   tagName: 'biz-date-time-picker',

@@ -1,4 +1,4 @@
-import { html } from "lit";
+import { html } from 'lit';
 
 export interface DatePickerTemplateOptions {
   value: string | Date | (string | Date)[] | null;

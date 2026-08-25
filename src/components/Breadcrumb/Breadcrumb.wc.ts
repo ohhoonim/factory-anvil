@@ -1,14 +1,15 @@
 import { LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { BreadcrumbTemplate, type BreadcrumbItem } from './Breadcrumb';
+import { BreadcrumbTemplate, type BreadcrumbHost, type BreadcrumbItem } from './Breadcrumb';
 import { breadcrumbStyles } from './Breadcrumb.css';
 
 /**
  * @element biz-breadcrumb
+ * 
  * @slot (no)
  */
 @customElement('biz-breadcrumb')
-export class BreadcrumbWC extends LitElement {
+export class BizBreadcrumb extends LitElement implements BreadcrumbHost {
   static styles = breadcrumbStyles;
 
   @property({ type: Array }) accessor items: BreadcrumbItem[] = [];
@@ -29,6 +30,6 @@ export class BreadcrumbWC extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'biz-breadcrumb': BreadcrumbWC;
+    'biz-breadcrumb': BizBreadcrumb;
   }
 }

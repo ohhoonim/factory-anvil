@@ -8,10 +8,9 @@ const config: StorybookConfig = {
   "addons": [
     "@chromatic-com/storybook",
     "@storybook/addon-vitest",
-    "@storybook/addon-a11y",
     "@storybook/addon-docs",
-    '@storybook/addon-interactions', // 인터랙션 테스트용 애드온
+    "@storybook/addon-a11y",
   ],
-  "framework": "@storybook/web-components-vite"
+  "framework": '@storybook/web-components-vite'
 };
 export default config;

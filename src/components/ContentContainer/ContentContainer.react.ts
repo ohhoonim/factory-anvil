@@ -1,5 +1,5 @@
-import { createComponent } from "@lit/react";
-import React from "react";
+import { createComponent } from '@lit/react';
+import React from 'react';
 
 import { ContentContainer as ContentContainerWc } from "./ContentContainer.wc";
 
