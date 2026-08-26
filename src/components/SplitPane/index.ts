@@ -1,1 +1,1 @@
-export * from './SplitPane.wc';
+export { BizSplitPane } from './SplitPane.wc.js';

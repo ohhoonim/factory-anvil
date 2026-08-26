@@ -1,143 +1,227 @@
-import { LitElement } from 'lit';
-import { splitPaneStyles } from "./SplitPane.css";
-import { customElement, property, state } from "lit/decorators.js";
-import { SplitPaneTemplate } from "./SplitPane";
+import { LitElement, html } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { SplitPaneTemplate, type SplitPaneHost } from './SplitPane.js';
+import { splitPaneStyles } from './SplitPane.css.js';
 
-/**
- * @element biz-split-pane
- * 
- * @slot pane-1-slot
- * @slot resizer-slot
- * @slot pane-2-slot
- */
 @customElement('biz-split-pane')
-export class BizSplitPane extends LitElement {
-  static styles = splitPaneStyles;
+export class BizSplitPane extends LitElement implements SplitPaneHost {
+  static override styles = splitPaneStyles;
 
-  @property({ type: String }) direction = 'horizontal';
-  @property({ type: Array }) sizes = [50, 50];
-  @property({ type: Array, attribute: 'min-sizes' }) minSizes = [100, 100];
-  @property({ type: Array, attribute: 'max-sizes' }) maxSizes = [];
-  @property({ type: Boolean }) disabled = false;
-  @property({ type: Boolean }) collapsible = false;
-  @property({ type: String }) variant = 'Line';
-  @property({ type: String }) size = 'Medium';
-  @property({ type: Boolean, attribute: 'full-width' }) fullWidth = false;
-  @property({ type: Boolean, attribute: 'full-height' }) fullHeight = false;
+  @property({ type: String, reflect: true })
+  direction: 'horizontal' | 'vertical' = 'horizontal';
 
-  @state() isDragging = false;
-  @state() collapsed = 0;
+  @property({ type: String, reflect: true })
+  variant: 'line' | 'grip' | 'invisible' = 'line';
 
-  private startPos = 0;
+  @property({ type: String, reflect: true })
+  size: 'small' | 'medium' | 'large' = 'medium';
+
+  @property({ type: Array })
+  sizes: number[] = [50, 50];
+
+  @property({ type: Array, attribute: 'min-sizes' })
+  minSizes: number[] = [100, 100];
+
+  @property({ type: Array, attribute: 'max-sizes' })
+  maxSizes: number[] = [];
+
+  @property({ type: Boolean, reflect: true })
+  disabled: boolean = false;
+
+  @property({ type: Boolean, reflect: true })
+  collapsible: boolean = false;
+
+  @state()
+  collapsed: boolean = false;
+
+  @state()
+  isDragging: boolean = false;
+
+  private startPosition: number = 0;
   private startSizes: number[] = [];
+  private previousSizes: number[] = [50, 50];
 
-  render() {
-    return SplitPaneTemplate(this);
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
   }
 
-  onResizeStart = (e: MouseEvent | TouchEvent) => {
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeDragListeners();
+  }
+
+  handleMouseDown = (event: MouseEvent): void => {
     if (this.disabled) return;
+    event.preventDefault();
+
     this.isDragging = true;
+    this.startPosition = this.direction === 'horizontal' ? event.clientX : event.clientY;
     this.startSizes = [...this.sizes];
-    this.startPos = e instanceof MouseEvent 
-      ? (this.direction === 'horizontal' ? e.clientX : e.clientY) 
-      : (this.direction === 'horizontal' ? e.touches[0].clientX : e.touches[0].clientY);
 
-    window.addEventListener('mousemove', this.onResize);
-    window.addEventListener('touchmove', this.onResize);
-    window.addEventListener('mouseup', this.onResizeEnd);
-    window.addEventListener('touchend', this.onResizeEnd);
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('mouseup', this.handleMouseUp);
 
-    this.dispatchEvent(new CustomEvent('resize-start', { 
-      bubbles: true, 
-      composed: true, 
-      detail: { sizes: this.sizes } 
-    }));
-  }
+    this.dispatchEvent(
+      new CustomEvent('resize-start', {
+        bubbles: true,
+        composed: true,
+        detail: { sizes: [...this.sizes] },
+      })
+    );
+  };
 
-  onResize = (e: MouseEvent | TouchEvent) => {
+  private handleMouseMove = (event: MouseEvent): void => {
     if (!this.isDragging) return;
-    const currentPos = e instanceof MouseEvent 
-      ? (this.direction === 'horizontal' ? e.clientX : e.clientY) 
-      : (this.direction === 'horizontal' ? e.touches[0].clientX : e.touches[0].clientY);
-    
-    const delta = currentPos - this.startPos;
-    const containerRect = this.getBoundingClientRect();
-    const containerSize = this.direction === 'horizontal' ? containerRect.width : containerRect.height;
-    const deltaPercent = (delta / containerSize) * 100;
 
-    const newSize0 = Math.max(0, this.startSizes[0] + deltaPercent);
-    const newSize1 = Math.max(0, this.startSizes[1] - deltaPercent);
+    const currentPos = this.direction === 'horizontal' ? event.clientX : event.clientY;
+    const delta = currentPos - this.startPosition;
+    const rect = this.getBoundingClientRect();
+    const totalSize = this.direction === 'horizontal' ? rect.width : rect.height;
 
-    this.sizes = [newSize0, newSize1];
-    
-    this.dispatchEvent(new CustomEvent('resize', { 
-      bubbles: true, 
-      composed: true, 
-      detail: { sizes: this.sizes } 
-    }));
-  }
+    if (totalSize === 0) return;
 
-  onResizeEnd = () => {
-    this.isDragging = false;
-    window.removeEventListener('mousemove', this.onResize);
-    window.removeEventListener('touchmove', this.onResize);
-    window.removeEventListener('mouseup', this.onResizeEnd);
-    window.removeEventListener('touchend', this.onResizeEnd);
+    const deltaPercent = (delta / totalSize) * 100;
+    const initialSize0 = this.startSizes[0] ?? 50;
+    const initialSize1 = this.startSizes[1] ?? 50;
 
-    this.dispatchEvent(new CustomEvent('resize-end', { 
-      bubbles: true, 
-      composed: true, 
-      detail: { sizes: this.sizes } 
-    }));
-  }
+    let newSize0 = initialSize0 + deltaPercent;
+    let newSize1 = initialSize1 - deltaPercent;
 
-  onKeyDown = (e: KeyboardEvent) => {
-    if (this.disabled) return;
-    const step = 5;
-    let newSize0 = this.sizes[0];
-    let newSize1 = this.sizes[1];
+    const min0Percent = ((this.minSizes[0] ?? 0) / totalSize) * 100;
+    const min1Percent = ((this.minSizes[1] ?? 0) / totalSize) * 100;
 
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      newSize0 -= step;
-      newSize1 += step;
-    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      newSize0 += step;
-      newSize1 -= step;
-    } else if (e.key === 'Home') {
-      newSize0 = 0;
-      newSize1 = 100;
-    } else if (e.key === 'End') {
-      newSize0 = 100;
-      newSize1 = 0;
-    } else if (e.key === 'Enter' && this.collapsible) {
-      this.onDoubleClick();
-      return;
-    } else {
-      return;
+    if (newSize0 < min0Percent) {
+      newSize0 = min0Percent;
+      newSize1 = 100 - min0Percent;
+    } else if (newSize1 < min1Percent) {
+      newSize1 = min1Percent;
+      newSize0 = 100 - min1Percent;
     }
 
-    this.sizes = [Math.max(0, newSize0), Math.max(0, newSize1)];
-    
-    this.dispatchEvent(new CustomEvent('resize', { 
-      bubbles: true, 
-      composed: true, 
-      detail: { sizes: this.sizes } 
-    }));
-    this.dispatchEvent(new CustomEvent('resize-end', { 
-      bubbles: true, 
-      composed: true, 
-      detail: { sizes: this.sizes } 
-    }));
+    if (this.maxSizes[0] !== undefined) {
+      const max0Percent = (this.maxSizes[0] / totalSize) * 100;
+      if (newSize0 > max0Percent) {
+        newSize0 = max0Percent;
+        newSize1 = 100 - max0Percent;
+      }
+    }
+
+    this.sizes = [newSize0, newSize1];
+    if (this.collapsed) {
+      this.collapsed = false;
+    }
+
+    this.dispatchEvent(
+      new CustomEvent('resize', {
+        bubbles: true,
+        composed: true,
+        detail: { sizes: [...this.sizes] },
+      })
+    );
+  };
+
+  private handleMouseUp = (): void => {
+    if (!this.isDragging) return;
+
+    this.isDragging = false;
+    this.removeDragListeners();
+
+    this.dispatchEvent(
+      new CustomEvent('resize-end', {
+        bubbles: true,
+        composed: true,
+        detail: { sizes: [...this.sizes] },
+      })
+    );
+  };
+
+  private removeDragListeners(): void {
+    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('mouseup', this.handleMouseUp);
   }
 
-  onDoubleClick = () => {
-    if (!this.collapsible || this.disabled) return;
-    this.collapsed = this.collapsed === 1 ? 0 : 1;
-    this.dispatchEvent(new CustomEvent('collapse', { 
-      bubbles: true, 
-      composed: true, 
-      detail: { paneIndex: 1, collapsed: this.collapsed === 1 } 
-    }));
+  handleKeyDown = (event: KeyboardEvent): void => {
+    if (this.disabled) return;
+
+    const step = 5;
+    let primary = this.sizes[0] ?? 50;
+    let isHandled = false;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        primary = Math.max(0, primary - step);
+        isHandled = true;
+        break;
+      case 'ArrowRight':
+      case 'ArrowDown':
+        primary = Math.min(100, primary + step);
+        isHandled = true;
+        break;
+      case 'Home':
+        primary = 0;
+        isHandled = true;
+        break;
+      case 'End':
+        primary = 100;
+        isHandled = true;
+        break;
+      case 'Enter':
+        if (this.collapsible) {
+          this.handleDoubleClick();
+          isHandled = true;
+        }
+        break;
+    }
+
+    if (isHandled) {
+      event.preventDefault();
+      if (event.key !== 'Enter') {
+        this.sizes = [primary, 100 - primary];
+        this.dispatchEvent(
+          new CustomEvent('resize', {
+            bubbles: true,
+            composed: true,
+            detail: { sizes: [...this.sizes] },
+          })
+        );
+      }
+    }
+  };
+
+  handleDoubleClick = (): void => {
+    if (this.disabled || !this.collapsible) return;
+
+    this.collapsed = !this.collapsed;
+
+    if (this.collapsed) {
+      this.previousSizes = [...this.sizes];
+      this.sizes = [0, 100];
+    } else {
+      this.sizes = [...this.previousSizes];
+    }
+
+    this.dispatchEvent(
+      new CustomEvent('collapse', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          paneIndex: 0,
+          collapsed: this.collapsed,
+        },
+      })
+    );
+  };
+
+  override render() {
+    return SplitPaneTemplate(this);
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'biz-split-pane': BizSplitPane;
   }
 }
