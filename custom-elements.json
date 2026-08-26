@@ -561,228 +561,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/examples/Cart/Cart.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "cartStyles",
-          "default": "css` .cart { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; } .cart-header { font-size: 1.2rem; margin-bottom: 1rem; } .cart-items { list-style: none; padding: 0; margin: 0; } .cart-item { display: flex; justify-content: space-between; margin-bottom: 0.5rem; } .cart-total { margin-top: 1rem; font-weight: bold; } `"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "cartStyles",
-          "declaration": {
-            "name": "cartStyles",
-            "module": "src/examples/Cart/Cart.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/examples/Cart/Cart.stories.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "meta",
-          "type": {
-            "text": "Meta<CartProps>"
-          },
-          "default": "{ title: 'Examples/Cart', render: (args) => { const handleAddItem = () => { const cartEl = document.querySelector('shop-cart'); if (cartEl) { const newItem: CartItem = { id: Math.floor(Math.random() * 5), name: `추가된 상품 (${Date.now().toString().slice(-4)})`, price: 1500, quantity: 1 }; cartEl.addItem(newItem); } }; const handleCheckout = () => { const cartEl = document.querySelector('shop-cart'); if (cartEl) { // public getter를 통해 병합된 내부 상태 수집 const finalItems = cartEl.itemsInCart; alert(`총 ${finalItems.length}개의 종류 상품 결재를 진행합니다.`); } }; return html` <div style=\"margin-bottom: 16px;\"> <button @click=${handleAddItem}>상품추가</button> </div> <shop-cart .items=${args.items} ></shop-cart> <div style=\"margin-top: 16px; display: flex; gap: 8px;\"> <button @click=${handleCheckout}>결재하기</button> </div> `; }, argTypes: { items: { control: { type: 'object' } } } }"
-        },
-        {
-          "kind": "variable",
-          "name": "Default",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { items: [ { id: 1, name: \"notebook\", price: 1000, quantity: 1 }, { id: 2, name: \"macbook\", price: 2300, quantity: 1 }, { id: 1, name: \"notebook\", price: 1000, quantity: 2 }, ] } }"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "default",
-          "declaration": {
-            "name": "meta",
-            "module": "src/examples/Cart/Cart.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Default",
-          "declaration": {
-            "name": "Default",
-            "module": "src/examples/Cart/Cart.stories.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/examples/Cart/Cart.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "CartTemplate",
-          "parameters": [
-            {
-              "name": "{\n    items,\n    }",
-              "type": {
-                "text": "CartProps"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CartTemplate",
-          "declaration": {
-            "name": "CartTemplate",
-            "module": "src/examples/Cart/Cart.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/examples/Cart/Cart.wc.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "",
-          "name": "CartWC",
-          "members": [
-            {
-              "kind": "field",
-              "name": "items",
-              "type": {
-                "text": "CartItem[]"
-              },
-              "default": "[]",
-              "attribute": "items"
-            },
-            {
-              "kind": "field",
-              "name": "_items",
-              "type": {
-                "text": "CartItem[]"
-              },
-              "privacy": "private",
-              "default": "[]"
-            },
-            {
-              "kind": "field",
-              "name": "itemsInCart",
-              "type": {
-                "text": "CartItem[]"
-              },
-              "privacy": "public",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "addItem",
-              "privacy": "public",
-              "parameters": [
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "CartItem"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleRemoveItem",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "CustomEvent<{ id: number }>"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_mergeItems",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "CartItem[]"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "items",
-                  "type": {
-                    "text": "CartItem[]"
-                  }
-                }
-              ]
-            }
-          ],
-          "attributes": [
-            {
-              "name": "items",
-              "type": {
-                "text": "CartItem[]"
-              },
-              "default": "[]",
-              "fieldName": "items"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "shop-cart",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CartWC",
-          "declaration": {
-            "name": "CartWC",
-            "module": "src/examples/Cart/Cart.wc.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "shop-cart",
-          "declaration": {
-            "name": "CartWC",
-            "module": "src/examples/Cart/Cart.wc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/examples/Cart/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/examples/Cart/Cart.wc"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/ApplicationShell/ApplicationShell.css.ts",
       "declarations": [
         {
@@ -1315,56 +1093,56 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/Button/Button.css.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.css.ts",
       "declarations": [
         {
           "kind": "variable",
-          "name": "buttonStyles",
-          "default": "css` :host { display: inline-block; box-sizing: border-box; --biz-button-height-sm: 32px; --biz-button-height-md: 40px; --biz-button-height-lg: 48px; --biz-button-padding-x-sm: 12px; --biz-button-padding-x-md: 16px; --biz-button-padding-x-lg: 20px; --biz-button-border-radius: 4px; --biz-button-font-size-sm: 12px; --biz-button-font-size-md: 14px; --biz-button-font-size-lg: 16px; --biz-button-bg-color: #2563eb; --biz-button-text-color: #ffffff; --biz-button-border-color: transparent; --biz-button-hover-bg-color: #1d4ed8; --biz-button-active-bg-color: #1e40af; --biz-button-focus-ring-color: rgba(37, 99, 235, 0.4); --biz-button-disabled-bg-color: #e5e7eb; --biz-button-disabled-text-color: #9ca3af; --biz-button-disabled-border-color: transparent; } :host([full-width]) { display: block; width: 100%; } *, *::before, *::after { box-sizing: border-box; } .biz-button { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 100%; border-style: solid; border-width: 1px; border-radius: var(--biz-button-border-radius); font-family: inherit; font-weight: 500; line-height: 1; text-decoration: none; cursor: pointer; user-select: none; transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; outline: none; } /* Sizes */ .biz-button--small { height: var(--biz-button-height-sm); padding: 0 var(--biz-button-padding-x-sm); font-size: var(--biz-button-font-size-sm); } .biz-button--medium { height: var(--biz-button-height-md); padding: 0 var(--biz-button-padding-x-md); font-size: var(--biz-button-font-size-md); } .biz-button--large { height: var(--biz-button-height-lg); padding: 0 var(--biz-button-padding-x-lg); font-size: var(--biz-button-font-size-lg); } /* Variants */ .biz-button--filled { background-color: var(--biz-button-bg-color); color: var(--biz-button-text-color); border-color: var(--biz-button-border-color); } .biz-button--filled:hover:not(:disabled) { background-color: var(--biz-button-hover-bg-color); } .biz-button--filled:active:not(:disabled) { background-color: var(--biz-button-active-bg-color); } .biz-button--outlined { background-color: transparent; color: var(--biz-button-bg-color); border-color: var(--biz-button-bg-color); } .biz-button--outlined:hover:not(:disabled) { background-color: rgba(37, 99, 235, 0.04); } .biz-button--outlined:active:not(:disabled) { background-color: rgba(37, 99, 235, 0.12); } .biz-button--text { background-color: transparent; color: var(--biz-button-bg-color); border-color: transparent; } .biz-button--text:hover:not(:disabled) { background-color: rgba(37, 99, 235, 0.04); } .biz-button--text:active:not(:disabled) { background-color: rgba(37, 99, 235, 0.12); } /* Focus & Focus-visible */ .biz-button:focus-visible { box-shadow: 0 0 0 3px var(--biz-button-focus-ring-color); } /* Full Width */ .biz-button--full-width { width: 100%; } /* Disabled State */ .biz-button:disabled { background-color: var(--biz-button-disabled-bg-color); color: var(--biz-button-disabled-text-color); border-color: var(--biz-button-disabled-border-color); cursor: not-allowed; opacity: 0.7; } .biz-button--outlined:disabled, .biz-button--text:disabled { background-color: transparent; border-color: var(--biz-button-disabled-bg-color); } .biz-button--text:disabled { border-color: transparent; } /* Loading State */ .biz-button--loading { cursor: wait; } .biz-button__spinner { display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; animation: biz-button-spin 1s linear infinite; } .biz-button__spinner svg { width: 100%; height: 100%; } @keyframes biz-button-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } .biz-button__icon { display: inline-flex; align-items: center; } .biz-button__label { display: inline-flex; align-items: center; } `"
+          "name": "checkboxGroupStyles",
+          "default": "css` :host { display: inline-block; box-sizing: border-box; /* Design Tokens */ --biz-checkbox-group-gap-sm: 8px; --biz-checkbox-group-gap-md: 12px; --biz-checkbox-group-gap-lg: 16px; --biz-checkbox-group-label-margin-bottom: 8px; --biz-checkbox-group-label-color: #111827; --biz-checkbox-group-helper-text-color: #6b7280; --biz-checkbox-group-error-color: #dc2626; --biz-checkbox-group-disabled-opacity: 0.5; --biz-checkbox-group-focus-ring-color: #2563eb; --biz-checkbox-group-border-color: #d1d5db; --biz-checkbox-group-bg: transparent; } :host([full-width]), .biz-checkbox-group--full-width { width: 100%; display: block; } .biz-checkbox-group { display: flex; flex-direction: column; box-sizing: border-box; width: 100%; } /* Label & Helper Styles */ .biz-checkbox-group__label { color: var(--biz-checkbox-group-label-color); margin-bottom: var(--biz-checkbox-group-label-margin-bottom); font-weight: 600; } .biz-checkbox-group__helper-text { margin-top: 6px; font-size: 0.875rem; color: var(--biz-checkbox-group-helper-text-color); } /* Container & Orientation */ .biz-checkbox-group__container { display: flex; box-sizing: border-box; } .biz-checkbox-group--vertical .biz-checkbox-group__container { flex-direction: column; } .biz-checkbox-group--horizontal .biz-checkbox-group__container { flex-direction: row; flex-wrap: wrap; } /* Sizes */ .biz-checkbox-group--small .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-sm); } .biz-checkbox-group--small .biz-checkbox-group__label { font-size: 0.875rem; } .biz-checkbox-group--medium .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-md); } .biz-checkbox-group--medium .biz-checkbox-group__label { font-size: 1rem; } .biz-checkbox-group--large .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-lg); } .biz-checkbox-group--large .biz-checkbox-group__label { font-size: 1.125rem; } /* Variants */ .biz-checkbox-group--standard { /* Standard Layout */ } .biz-checkbox-group--card .biz-checkbox-group__container { padding: 4px; } .biz-checkbox-group--button .biz-checkbox-group__container { display: inline-flex; border-radius: 6px; background-color: #f3f4f6; padding: 2px; } /* States */ .biz-checkbox-group--disabled { opacity: var(--biz-checkbox-group-disabled-opacity); cursor: not-allowed; pointer-events: none; } .biz-checkbox-group--readonly { pointer-events: none; } .biz-checkbox-group--error .biz-checkbox-group__label, .biz-checkbox-group--error .biz-checkbox-group__helper-text { color: var(--biz-checkbox-group-error-color); } .biz-checkbox-group:focus-within { outline: none; } `"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "buttonStyles",
+          "name": "checkboxGroupStyles",
           "declaration": {
-            "name": "buttonStyles",
-            "module": "src/components/Button/Button.css.ts"
+            "name": "checkboxGroupStyles",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/Button/Button.react.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.react.ts",
       "declarations": [
         {
           "kind": "variable",
-          "name": "Button"
+          "name": "CheckboxGroup"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "Button",
+          "name": "CheckboxGroup",
           "declaration": {
-            "name": "Button",
-            "module": "src/components/Button/Button.react.ts"
+            "name": "CheckboxGroup",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.react.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/Button/Button.stories.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.stories.ts",
       "declarations": [
         {
           "kind": "variable",
           "name": "meta",
           "type": {
-            "text": "Meta<Args>"
+            "text": "Meta"
           },
-          "default": "{ title: 'Components/Forms/Button', component: 'biz-button', tags: ['autodocs'], argTypes: { variant: { control: { type: 'select' }, options: ['filled', 'outlined', 'text'], description: '버튼 시각적 형태 옵션', table: { category: 'props' }, }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'], description: '버튼 크기 옵션', table: { category: 'props' }, }, type: { control: { type: 'select' }, options: ['button', 'submit', 'reset'], description: '버튼의 기능적 동작 타입', table: { category: 'props' }, }, disabled: { control: { type: 'boolean' }, description: '비활성화 여부', table: { category: 'props' }, }, loading: { control: { type: 'boolean' }, description: '로딩 상태 여부', table: { category: 'props' }, }, fullWidth: { control: { type: 'boolean' }, description: '너비 100% 확장 여부', table: { category: 'props' }, }, label: { name: 'default (slot)', control: { type: 'text' }, description: '버튼 내 기본 슬롯 텍스트 콘텐츠', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, startIcon: { name: 'start-slot', control: { type: 'text' }, description: '버튼 앞쪽에 위치하는 아이콘/요소 슬롯', table: { category: 'slots', type: { summary: 'HTMLElement' } }, }, endIcon: { name: 'end-slot', control: { type: 'text' }, description: '버튼 뒤쪽에 위치하는 아이콘/요소 슬롯', table: { category: 'slots', type: { summary: 'HTMLElement' } }, }, }, args: { variant: 'filled', size: 'medium', type: 'button', disabled: false, loading: false, fullWidth: false, label: 'Button', startIcon: '', endIcon: '', }, render: (args) => html` <biz-button .variant=${args.variant} .size=${args.size} .type=${args.type} ?disabled=${args.disabled} ?loading=${args.loading} ?full-width=${args.fullWidth} > ${args.startIcon ? html`<span slot=\"start-slot\">${args.startIcon}</span>` : ''} ${args.label} ${args.endIcon ? html`<span slot=\"end-slot\">${args.endIcon}</span>` : ''} </biz-button> `, }"
+          "default": "{ title: 'Components/Forms/CheckboxGroup', component: 'biz-checkbox-group', tags: ['autodocs'], argTypes: { orientation: { control: { type: 'select' }, options: ['vertical', 'horizontal'] }, variant: { control: { type: 'select' }, options: ['standard', 'card', 'button'] }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'] }, required: { control: 'boolean' }, disabled: { control: 'boolean' }, readonly: { control: 'boolean' }, error: { control: 'boolean' }, fullWidth: { control: 'boolean' }, min: { control: 'number' }, max: { control: 'number' } }, args: { orientation: 'vertical', variant: 'standard', size: 'medium', required: false, disabled: false, readonly: false, error: false, fullWidth: false, min: 0, max: Number.POSITIVE_INFINITY } }"
         },
         {
           "kind": "variable",
@@ -1372,7 +1150,7 @@
           "type": {
             "text": "Story"
           },
-          "default": "{ args: { label: '기본 버튼', }, }"
+          "default": "{ render: (args) => html` <biz-checkbox-group .orientation=\"${args.orientation}\" .variant=\"${args.variant}\" .size=\"${args.size}\" ?required=\"${args.required}\" ?disabled=\"${args.disabled}\" ?readonly=\"${args.readonly}\" ?error=\"${args.error}\" ?full-width=\"${args.fullWidth}\" .min=\"${args.min}\" .max=\"${args.max}\" > <span slot=\"label-slot\">알림 설정</span> <label><input type=\"checkbox\" value=\"email\" /> 이메일 알림</label> <label><input type=\"checkbox\" value=\"sms\" /> SMS 알림</label> <label><input type=\"checkbox\" value=\"push\" /> 앱 푸시 알림</label> <span slot=\"helper-text-slot\">수신하고자 하는 알림 채널을 선택하세요.</span> </biz-checkbox-group> ` }"
         },
         {
           "kind": "variable",
@@ -1380,7 +1158,7 @@
           "type": {
             "text": "Story"
           },
-          "default": "{ render: () => html` <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button variant=\"filled\">Filled (Primary)</biz-button> <biz-button variant=\"outlined\">Outlined</biz-button> <biz-button variant=\"text\">Text</biz-button> </div> `, }"
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-checkbox-group variant=\"standard\"> <span slot=\"label-slot\">Standard Variant</span> <label><input type=\"checkbox\" value=\"1\" /> 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group variant=\"card\"> <span slot=\"label-slot\">Card Variant</span> <label><input type=\"checkbox\" value=\"1\" /> 카드 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 카드 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group variant=\"button\" orientation=\"horizontal\"> <span slot=\"label-slot\">Button Variant</span> <label><input type=\"checkbox\" value=\"1\" /> 버튼 1</label> <label><input type=\"checkbox\" value=\"2\" /> 버튼 2</label> </biz-checkbox-group> </div> ` }"
         },
         {
           "kind": "variable",
@@ -1388,7 +1166,7 @@
           "type": {
             "text": "Story"
           },
-          "default": "{ render: () => html` <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button size=\"small\">Small</biz-button> <biz-button size=\"medium\">Medium</biz-button> <biz-button size=\"large\">Large</biz-button> </div> `, }"
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-checkbox-group size=\"small\"> <span slot=\"label-slot\">Small Size</span> <label><input type=\"checkbox\" value=\"1\" /> 소형 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 소형 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group size=\"medium\"> <span slot=\"label-slot\">Medium Size</span> <label><input type=\"checkbox\" value=\"1\" /> 중형 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 중형 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group size=\"large\"> <span slot=\"label-slot\">Large Size</span> <label><input type=\"checkbox\" value=\"1\" /> 대형 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 대형 옵션 2</label> </biz-checkbox-group> </div> ` }"
         },
         {
           "kind": "variable",
@@ -1396,31 +1174,7 @@
           "type": {
             "text": "Story"
           },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 16px;\"> <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button disabled>Disabled (Filled)</biz-button> <biz-button variant=\"outlined\" disabled>Disabled (Outlined)</biz-button> <biz-button variant=\"text\" disabled>Disabled (Text)</biz-button> </div> <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button loading>Loading (Filled)</biz-button> <biz-button variant=\"outlined\" loading>Loading (Outlined)</biz-button> <biz-button variant=\"text\" loading>Loading (Text)</biz-button> </div> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "WithIcons",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button> <span slot=\"start-slot\">🚀</span> Start Icon </biz-button> <biz-button variant=\"outlined\"> End Icon <span slot=\"end-slot\">➡️</span> </biz-button> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "FullWidth",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"width: 320px; padding: 16px; border: 1px dashed #ccc;\"> <biz-button full-width>Full Width Button</biz-button> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "Accessibility",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 12px;\"> <biz-button aria-label=\"닫기\"> <span slot=\"start-slot\">✕</span> </biz-button> <biz-button loading aria-label=\"데이터 처리 중입니다\"> 저장하기 </biz-button> </div> `, }"
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-checkbox-group disabled> <span slot=\"label-slot\">Disabled State</span> <label><input type=\"checkbox\" value=\"1\" /> 비활성화 1</label> <label><input type=\"checkbox\" value=\"2\" /> 비활성화 2</label> </biz-checkbox-group> <biz-checkbox-group readonly .value=\"${['1']}\"> <span slot=\"label-slot\">Readonly State</span> <label><input type=\"checkbox\" value=\"1\" /> 읽기 전용 1</label> <label><input type=\"checkbox\" value=\"2\" /> 읽기 전용 2</label> </biz-checkbox-group> <biz-checkbox-group error> <span slot=\"label-slot\">Error State</span> <label><input type=\"checkbox\" value=\"1\" /> 에러 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 에러 옵션 2</label> <span slot=\"helper-text-slot\">필수 항목을 선택해 주세요.</span> </biz-checkbox-group> </div> ` }"
         }
       ],
       "exports": [
@@ -1429,7 +1183,7 @@
           "name": "default",
           "declaration": {
             "name": "meta",
-            "module": "src/components/Button/Button.stories.ts"
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
@@ -1437,7 +1191,7 @@
           "name": "Default",
           "declaration": {
             "name": "Default",
-            "module": "src/components/Button/Button.stories.ts"
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
@@ -1445,7 +1199,7 @@
           "name": "Variants",
           "declaration": {
             "name": "Variants",
-            "module": "src/components/Button/Button.stories.ts"
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
@@ -1453,7 +1207,7 @@
           "name": "Sizes",
           "declaration": {
             "name": "Sizes",
-            "module": "src/components/Button/Button.stories.ts"
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
@@ -1461,47 +1215,28 @@
           "name": "States",
           "declaration": {
             "name": "States",
-            "module": "src/components/Button/Button.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "WithIcons",
-          "declaration": {
-            "name": "WithIcons",
-            "module": "src/components/Button/Button.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "FullWidth",
-          "declaration": {
-            "name": "FullWidth",
-            "module": "src/components/Button/Button.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Accessibility",
-          "declaration": {
-            "name": "Accessibility",
-            "module": "src/components/Button/Button.stories.ts"
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/Button/Button.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.ts",
       "declarations": [
         {
           "kind": "function",
-          "name": "ButtonTemplate",
+          "name": "CheckboxGroupTemplate",
+          "return": {
+            "type": {
+              "text": "TemplateResult"
+            }
+          },
           "parameters": [
             {
-              "name": "host",
+              "name": "props",
               "type": {
-                "text": "ButtonHost"
+                "text": "CheckboxGroupTemplateProps"
               }
             }
           ]
@@ -1510,32 +1245,69 @@
       "exports": [
         {
           "kind": "js",
-          "name": "ButtonTemplate",
+          "name": "CheckboxGroupTemplate",
           "declaration": {
-            "name": "ButtonTemplate",
-            "module": "src/components/Button/Button.ts"
+            "name": "CheckboxGroupTemplate",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/Button/Button.wc.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.wc.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "",
-          "name": "BizButton",
+          "name": "CheckboxGroup",
+          "slots": [
+            {
+              "name": "label-slot"
+            },
+            {
+              "name": "helper-text-slot"
+            },
+            {
+              "name": "(default)"
+            }
+          ],
           "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "attribute": "orientation"
+            },
             {
               "kind": "field",
               "name": "variant",
               "type": {
-                "text": "'filled' | 'outlined' | 'text'"
+                "text": "'standard' | 'card' | 'button'"
               },
-              "default": "'filled'",
-              "attribute": "variant",
-              "reflects": true
+              "default": "'standard'",
+              "attribute": "variant"
             },
             {
               "kind": "field",
@@ -1544,18 +1316,16 @@
                 "text": "'small' | 'medium' | 'large'"
               },
               "default": "'medium'",
-              "attribute": "size",
-              "reflects": true
+              "attribute": "size"
             },
             {
               "kind": "field",
-              "name": "type",
+              "name": "required",
               "type": {
-                "text": "'button' | 'submit' | 'reset'"
+                "text": "boolean"
               },
-              "default": "'button'",
-              "attribute": "type",
-              "reflects": true
+              "default": "false",
+              "attribute": "required"
             },
             {
               "kind": "field",
@@ -1564,18 +1334,25 @@
                 "text": "boolean"
               },
               "default": "false",
-              "attribute": "disabled",
-              "reflects": true
+              "attribute": "disabled"
             },
             {
               "kind": "field",
-              "name": "loading",
+              "name": "readonly",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "attribute": "loading",
-              "reflects": true
+              "attribute": "readonly"
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "error"
             },
             {
               "kind": "field",
@@ -1584,29 +1361,93 @@
                 "text": "boolean"
               },
               "default": "false",
-              "attribute": "full-width",
-              "reflects": true
+              "attribute": "full-width"
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "attribute": "min"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "labelId",
+              "privacy": "private",
+              "default": "`biz-checkbox-group-label-${++instanceCounter}`"
+            },
+            {
+              "kind": "field",
+              "name": "helperId",
+              "privacy": "private",
+              "default": "`biz-checkbox-group-helper-${instanceCounter}`"
             },
             {
               "kind": "method",
-              "name": "handleClick",
+              "name": "handleSlotChange",
+              "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "MouseEvent"
-                  }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getSlottedCheckboxes",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLInputElement[]"
                 }
-              ]
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncChildCheckboxes",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "handleChildChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "dispatchChangeEvent",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "clear",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "method",
               "name": "handleKeyDown",
+              "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
@@ -1614,7 +1455,7 @@
               },
               "parameters": [
                 {
-                  "name": "event",
+                  "name": "e",
                   "type": {
                     "text": "KeyboardEvent"
                   }
@@ -1622,13 +1463,51 @@
               ]
             }
           ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "CustomEvent"
+              }
+            },
+            {
+              "name": "clear",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
           "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "value"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "name"
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "fieldName": "orientation"
+            },
             {
               "name": "variant",
               "type": {
-                "text": "'filled' | 'outlined' | 'text'"
+                "text": "'standard' | 'card' | 'button'"
               },
-              "default": "'filled'",
+              "default": "'standard'",
               "fieldName": "variant"
             },
             {
@@ -1640,12 +1519,12 @@
               "fieldName": "size"
             },
             {
-              "name": "type",
+              "name": "required",
               "type": {
-                "text": "'button' | 'submit' | 'reset'"
+                "text": "boolean"
               },
-              "default": "'button'",
-              "fieldName": "type"
+              "default": "false",
+              "fieldName": "required"
             },
             {
               "name": "disabled",
@@ -1656,12 +1535,20 @@
               "fieldName": "disabled"
             },
             {
-              "name": "loading",
+              "name": "readonly",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "fieldName": "loading"
+              "fieldName": "readonly"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "error"
             },
             {
               "name": "full-width",
@@ -1670,46 +1557,58 @@
               },
               "default": "false",
               "fieldName": "fullWidth"
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "fieldName": "min"
+            },
+            {
+              "name": "max",
+              "fieldName": "max"
             }
           ],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
           },
-          "tagName": "biz-button",
+          "tagName": "biz-checkbox-group",
           "customElement": true
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "BizButton",
+          "name": "CheckboxGroup",
           "declaration": {
-            "name": "BizButton",
-            "module": "src/components/Button/Button.wc.ts"
+            "name": "CheckboxGroup",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "biz-button",
+          "name": "biz-checkbox-group",
           "declaration": {
-            "name": "BizButton",
-            "module": "src/components/Button/Button.wc.ts"
+            "name": "CheckboxGroup",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/Button/index.ts",
+      "path": "src/components/CheckboxGroup/index.ts",
       "declarations": [],
       "exports": [
         {
           "kind": "js",
-          "name": "BizButton",
+          "name": "CheckboxGroupWc",
           "declaration": {
-            "name": "BizButton",
-            "module": "./Button.wc"
+            "name": "CheckboxGroup",
+            "module": "./CheckboxGroup.wc"
           }
         }
       ]
@@ -2279,917 +2178,6 @@
           "declaration": {
             "name": "BizCheckbox",
             "module": "./Checkbox.wc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "checkboxGroupStyles",
-          "default": "css` :host { display: inline-block; box-sizing: border-box; /* Design Tokens */ --biz-checkbox-group-gap-sm: 8px; --biz-checkbox-group-gap-md: 12px; --biz-checkbox-group-gap-lg: 16px; --biz-checkbox-group-label-margin-bottom: 8px; --biz-checkbox-group-label-color: #111827; --biz-checkbox-group-helper-text-color: #6b7280; --biz-checkbox-group-error-color: #dc2626; --biz-checkbox-group-disabled-opacity: 0.5; --biz-checkbox-group-focus-ring-color: #2563eb; --biz-checkbox-group-border-color: #d1d5db; --biz-checkbox-group-bg: transparent; } :host([full-width]), .biz-checkbox-group--full-width { width: 100%; display: block; } .biz-checkbox-group { display: flex; flex-direction: column; box-sizing: border-box; width: 100%; } /* Label & Helper Styles */ .biz-checkbox-group__label { color: var(--biz-checkbox-group-label-color); margin-bottom: var(--biz-checkbox-group-label-margin-bottom); font-weight: 600; } .biz-checkbox-group__helper-text { margin-top: 6px; font-size: 0.875rem; color: var(--biz-checkbox-group-helper-text-color); } /* Container & Orientation */ .biz-checkbox-group__container { display: flex; box-sizing: border-box; } .biz-checkbox-group--vertical .biz-checkbox-group__container { flex-direction: column; } .biz-checkbox-group--horizontal .biz-checkbox-group__container { flex-direction: row; flex-wrap: wrap; } /* Sizes */ .biz-checkbox-group--small .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-sm); } .biz-checkbox-group--small .biz-checkbox-group__label { font-size: 0.875rem; } .biz-checkbox-group--medium .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-md); } .biz-checkbox-group--medium .biz-checkbox-group__label { font-size: 1rem; } .biz-checkbox-group--large .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-lg); } .biz-checkbox-group--large .biz-checkbox-group__label { font-size: 1.125rem; } /* Variants */ .biz-checkbox-group--standard { /* Standard Layout */ } .biz-checkbox-group--card .biz-checkbox-group__container { padding: 4px; } .biz-checkbox-group--button .biz-checkbox-group__container { display: inline-flex; border-radius: 6px; background-color: #f3f4f6; padding: 2px; } /* States */ .biz-checkbox-group--disabled { opacity: var(--biz-checkbox-group-disabled-opacity); cursor: not-allowed; pointer-events: none; } .biz-checkbox-group--readonly { pointer-events: none; } .biz-checkbox-group--error .biz-checkbox-group__label, .biz-checkbox-group--error .biz-checkbox-group__helper-text { color: var(--biz-checkbox-group-error-color); } .biz-checkbox-group:focus-within { outline: none; } `"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "checkboxGroupStyles",
-          "declaration": {
-            "name": "checkboxGroupStyles",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.react.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "CheckboxGroup"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CheckboxGroup",
-          "declaration": {
-            "name": "CheckboxGroup",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.react.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.stories.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "meta",
-          "type": {
-            "text": "Meta"
-          },
-          "default": "{ title: 'Components/Forms/CheckboxGroup', component: 'biz-checkbox-group', tags: ['autodocs'], argTypes: { orientation: { control: { type: 'select' }, options: ['vertical', 'horizontal'] }, variant: { control: { type: 'select' }, options: ['standard', 'card', 'button'] }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'] }, required: { control: 'boolean' }, disabled: { control: 'boolean' }, readonly: { control: 'boolean' }, error: { control: 'boolean' }, fullWidth: { control: 'boolean' }, min: { control: 'number' }, max: { control: 'number' } }, args: { orientation: 'vertical', variant: 'standard', size: 'medium', required: false, disabled: false, readonly: false, error: false, fullWidth: false, min: 0, max: Number.POSITIVE_INFINITY } }"
-        },
-        {
-          "kind": "variable",
-          "name": "Default",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: (args) => html` <biz-checkbox-group .orientation=\"${args.orientation}\" .variant=\"${args.variant}\" .size=\"${args.size}\" ?required=\"${args.required}\" ?disabled=\"${args.disabled}\" ?readonly=\"${args.readonly}\" ?error=\"${args.error}\" ?full-width=\"${args.fullWidth}\" .min=\"${args.min}\" .max=\"${args.max}\" > <span slot=\"label-slot\">알림 설정</span> <label><input type=\"checkbox\" value=\"email\" /> 이메일 알림</label> <label><input type=\"checkbox\" value=\"sms\" /> SMS 알림</label> <label><input type=\"checkbox\" value=\"push\" /> 앱 푸시 알림</label> <span slot=\"helper-text-slot\">수신하고자 하는 알림 채널을 선택하세요.</span> </biz-checkbox-group> ` }"
-        },
-        {
-          "kind": "variable",
-          "name": "Variants",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-checkbox-group variant=\"standard\"> <span slot=\"label-slot\">Standard Variant</span> <label><input type=\"checkbox\" value=\"1\" /> 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group variant=\"card\"> <span slot=\"label-slot\">Card Variant</span> <label><input type=\"checkbox\" value=\"1\" /> 카드 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 카드 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group variant=\"button\" orientation=\"horizontal\"> <span slot=\"label-slot\">Button Variant</span> <label><input type=\"checkbox\" value=\"1\" /> 버튼 1</label> <label><input type=\"checkbox\" value=\"2\" /> 버튼 2</label> </biz-checkbox-group> </div> ` }"
-        },
-        {
-          "kind": "variable",
-          "name": "Sizes",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-checkbox-group size=\"small\"> <span slot=\"label-slot\">Small Size</span> <label><input type=\"checkbox\" value=\"1\" /> 소형 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 소형 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group size=\"medium\"> <span slot=\"label-slot\">Medium Size</span> <label><input type=\"checkbox\" value=\"1\" /> 중형 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 중형 옵션 2</label> </biz-checkbox-group> <biz-checkbox-group size=\"large\"> <span slot=\"label-slot\">Large Size</span> <label><input type=\"checkbox\" value=\"1\" /> 대형 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 대형 옵션 2</label> </biz-checkbox-group> </div> ` }"
-        },
-        {
-          "kind": "variable",
-          "name": "States",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-checkbox-group disabled> <span slot=\"label-slot\">Disabled State</span> <label><input type=\"checkbox\" value=\"1\" /> 비활성화 1</label> <label><input type=\"checkbox\" value=\"2\" /> 비활성화 2</label> </biz-checkbox-group> <biz-checkbox-group readonly .value=\"${['1']}\"> <span slot=\"label-slot\">Readonly State</span> <label><input type=\"checkbox\" value=\"1\" /> 읽기 전용 1</label> <label><input type=\"checkbox\" value=\"2\" /> 읽기 전용 2</label> </biz-checkbox-group> <biz-checkbox-group error> <span slot=\"label-slot\">Error State</span> <label><input type=\"checkbox\" value=\"1\" /> 에러 옵션 1</label> <label><input type=\"checkbox\" value=\"2\" /> 에러 옵션 2</label> <span slot=\"helper-text-slot\">필수 항목을 선택해 주세요.</span> </biz-checkbox-group> </div> ` }"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "default",
-          "declaration": {
-            "name": "meta",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Default",
-          "declaration": {
-            "name": "Default",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Variants",
-          "declaration": {
-            "name": "Variants",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Sizes",
-          "declaration": {
-            "name": "Sizes",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "States",
-          "declaration": {
-            "name": "States",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "CheckboxGroupTemplate",
-          "return": {
-            "type": {
-              "text": "TemplateResult"
-            }
-          },
-          "parameters": [
-            {
-              "name": "props",
-              "type": {
-                "text": "CheckboxGroupTemplateProps"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CheckboxGroupTemplate",
-          "declaration": {
-            "name": "CheckboxGroupTemplate",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.wc.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "",
-          "name": "CheckboxGroup",
-          "slots": [
-            {
-              "name": "label-slot"
-            },
-            {
-              "name": "helper-text-slot"
-            },
-            {
-              "name": "(default)"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "attribute": "orientation"
-            },
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'standard' | 'card' | 'button'"
-              },
-              "default": "'standard'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "required"
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "disabled"
-            },
-            {
-              "kind": "field",
-              "name": "readonly",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "readonly"
-            },
-            {
-              "kind": "field",
-              "name": "error",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "error"
-            },
-            {
-              "kind": "field",
-              "name": "fullWidth",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "full-width"
-            },
-            {
-              "kind": "field",
-              "name": "min",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "attribute": "min"
-            },
-            {
-              "kind": "field",
-              "name": "max",
-              "attribute": "max"
-            },
-            {
-              "kind": "field",
-              "name": "labelId",
-              "privacy": "private",
-              "default": "`biz-checkbox-group-label-${++instanceCounter}`"
-            },
-            {
-              "kind": "field",
-              "name": "helperId",
-              "privacy": "private",
-              "default": "`biz-checkbox-group-helper-${instanceCounter}`"
-            },
-            {
-              "kind": "method",
-              "name": "handleSlotChange",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "getSlottedCheckboxes",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "HTMLInputElement[]"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "syncChildCheckboxes",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "field",
-              "name": "handleChildChange",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "dispatchChangeEvent",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "clear",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "handleKeyDown",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "KeyboardEvent"
-                  }
-                }
-              ]
-            }
-          ],
-          "events": [
-            {
-              "name": "change",
-              "type": {
-                "text": "CustomEvent"
-              }
-            },
-            {
-              "name": "clear",
-              "type": {
-                "text": "CustomEvent"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "value",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "fieldName": "value"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "name"
-            },
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "fieldName": "orientation"
-            },
-            {
-              "name": "variant",
-              "type": {
-                "text": "'standard' | 'card' | 'button'"
-              },
-              "default": "'standard'",
-              "fieldName": "variant"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "fieldName": "size"
-            },
-            {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "required"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "disabled"
-            },
-            {
-              "name": "readonly",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "readonly"
-            },
-            {
-              "name": "error",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "error"
-            },
-            {
-              "name": "full-width",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "fullWidth"
-            },
-            {
-              "name": "min",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "fieldName": "min"
-            },
-            {
-              "name": "max",
-              "fieldName": "max"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "biz-checkbox-group",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CheckboxGroup",
-          "declaration": {
-            "name": "CheckboxGroup",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "biz-checkbox-group",
-          "declaration": {
-            "name": "CheckboxGroup",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CheckboxGroupWc",
-          "declaration": {
-            "name": "CheckboxGroup",
-            "module": "./CheckboxGroup.wc"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CardContainer/CardContainer.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "cardContainerStyles",
-          "default": "css` :host { display: inline-block; box-sizing: border-box; --biz-card-container-padding-sm: 12px; --biz-card-container-padding-md: 16px; --biz-card-container-padding-lg: 24px; --biz-card-container-border-radius: 8px; --biz-card-container-bg-color: #ffffff; --biz-card-container-border-color: #e5e7eb; --biz-card-container-divider-color: #f3f4f6; --biz-card-container-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); --biz-card-container-hover-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); --biz-card-container-focus-ring-color: #3b82f6; --biz-card-container-disabled-opacity: 0.6; --biz-card-container-filled-bg: #f9fafb; --biz-card-container-elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); } :host([full-width]) { display: block; width: 100%; } .biz-card-container { position: relative; display: flex; flex-direction: column; box-sizing: border-box; border-radius: var(--biz-card-container-border-radius); background-color: var(--biz-card-container-bg-color); transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; overflow: hidden; } /* Variants */ .biz-card-container--outlined { border: 1px solid var(--biz-card-container-border-color); box-shadow: none; } .biz-card-container--filled { border: 1px solid transparent; background-color: var(--biz-card-container-filled-bg); box-shadow: none; } .biz-card-container--elevated { border: 1px solid transparent; box-shadow: var(--biz-card-container-elevated-shadow); } /* Sizes */ .biz-card-container--small .biz-card-container__header, .biz-card-container--small .biz-card-container__body, .biz-card-container--small .biz-card-container__footer { padding: var(--biz-card-container-padding-sm); } .biz-card-container--medium .biz-card-container__header, .biz-card-container--medium .biz-card-container__body, .biz-card-container--medium .biz-card-container__footer { padding: var(--biz-card-container-padding-md); } .biz-card-container--large .biz-card-container__header, .biz-card-container--large .biz-card-container__body, .biz-card-container--large .biz-card-container__footer { padding: var(--biz-card-container-padding-lg); } /* Layout Properties */ .biz-card-container--full-width { width: 100%; } .biz-card-container__divider { height: 1px; background-color: var(--biz-card-container-divider-color); width: 100%; } /* States: Hoverable */ .biz-card-container--hoverable { cursor: pointer; } .biz-card-container--hoverable:hover { box-shadow: var(--biz-card-container-hover-shadow); border-color: var(--biz-card-container-border-color); } /* States: Focus / Focus-visible */ .biz-card-container:focus-visible { outline: 2px solid var(--biz-card-container-focus-ring-color); outline-offset: 2px; } /* States: Disabled */ .biz-card-container--disabled { opacity: var(--biz-card-container-disabled-opacity); cursor: not-allowed; pointer-events: none; } /* States: Loading */ .biz-card-container--loading { pointer-events: none; } .biz-card-container__loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; justify-content: center; z-index: 10; } .biz-card-container__spinner { width: 24px; height: 24px; border: 3px solid var(--biz-card-container-border-color); border-top-color: var(--biz-card-container-focus-ring-color); border-radius: 50%; animation: biz-card-spinner 0.8s linear infinite; } @keyframes biz-card-spinner { to { transform: rotate(360deg); } } `"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "cardContainerStyles",
-          "declaration": {
-            "name": "cardContainerStyles",
-            "module": "src/components/CardContainer/CardContainer.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CardContainer/CardContainer.react.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "CardContainer"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CardContainer",
-          "declaration": {
-            "name": "CardContainer",
-            "module": "src/components/CardContainer/CardContainer.react.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CardContainer/CardContainer.stories.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "meta",
-          "type": {
-            "text": "Meta<Args>"
-          },
-          "default": "{ title: 'Components/Layout/CardContainer', component: 'biz-card-container', tags: ['autodocs'], argTypes: { variant: { control: { type: 'select' }, options: ['outlined', 'filled', 'elevated'], }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'], }, fullWidth: { table: { disable: true } }, \"full-width\": { control: 'boolean' , description: '너비 100% 확장 여부' }, borderedDivider: { table: { disable: true } }, \"bordered-divider\": { control: 'boolean' , description: 'Header, Body, Footer 사이 구분선 적용 여부', }, hoverable: { control: 'boolean' , description: '마우스 오버 시 인터랙션 스타일 적용 여부', }, disabled: { control: 'boolean' }, loading: { control: 'boolean' }, ariaLabelledby: { table: { disable: true } }, \"aria-labelledby\": { control: 'boolean' }, contents: { name: 'default (slot)', control: { type: 'text' }, description: '카드 본문 ', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, headerSlot: { name: \"header-slot\", control: { type: 'text' }, description: '카드 상단 ', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, footerSlot: { name: \"footer-slot\", control: { type: 'text' }, description: '카드 하단 ', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, }, args: { variant: 'outlined', size: 'medium', fullWidth: true, borderedDivider: true, hoverable: false, disabled: false, loading: false, contents: '카드 메인 <p> paragraph </p> ', headerSlot: '<b>카드 타이틀</b>', footerSlot: '<button>확인</button>', }, render: (args) => html` <biz-card-container .variant=${args.variant} .size=${args.size} ?full-width=${args.fullWidth} ?bordered-divider=${args.borderedDivider} ?hoverable=${args.hoverable} ?disabled=${args.disabled} ?loading=${args.loading} aria-labelledby=\"card-title\" > ${args.headerSlot ? html`<div slot=\"header-slot\">${unsafeHTML(args.headerSlot)} </div>` : ''} ${unsafeHTML(args.contents)} ${args.footerSlot ? html`<div slot=\"footer-slot\">${unsafeHTML(args.footerSlot)}</div>` : ''} </biz-card-container> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "Default",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{}"
-        },
-        {
-          "kind": "variable",
-          "name": "Variants",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; gap: 16px; flex-wrap: wrap;\"> <biz-card-container variant=\"outlined\"> <div slot=\"header-slot\"><strong>Outlined</strong></div> <p>테두리 중심 스타일입니다.</p> </biz-card-container> <biz-card-container variant=\"filled\"> <div slot=\"header-slot\"><strong>Filled</strong></div> <p>배경색 중심 스타일입니다.</p> </biz-card-container> <biz-card-container variant=\"elevated\"> <div slot=\"header-slot\"><strong>Elevated</strong></div> <p>그림자 효과 중심 스타일입니다.</p> </biz-card-container> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "Sizes",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 16px;\"> <biz-card-container size=\"small\"> <div slot=\"header-slot\"><strong>Small Size</strong></div> <p>패딩 12px 규격</p> </biz-card-container> <biz-card-container size=\"medium\"> <div slot=\"header-slot\"><strong>Medium Size</strong></div> <p>패딩 16px 규격</p> </biz-card-container> <biz-card-container size=\"large\"> <div slot=\"header-slot\"><strong>Large Size</strong></div> <p>패딩 24px 규격</p> </biz-card-container> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "States",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { onCardClick: fn<(e: MouseEvent | CardClickEvent) => void>() }, render: (args) => html` <div style=\"display: flex; gap: 16px; flex-wrap: wrap;\"> <biz-card-container hoverable> <div slot=\"header-slot\"><strong>Hoverable State</strong></div> <p>마우스 오버 및 포커스 시 인터랙션 피드백을 제공합니다.</p> </biz-card-container> <biz-card-container hoverable @card-click=${args.onCardClick}> <div slot=\"header-slot\"><strong>Click 이벤트</strong></div> <p>카드 클릭시 card-click 이벤트를 발행합니다.</p> </biz-card-container> <biz-card-container disabled> <div slot=\"header-slot\"><strong>Disabled State</strong></div> <p>비활성화 상태로 인터랙션이 불가합니다.</p> </biz-card-container> <biz-card-container loading> <div slot=\"header-slot\"><strong>Loading State</strong></div> <p>로딩 스피너 오버레이가 상단에 표시됩니다.</p> </biz-card-container> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "BorderedDivider",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { borderedDivider: true, }, }"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "default",
-          "declaration": {
-            "name": "meta",
-            "module": "src/components/CardContainer/CardContainer.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Default",
-          "declaration": {
-            "name": "Default",
-            "module": "src/components/CardContainer/CardContainer.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Variants",
-          "declaration": {
-            "name": "Variants",
-            "module": "src/components/CardContainer/CardContainer.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Sizes",
-          "declaration": {
-            "name": "Sizes",
-            "module": "src/components/CardContainer/CardContainer.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "States",
-          "declaration": {
-            "name": "States",
-            "module": "src/components/CardContainer/CardContainer.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "BorderedDivider",
-          "declaration": {
-            "name": "BorderedDivider",
-            "module": "src/components/CardContainer/CardContainer.stories.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CardContainer/CardContainer.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "CardContainerTemplate",
-          "parameters": [
-            {
-              "name": "host",
-              "type": {
-                "text": "CardContainerHost"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CardContainerTemplate",
-          "declaration": {
-            "name": "CardContainerTemplate",
-            "module": "src/components/CardContainer/CardContainer.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CardContainer/CardContainer.wc.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "",
-          "name": "BizCardContainer",
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'outlined' | 'filled' | 'elevated'"
-              },
-              "default": "'outlined'",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "fullWidth",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "full-width",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "borderedDivider",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "bordered-divider",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "hoverable",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "hoverable",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "disabled",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "loading",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "loading",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "ariaLabelledby",
-              "type": {
-                "text": "string | undefined"
-              },
-              "attribute": "aria-labelledby"
-            },
-            {
-              "kind": "method",
-              "name": "_handleCardClick",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "MouseEvent"
-                  }
-                }
-              ]
-            }
-          ],
-          "events": [
-            {
-              "name": "card-click",
-              "type": {
-                "text": "CustomEvent"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'outlined' | 'filled' | 'elevated'"
-              },
-              "default": "'outlined'",
-              "fieldName": "variant"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "fieldName": "size"
-            },
-            {
-              "name": "full-width",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "fullWidth"
-            },
-            {
-              "name": "bordered-divider",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "borderedDivider"
-            },
-            {
-              "name": "hoverable",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "hoverable"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "disabled"
-            },
-            {
-              "name": "loading",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "loading"
-            },
-            {
-              "name": "aria-labelledby",
-              "type": {
-                "text": "string | undefined"
-              },
-              "fieldName": "ariaLabelledby"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "biz-card-container",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "BizCardContainer",
-          "declaration": {
-            "name": "BizCardContainer",
-            "module": "src/components/CardContainer/CardContainer.wc.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "biz-card-container",
-          "declaration": {
-            "name": "BizCardContainer",
-            "module": "src/components/CardContainer/CardContainer.wc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/CardContainer/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
-            "module": "src/components/CardContainer/CardContainer.wc"
           }
         }
       ]
@@ -3835,9 +2823,9 @@
           "kind": "variable",
           "name": "meta",
           "type": {
-            "text": "Meta<ContentContainer>"
+            "text": "Meta<Args>"
           },
-          "default": "{ title: 'Components/Layout/ContentContainer', component: 'biz-content-container', tags: ['autodocs'], argTypes: { variant: { control: 'select', options: ['standard', 'fluid', 'card'], }, size: { control: 'select', options: ['small', 'medium', 'large', 'full'], }, centered: { control: 'boolean' }, scrollable: { control: 'boolean' }, padding: { control: 'boolean' }, loading: { control: 'boolean' }, empty: { control: 'boolean' }, }, args: { variant: 'standard', size: 'medium', centered: false, scrollable: false, padding: true, loading: false, empty: false, }, }"
+          "default": "{ title: 'Components/Layout/ContentContainer', component: 'biz-content-container', tags: ['autodocs'], argTypes: { variant: { control: 'select', options: ['standard', 'fluid', 'card'], description: `- \\`Standard\\`: 여백 및 최대 너비가 제한된 표준 업무 화면 스타일 - \\`Fluid\\`: 최대 너비 제한 없이 부모 영역을 전체 사용하는 스타일 - \\`Card\\`: 독립된 배경 영역 및 그림자 효과가 적용된 스타일`, }, size: { control: 'select', options: ['small', 'medium', 'large', 'full'], }, centered: { control: 'boolean' }, scrollable: { control: 'boolean' }, padding: { control: 'boolean' }, loading: { control: 'boolean' }, empty: { control: 'boolean' }, default: { name: 'default slot', control: 'text', table: { category: 'slot'} }, headerSlot: { name: 'header-slot', control: 'text', table: { category: 'slot'} }, footerSlot: { name: 'footer-slot', contol: 'text', table: { category: 'slot'} } }, args: { variant: 'standard', size: 'medium', centered: false, scrollable: false, padding: true, loading: false, empty: false, }, }"
         },
         {
           "kind": "variable",
@@ -3958,7 +2946,7 @@
             {
               "name": "host",
               "type": {
-                "text": "ContentContainerTemplateHost"
+                "text": "ContentContainerHost"
               }
             }
           ]
@@ -3983,25 +2971,6 @@
           "kind": "class",
           "description": "",
           "name": "ContentContainer",
-          "slots": [
-            {
-              "description": "loading == true  일 때",
-              "name": "loading-slot"
-            },
-            {
-              "description": "loading=false && empty=true 일 때",
-              "name": "empty-slot"
-            },
-            {
-              "name": "header-slot"
-            },
-            {
-              "name": "footer-slot"
-            },
-            {
-              "name": "(default)"
-            }
-          ],
           "members": [
             {
               "kind": "field",
@@ -4173,6 +3142,796 @@
           "declaration": {
             "name": "*",
             "module": "src/components/ContentContainer/ContentContainer.wc"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/CardContainer/CardContainer.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "cardContainerStyles",
+          "default": "css` :host { display: inline-block; box-sizing: border-box; --biz-card-container-padding-sm: 12px; --biz-card-container-padding-md: 16px; --biz-card-container-padding-lg: 24px; --biz-card-container-border-radius: 8px; --biz-card-container-bg-color: #ffffff; --biz-card-container-border-color: #e5e7eb; --biz-card-container-divider-color: #f3f4f6; --biz-card-container-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); --biz-card-container-hover-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); --biz-card-container-focus-ring-color: #3b82f6; --biz-card-container-disabled-opacity: 0.6; --biz-card-container-filled-bg: #f9fafb; --biz-card-container-elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); } :host([full-width]) { display: block; width: 100%; } .biz-card-container { position: relative; display: flex; flex-direction: column; box-sizing: border-box; border-radius: var(--biz-card-container-border-radius); background-color: var(--biz-card-container-bg-color); transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; overflow: hidden; } /* Variants */ .biz-card-container--outlined { border: 1px solid var(--biz-card-container-border-color); box-shadow: none; } .biz-card-container--filled { border: 1px solid transparent; background-color: var(--biz-card-container-filled-bg); box-shadow: none; } .biz-card-container--elevated { border: 1px solid transparent; box-shadow: var(--biz-card-container-elevated-shadow); } /* Sizes */ .biz-card-container--small .biz-card-container__header, .biz-card-container--small .biz-card-container__body, .biz-card-container--small .biz-card-container__footer { padding: var(--biz-card-container-padding-sm); } .biz-card-container--medium .biz-card-container__header, .biz-card-container--medium .biz-card-container__body, .biz-card-container--medium .biz-card-container__footer { padding: var(--biz-card-container-padding-md); } .biz-card-container--large .biz-card-container__header, .biz-card-container--large .biz-card-container__body, .biz-card-container--large .biz-card-container__footer { padding: var(--biz-card-container-padding-lg); } /* Layout Properties */ .biz-card-container--full-width { width: 100%; } .biz-card-container__divider { height: 1px; background-color: var(--biz-card-container-divider-color); width: 100%; } /* States: Hoverable */ .biz-card-container--hoverable { cursor: pointer; } .biz-card-container--hoverable:hover { box-shadow: var(--biz-card-container-hover-shadow); border-color: var(--biz-card-container-border-color); } /* States: Focus / Focus-visible */ .biz-card-container:focus-visible { outline: 2px solid var(--biz-card-container-focus-ring-color); outline-offset: 2px; } /* States: Disabled */ .biz-card-container--disabled { opacity: var(--biz-card-container-disabled-opacity); cursor: not-allowed; pointer-events: none; } /* States: Loading */ .biz-card-container--loading { pointer-events: none; } .biz-card-container__loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; justify-content: center; z-index: 10; } .biz-card-container__spinner { width: 24px; height: 24px; border: 3px solid var(--biz-card-container-border-color); border-top-color: var(--biz-card-container-focus-ring-color); border-radius: 50%; animation: biz-card-spinner 0.8s linear infinite; } @keyframes biz-card-spinner { to { transform: rotate(360deg); } } `"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "cardContainerStyles",
+          "declaration": {
+            "name": "cardContainerStyles",
+            "module": "src/components/CardContainer/CardContainer.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/CardContainer/CardContainer.react.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "CardContainer"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CardContainer",
+          "declaration": {
+            "name": "CardContainer",
+            "module": "src/components/CardContainer/CardContainer.react.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/CardContainer/CardContainer.stories.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "meta",
+          "type": {
+            "text": "Meta<Args>"
+          },
+          "default": "{ title: 'Components/Layout/CardContainer', component: 'biz-card-container', tags: ['autodocs'], argTypes: { variant: { control: { type: 'select' }, options: ['outlined', 'filled', 'elevated'], }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'], }, fullWidth: { table: { disable: true } }, \"full-width\": { control: 'boolean' , description: '너비 100% 확장 여부' }, borderedDivider: { table: { disable: true } }, \"bordered-divider\": { control: 'boolean' , description: 'Header, Body, Footer 사이 구분선 적용 여부', }, hoverable: { control: 'boolean' , description: '마우스 오버 시 인터랙션 스타일 적용 여부', }, disabled: { control: 'boolean' }, loading: { control: 'boolean' }, ariaLabelledby: { table: { disable: true } }, \"aria-labelledby\": { control: 'boolean' }, contents: { name: 'default (slot)', control: { type: 'text' }, description: '카드 본문 ', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, headerSlot: { name: \"header-slot\", control: { type: 'text' }, description: '카드 상단 ', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, footerSlot: { name: \"footer-slot\", control: { type: 'text' }, description: '카드 하단 ', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, }, args: { variant: 'outlined', size: 'medium', fullWidth: true, borderedDivider: true, hoverable: false, disabled: false, loading: false, contents: '카드 메인 <p> paragraph </p> ', headerSlot: '<b>카드 타이틀</b>', footerSlot: '<button>확인</button>', }, render: (args) => html` <biz-card-container .variant=${args.variant} .size=${args.size} ?full-width=${args.fullWidth} ?bordered-divider=${args.borderedDivider} ?hoverable=${args.hoverable} ?disabled=${args.disabled} ?loading=${args.loading} aria-labelledby=\"card-title\" > ${args.headerSlot ? html`<div slot=\"header-slot\">${unsafeHTML(args.headerSlot)} </div>` : ''} ${unsafeHTML(args.contents)} ${args.footerSlot ? html`<div slot=\"footer-slot\">${unsafeHTML(args.footerSlot)}</div>` : ''} </biz-card-container> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Default",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{}"
+        },
+        {
+          "kind": "variable",
+          "name": "Variants",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; gap: 16px; flex-wrap: wrap;\"> <biz-card-container variant=\"outlined\"> <div slot=\"header-slot\"><strong>Outlined</strong></div> <p>테두리 중심 스타일입니다.</p> </biz-card-container> <biz-card-container variant=\"filled\"> <div slot=\"header-slot\"><strong>Filled</strong></div> <p>배경색 중심 스타일입니다.</p> </biz-card-container> <biz-card-container variant=\"elevated\"> <div slot=\"header-slot\"><strong>Elevated</strong></div> <p>그림자 효과 중심 스타일입니다.</p> </biz-card-container> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Sizes",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 16px;\"> <biz-card-container size=\"small\"> <div slot=\"header-slot\"><strong>Small Size</strong></div> <p>패딩 12px 규격</p> </biz-card-container> <biz-card-container size=\"medium\"> <div slot=\"header-slot\"><strong>Medium Size</strong></div> <p>패딩 16px 규격</p> </biz-card-container> <biz-card-container size=\"large\"> <div slot=\"header-slot\"><strong>Large Size</strong></div> <p>패딩 24px 규격</p> </biz-card-container> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "States",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: (args) => html` <div style=\"display: flex; gap: 16px; flex-wrap: wrap;\"> <biz-card-container hoverable> <div slot=\"header-slot\"><strong>Hoverable State</strong></div> <p>마우스 오버 및 포커스 시 인터랙션 피드백을 제공합니다.</p> </biz-card-container> <biz-card-container hoverable @card-click=${ (e: MouseEvent) => { alert(JSON.stringify(e.detail)); } }> <div slot=\"header-slot\"><strong>Click 이벤트</strong></div> <p>카드 클릭시 card-click 이벤트를 발행합니다.</p> </biz-card-container> <biz-card-container disabled> <div slot=\"header-slot\"><strong>Disabled State</strong></div> <p>비활성화 상태로 인터랙션이 불가합니다.</p> </biz-card-container> <biz-card-container loading> <div slot=\"header-slot\"><strong>Loading State</strong></div> <p>로딩 스피너 오버레이가 상단에 표시됩니다.</p> </biz-card-container> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "BorderedDivider",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { borderedDivider: true, }, }"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "meta",
+            "module": "src/components/CardContainer/CardContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Default",
+          "declaration": {
+            "name": "Default",
+            "module": "src/components/CardContainer/CardContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Variants",
+          "declaration": {
+            "name": "Variants",
+            "module": "src/components/CardContainer/CardContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Sizes",
+          "declaration": {
+            "name": "Sizes",
+            "module": "src/components/CardContainer/CardContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "States",
+          "declaration": {
+            "name": "States",
+            "module": "src/components/CardContainer/CardContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "BorderedDivider",
+          "declaration": {
+            "name": "BorderedDivider",
+            "module": "src/components/CardContainer/CardContainer.stories.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/CardContainer/CardContainer.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "CardContainerTemplate",
+          "parameters": [
+            {
+              "name": "host",
+              "type": {
+                "text": "CardContainerHost"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CardContainerTemplate",
+          "declaration": {
+            "name": "CardContainerTemplate",
+            "module": "src/components/CardContainer/CardContainer.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/CardContainer/CardContainer.wc.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "BizCardContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'outlined' | 'filled' | 'elevated'"
+              },
+              "default": "'outlined'",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large'"
+              },
+              "default": "'medium'",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "fullWidth",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "full-width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "borderedDivider",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "bordered-divider",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "hoverable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "hoverable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "ariaLabelledby",
+              "type": {
+                "text": "string | undefined"
+              },
+              "attribute": "aria-labelledby"
+            },
+            {
+              "kind": "method",
+              "name": "_handleCardClick",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "card-click",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'outlined' | 'filled' | 'elevated'"
+              },
+              "default": "'outlined'",
+              "fieldName": "variant"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large'"
+              },
+              "default": "'medium'",
+              "fieldName": "size"
+            },
+            {
+              "name": "full-width",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "fullWidth"
+            },
+            {
+              "name": "bordered-divider",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "borderedDivider"
+            },
+            {
+              "name": "hoverable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "hoverable"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "loading"
+            },
+            {
+              "name": "aria-labelledby",
+              "type": {
+                "text": "string | undefined"
+              },
+              "fieldName": "ariaLabelledby"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "biz-card-container",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BizCardContainer",
+          "declaration": {
+            "name": "BizCardContainer",
+            "module": "src/components/CardContainer/CardContainer.wc.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "biz-card-container",
+          "declaration": {
+            "name": "BizCardContainer",
+            "module": "src/components/CardContainer/CardContainer.wc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/CardContainer/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/components/CardContainer/CardContainer.wc"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/Button/Button.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "buttonStyles",
+          "default": "css` :host { display: inline-block; box-sizing: border-box; --biz-button-height-sm: 32px; --biz-button-height-md: 40px; --biz-button-height-lg: 48px; --biz-button-padding-x-sm: 12px; --biz-button-padding-x-md: 16px; --biz-button-padding-x-lg: 20px; --biz-button-border-radius: 4px; --biz-button-font-size-sm: 12px; --biz-button-font-size-md: 14px; --biz-button-font-size-lg: 16px; --biz-button-bg-color: #2563eb; --biz-button-text-color: #ffffff; --biz-button-border-color: transparent; --biz-button-hover-bg-color: #1d4ed8; --biz-button-active-bg-color: #1e40af; --biz-button-focus-ring-color: rgba(37, 99, 235, 0.4); --biz-button-disabled-bg-color: #e5e7eb; --biz-button-disabled-text-color: #9ca3af; --biz-button-disabled-border-color: transparent; } :host([full-width]) { display: block; width: 100%; } *, *::before, *::after { box-sizing: border-box; } .biz-button { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 100%; border-style: solid; border-width: 1px; border-radius: var(--biz-button-border-radius); font-family: inherit; font-weight: 500; line-height: 1; text-decoration: none; cursor: pointer; user-select: none; transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; outline: none; } /* Sizes */ .biz-button--small { height: var(--biz-button-height-sm); padding: 0 var(--biz-button-padding-x-sm); font-size: var(--biz-button-font-size-sm); } .biz-button--medium { height: var(--biz-button-height-md); padding: 0 var(--biz-button-padding-x-md); font-size: var(--biz-button-font-size-md); } .biz-button--large { height: var(--biz-button-height-lg); padding: 0 var(--biz-button-padding-x-lg); font-size: var(--biz-button-font-size-lg); } /* Variants */ .biz-button--filled { background-color: var(--biz-button-bg-color); color: var(--biz-button-text-color); border-color: var(--biz-button-border-color); } .biz-button--filled:hover:not(:disabled) { background-color: var(--biz-button-hover-bg-color); } .biz-button--filled:active:not(:disabled) { background-color: var(--biz-button-active-bg-color); } .biz-button--outlined { background-color: transparent; color: var(--biz-button-bg-color); border-color: var(--biz-button-bg-color); } .biz-button--outlined:hover:not(:disabled) { background-color: rgba(37, 99, 235, 0.04); } .biz-button--outlined:active:not(:disabled) { background-color: rgba(37, 99, 235, 0.12); } .biz-button--text { background-color: transparent; color: var(--biz-button-bg-color); border-color: transparent; } .biz-button--text:hover:not(:disabled) { background-color: rgba(37, 99, 235, 0.04); } .biz-button--text:active:not(:disabled) { background-color: rgba(37, 99, 235, 0.12); } /* Focus & Focus-visible */ .biz-button:focus-visible { box-shadow: 0 0 0 3px var(--biz-button-focus-ring-color); } /* Full Width */ .biz-button--full-width { width: 100%; } /* Disabled State */ .biz-button:disabled { background-color: var(--biz-button-disabled-bg-color); color: var(--biz-button-disabled-text-color); border-color: var(--biz-button-disabled-border-color); cursor: not-allowed; opacity: 0.7; } .biz-button--outlined:disabled, .biz-button--text:disabled { background-color: transparent; border-color: var(--biz-button-disabled-bg-color); } .biz-button--text:disabled { border-color: transparent; } /* Loading State */ .biz-button--loading { cursor: wait; } .biz-button__spinner { display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; animation: biz-button-spin 1s linear infinite; } .biz-button__spinner svg { width: 100%; height: 100%; } @keyframes biz-button-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } .biz-button__icon { display: inline-flex; align-items: center; } .biz-button__label { display: inline-flex; align-items: center; } `"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "buttonStyles",
+          "declaration": {
+            "name": "buttonStyles",
+            "module": "src/components/Button/Button.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/Button/Button.react.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "Button"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "Button",
+          "declaration": {
+            "name": "Button",
+            "module": "src/components/Button/Button.react.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/Button/Button.stories.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "meta",
+          "type": {
+            "text": "Meta<Args>"
+          },
+          "default": "{ title: 'Components/Forms/Button', component: 'biz-button', tags: ['autodocs'], argTypes: { variant: { control: { type: 'select' }, options: ['filled', 'outlined', 'text'], description: '버튼 시각적 형태 옵션', table: { category: 'props' }, }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'], description: '버튼 크기 옵션', table: { category: 'props' }, }, type: { control: { type: 'select' }, options: ['button', 'submit', 'reset'], description: '버튼의 기능적 동작 타입', table: { category: 'props' }, }, disabled: { control: { type: 'boolean' }, description: '비활성화 여부', table: { category: 'props' }, }, loading: { control: { type: 'boolean' }, description: '로딩 상태 여부', table: { category: 'props' }, }, fullWidth: { control: { type: 'boolean' }, description: '너비 100% 확장 여부', table: { category: 'props' }, }, label: { name: 'default (slot)', control: { type: 'text' }, description: '버튼 내 기본 슬롯 텍스트 콘텐츠', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, startIcon: { name: 'start-slot', control: { type: 'text' }, description: '버튼 앞쪽에 위치하는 아이콘/요소 슬롯', table: { category: 'slots', type: { summary: 'HTMLElement' } }, }, endIcon: { name: 'end-slot', control: { type: 'text' }, description: '버튼 뒤쪽에 위치하는 아이콘/요소 슬롯', table: { category: 'slots', type: { summary: 'HTMLElement' } }, }, }, args: { variant: 'filled', size: 'medium', type: 'button', disabled: false, loading: false, fullWidth: false, label: 'Button', startIcon: '', endIcon: '', }, render: (args) => html` <biz-button .variant=${args.variant} .size=${args.size} .type=${args.type} ?disabled=${args.disabled} ?loading=${args.loading} ?full-width=${args.fullWidth} > ${args.startIcon ? html`<span slot=\"start-slot\">${args.startIcon}</span>` : ''} ${args.label} ${args.endIcon ? html`<span slot=\"end-slot\">${args.endIcon}</span>` : ''} </biz-button> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Default",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { label: '기본 버튼', }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Variants",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button variant=\"filled\">Filled (Primary)</biz-button> <biz-button variant=\"outlined\">Outlined</biz-button> <biz-button variant=\"text\">Text</biz-button> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Sizes",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button size=\"small\">Small</biz-button> <biz-button size=\"medium\">Medium</biz-button> <biz-button size=\"large\">Large</biz-button> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "States",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 16px;\"> <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button disabled>Disabled (Filled)</biz-button> <biz-button variant=\"outlined\" disabled>Disabled (Outlined)</biz-button> <biz-button variant=\"text\" disabled>Disabled (Text)</biz-button> </div> <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button loading>Loading (Filled)</biz-button> <biz-button variant=\"outlined\" loading>Loading (Outlined)</biz-button> <biz-button variant=\"text\" loading>Loading (Text)</biz-button> </div> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "WithIcons",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; gap: 12px; align-items: center;\"> <biz-button> <span slot=\"start-slot\">🚀</span> Start Icon </biz-button> <biz-button variant=\"outlined\"> End Icon <span slot=\"end-slot\">➡️</span> </biz-button> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "FullWidth",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"width: 320px; padding: 16px; border: 1px dashed #ccc;\"> <biz-button full-width>Full Width Button</biz-button> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Accessibility",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 12px;\"> <biz-button aria-label=\"닫기\"> <span slot=\"start-slot\">✕</span> </biz-button> <biz-button loading aria-label=\"데이터 처리 중입니다\"> 저장하기 </biz-button> </div> `, }"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "meta",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Default",
+          "declaration": {
+            "name": "Default",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Variants",
+          "declaration": {
+            "name": "Variants",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Sizes",
+          "declaration": {
+            "name": "Sizes",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "States",
+          "declaration": {
+            "name": "States",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "WithIcons",
+          "declaration": {
+            "name": "WithIcons",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FullWidth",
+          "declaration": {
+            "name": "FullWidth",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Accessibility",
+          "declaration": {
+            "name": "Accessibility",
+            "module": "src/components/Button/Button.stories.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/Button/Button.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "ButtonTemplate",
+          "parameters": [
+            {
+              "name": "host",
+              "type": {
+                "text": "ButtonHost"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ButtonTemplate",
+          "declaration": {
+            "name": "ButtonTemplate",
+            "module": "src/components/Button/Button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/Button/Button.wc.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "BizButton",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'filled' | 'outlined' | 'text'"
+              },
+              "default": "'filled'",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large'"
+              },
+              "default": "'medium'",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "attribute": "type",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "fullWidth",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "full-width",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "handleClick",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleKeyDown",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'filled' | 'outlined' | 'text'"
+              },
+              "default": "'filled'",
+              "fieldName": "variant"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large'"
+              },
+              "default": "'medium'",
+              "fieldName": "size"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "fieldName": "type"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "loading"
+            },
+            {
+              "name": "full-width",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "fullWidth"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "biz-button",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BizButton",
+          "declaration": {
+            "name": "BizButton",
+            "module": "src/components/Button/Button.wc.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "biz-button",
+          "declaration": {
+            "name": "BizButton",
+            "module": "src/components/Button/Button.wc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/Button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BizButton",
+          "declaration": {
+            "name": "BizButton",
+            "module": "./Button.wc"
           }
         }
       ]
@@ -14081,519 +13840,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/RadioButtonGroup/RadioButtonGroup.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "radioButtonGroupStyles",
-          "default": "css` :host { display: inline-flex; flex-direction: column; width: auto; box-sizing: border-box; --biz-radio-button-group-gap-sm: 8px; --biz-radio-button-group-gap-md: 12px; --biz-radio-button-group-gap-lg: 16px; --biz-radio-button-group-label-margin-bottom: 8px; --biz-radio-button-group-label-color: #111827; --biz-radio-button-group-helper-text-color: #6b7280; --biz-radio-button-group-error-color: #dc2626; --biz-radio-button-group-disabled-opacity: 0.5; } :host([full-width]) { display: flex; width: 100%; } .biz-radio-button-group { display: flex; flex-direction: column; box-sizing: border-box; width: 100%; } .biz-radio-button-group__label { display: block; margin-bottom: var(--biz-radio-button-group-label-margin-bottom); color: var(--biz-radio-button-group-label-color); font-weight: 600; } .biz-radio-button-group__items { display: flex; gap: var(--biz-radio-button-group-gap-md); } .biz-radio-button-group.vertical .biz-radio-button-group__items { flex-direction: column; } .biz-radio-button-group.horizontal .biz-radio-button-group__items { flex-direction: row; flex-wrap: wrap; } .biz-radio-button-group.small .biz-radio-button-group__items { gap: var(--biz-radio-button-group-gap-sm); font-size: 0.875rem; } .biz-radio-button-group.medium .biz-radio-button-group__items { gap: var(--biz-radio-button-group-gap-md); font-size: 1rem; } .biz-radio-button-group.large .biz-radio-button-group__items { gap: var(--biz-radio-button-group-gap-lg); font-size: 1.125rem; } .biz-radio-button-group.standard { background-color: transparent; } .biz-radio-button-group.card { padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff; } .biz-radio-button-group.button { display: inline-flex; padding: 4px; background-color: #f3f4f6; border-radius: 8px; } .biz-radio-button-group.outlined { border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; } .biz-radio-button-group.filled { background-color: #f9fafb; border-radius: 6px; padding: 8px; } .biz-radio-button-group:hover { color: var(--biz-radio-button-group-label-color); } .biz-radio-button-group:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px; } .biz-radio-button-group.disabled { opacity: var(--biz-radio-button-group-disabled-opacity); cursor: not-allowed; pointer-events: none; } .biz-radio-button-group.readonly { cursor: default; } .biz-radio-button-group.error .biz-radio-button-group__label { color: var(--biz-radio-button-group-error-color); } .biz-radio-button-group.error .biz-radio-button-group__helper-text { color: var(--biz-radio-button-group-error-color); } .biz-radio-button-group.loading { opacity: 0.7; pointer-events: none; } .biz-radio-button-group__helper-text { margin-top: 4px; font-size: 0.75rem; color: var(--biz-radio-button-group-helper-text-color); } `"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "radioButtonGroupStyles",
-          "declaration": {
-            "name": "radioButtonGroupStyles",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/RadioButtonGroup/RadioButtonGroup.react.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "RadioButtonGroup"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "RadioButtonGroup",
-          "declaration": {
-            "name": "RadioButtonGroup",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.react.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "meta",
-          "type": {
-            "text": "Meta"
-          },
-          "default": "{ title: 'Components/Forms/RadioButtonGroup', component: 'biz-radio-button-group', tags: ['autodocs'], argTypes: { orientation: { control: { type: 'radio' }, options: ['vertical', 'horizontal'], }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'], }, variant: { control: { type: 'select' }, options: ['standard', 'card', 'button', 'outlined', 'filled'], }, disabled: { control: 'boolean' }, readonly: { control: 'boolean' }, error: { control: 'boolean' }, fullWidth: { control: 'boolean' }, }, args: { label: '결제 수단 선택', helperText: '원하시는 결제 수단을 하나 선택해 주세요.', value: 'card', orientation: 'vertical', size: 'medium', variant: 'standard', disabled: false, readonly: false, error: false, fullWidth: false, }, render: (args) => html` <biz-radio-button-group .label=${args.label} .helperText=${args.helperText} .value=${args.value} .orientation=${args.orientation} .size=${args.size} .variant=${args.variant} ?disabled=${args.disabled} ?readonly=${args.readonly} ?error=${args.error} ?full-width=${args.fullWidth} > <input type=\"radio\" name=\"payment\" value=\"card\" id=\"card\" /> <label for=\"card\">신용/체크카드</label> <input type=\"radio\" name=\"payment\" value=\"trans\" id=\"trans\" /> <label for=\"trans\">실시간 계좌이체</label> <input type=\"radio\" name=\"payment\" value=\"vbank\" id=\"vbank\" /> <label for=\"vbank\">가상계좌</label> </biz-radio-button-group> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "Default",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{}"
-        },
-        {
-          "kind": "variable",
-          "name": "Variants",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-radio-button-group label=\"Standard Variant\" variant=\"standard\" value=\"1\"> <input type=\"radio\" name=\"v1\" value=\"1\" id=\"v1-1\" /><label for=\"v1-1\">Option 1</label> <input type=\"radio\" name=\"v1\" value=\"2\" id=\"v1-2\" /><label for=\"v1-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Card Variant\" variant=\"card\" value=\"1\"> <input type=\"radio\" name=\"v2\" value=\"1\" id=\"v2-1\" /><label for=\"v2-1\">Option 1</label> <input type=\"radio\" name=\"v2\" value=\"2\" id=\"v2-2\" /><label for=\"v2-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Outlined Variant\" variant=\"outlined\" value=\"1\"> <input type=\"radio\" name=\"v3\" value=\"1\" id=\"v3-1\" /><label for=\"v3-1\">Option 1</label> <input type=\"radio\" name=\"v3\" value=\"2\" id=\"v3-2\" /><label for=\"v3-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Filled Variant\" variant=\"filled\" value=\"1\"> <input type=\"radio\" name=\"v4\" value=\"1\" id=\"v4-1\" /><label for=\"v4-1\">Option 1</label> <input type=\"radio\" name=\"v4\" value=\"2\" id=\"v4-2\" /><label for=\"v4-2\">Option 2</label> </biz-radio-button-group> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "Sizes",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-radio-button-group label=\"Small Size\" size=\"small\" value=\"1\"> <input type=\"radio\" name=\"s1\" value=\"1\" id=\"s1-1\" /><label for=\"s1-1\">Small 1</label> <input type=\"radio\" name=\"s1\" value=\"2\" id=\"s1-2\" /><label for=\"s1-2\">Small 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Medium Size\" size=\"medium\" value=\"1\"> <input type=\"radio\" name=\"s2\" value=\"1\" id=\"s2-1\" /><label for=\"s2-1\">Medium 1</label> <input type=\"radio\" name=\"s2\" value=\"2\" id=\"s2-2\" /><label for=\"s2-2\">Medium 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Large Size\" size=\"large\" value=\"1\"> <input type=\"radio\" name=\"s3\" value=\"1\" id=\"s3-1\" /><label for=\"s3-1\">Large 1</label> <input type=\"radio\" name=\"s3\" value=\"2\" id=\"s3-2\" /><label for=\"s3-2\">Large 2</label> </biz-radio-button-group> </div> `, }"
-        },
-        {
-          "kind": "variable",
-          "name": "States",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-radio-button-group label=\"Disabled State\" disabled value=\"1\"> <input type=\"radio\" name=\"st1\" value=\"1\" id=\"st1-1\" /><label for=\"st1-1\">Option 1</label> <input type=\"radio\" name=\"st1\" value=\"2\" id=\"st1-2\" /><label for=\"st1-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Readonly State\" readonly value=\"1\"> <input type=\"radio\" name=\"st2\" value=\"1\" id=\"st2-1\" /><label for=\"st2-1\">Option 1</label> <input type=\"radio\" name=\"st2\" value=\"2\" id=\"st2-2\" /><label for=\"st2-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Error State\" error helperText=\"필수 선택 항목입니다.\" value=\"\"> <input type=\"radio\" name=\"st3\" value=\"1\" id=\"st3-1\" /><label for=\"st3-1\">Option 1</label> <input type=\"radio\" name=\"st3\" value=\"2\" id=\"st3-2\" /><label for=\"st3-2\">Option 2</label> </biz-radio-button-group> </div> `, }"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "default",
-          "declaration": {
-            "name": "meta",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Default",
-          "declaration": {
-            "name": "Default",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Variants",
-          "declaration": {
-            "name": "Variants",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Sizes",
-          "declaration": {
-            "name": "Sizes",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "States",
-          "declaration": {
-            "name": "States",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/RadioButtonGroup/RadioButtonGroup.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "RadioButtonGroupTemplate",
-          "parameters": [
-            {
-              "name": "context",
-              "type": {
-                "text": "RadioButtonGroupContext"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "RadioButtonGroupTemplate",
-          "declaration": {
-            "name": "RadioButtonGroupTemplate",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/RadioButtonGroup/RadioButtonGroup.wc.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "",
-          "name": "BizRadioButtonGroup",
-          "slots": [
-            {
-              "name": "label-slot"
-            },
-            {
-              "name": "(default)"
-            },
-            {
-              "name": "helper-text-slot"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "attribute": "orientation"
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "required",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "disabled",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "readonly",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "readonly",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "error",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "error",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'standard' | 'card' | 'button' | 'outlined' | 'filled'"
-              },
-              "default": "'standard'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "helperText",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "helper-text"
-            },
-            {
-              "kind": "field",
-              "name": "fullWidth",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "full-width",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "labelId",
-              "privacy": "private",
-              "default": "`biz-radio-group-label-${Math.random().toString(36).substring(2, 9)}`"
-            },
-            {
-              "kind": "field",
-              "name": "helperTextId",
-              "privacy": "private",
-              "default": "`biz-radio-group-helper-${Math.random().toString(36).substring(2, 9)}`"
-            },
-            {
-              "kind": "method",
-              "name": "getRadios",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "HTMLElement[]"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "syncSubRadioButtons",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "handleSlotChange",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "handleValueChange",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "dispatchChangeEvent",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "clear",
-              "privacy": "public"
-            },
-            {
-              "kind": "method",
-              "name": "handleKeyDown",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "KeyboardEvent"
-                  }
-                }
-              ]
-            }
-          ],
-          "events": [
-            {
-              "name": "change",
-              "type": {
-                "text": "CustomEvent"
-              }
-            },
-            {
-              "name": "clear",
-              "type": {
-                "text": "CustomEvent"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "value"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "name"
-            },
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "fieldName": "orientation"
-            },
-            {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "required"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "disabled"
-            },
-            {
-              "name": "readonly",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "readonly"
-            },
-            {
-              "name": "error",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "error"
-            },
-            {
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "fieldName": "size"
-            },
-            {
-              "name": "variant",
-              "type": {
-                "text": "'standard' | 'card' | 'button' | 'outlined' | 'filled'"
-              },
-              "default": "'standard'",
-              "fieldName": "variant"
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "label"
-            },
-            {
-              "name": "helper-text",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "helperText"
-            },
-            {
-              "name": "full-width",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "fullWidth"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "biz-radio-button-group",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "BizRadioButtonGroup",
-          "declaration": {
-            "name": "BizRadioButtonGroup",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.wc.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "biz-radio-button-group",
-          "declaration": {
-            "name": "BizRadioButtonGroup",
-            "module": "src/components/RadioButtonGroup/RadioButtonGroup.wc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/RadioButtonGroup/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "BizRadioButtonGroup",
-          "declaration": {
-            "name": "BizRadioButtonGroup",
-            "module": "./RadioButtonGroup.wc"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/Rating/Rating.css.ts",
       "declarations": [
         {
@@ -15202,6 +14448,519 @@
           "declaration": {
             "name": "BizRating",
             "module": "./Rating.wc"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/RadioButtonGroup/RadioButtonGroup.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "radioButtonGroupStyles",
+          "default": "css` :host { display: inline-flex; flex-direction: column; width: auto; box-sizing: border-box; --biz-radio-button-group-gap-sm: 8px; --biz-radio-button-group-gap-md: 12px; --biz-radio-button-group-gap-lg: 16px; --biz-radio-button-group-label-margin-bottom: 8px; --biz-radio-button-group-label-color: #111827; --biz-radio-button-group-helper-text-color: #6b7280; --biz-radio-button-group-error-color: #dc2626; --biz-radio-button-group-disabled-opacity: 0.5; } :host([full-width]) { display: flex; width: 100%; } .biz-radio-button-group { display: flex; flex-direction: column; box-sizing: border-box; width: 100%; } .biz-radio-button-group__label { display: block; margin-bottom: var(--biz-radio-button-group-label-margin-bottom); color: var(--biz-radio-button-group-label-color); font-weight: 600; } .biz-radio-button-group__items { display: flex; gap: var(--biz-radio-button-group-gap-md); } .biz-radio-button-group.vertical .biz-radio-button-group__items { flex-direction: column; } .biz-radio-button-group.horizontal .biz-radio-button-group__items { flex-direction: row; flex-wrap: wrap; } .biz-radio-button-group.small .biz-radio-button-group__items { gap: var(--biz-radio-button-group-gap-sm); font-size: 0.875rem; } .biz-radio-button-group.medium .biz-radio-button-group__items { gap: var(--biz-radio-button-group-gap-md); font-size: 1rem; } .biz-radio-button-group.large .biz-radio-button-group__items { gap: var(--biz-radio-button-group-gap-lg); font-size: 1.125rem; } .biz-radio-button-group.standard { background-color: transparent; } .biz-radio-button-group.card { padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff; } .biz-radio-button-group.button { display: inline-flex; padding: 4px; background-color: #f3f4f6; border-radius: 8px; } .biz-radio-button-group.outlined { border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; } .biz-radio-button-group.filled { background-color: #f9fafb; border-radius: 6px; padding: 8px; } .biz-radio-button-group:hover { color: var(--biz-radio-button-group-label-color); } .biz-radio-button-group:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px; } .biz-radio-button-group.disabled { opacity: var(--biz-radio-button-group-disabled-opacity); cursor: not-allowed; pointer-events: none; } .biz-radio-button-group.readonly { cursor: default; } .biz-radio-button-group.error .biz-radio-button-group__label { color: var(--biz-radio-button-group-error-color); } .biz-radio-button-group.error .biz-radio-button-group__helper-text { color: var(--biz-radio-button-group-error-color); } .biz-radio-button-group.loading { opacity: 0.7; pointer-events: none; } .biz-radio-button-group__helper-text { margin-top: 4px; font-size: 0.75rem; color: var(--biz-radio-button-group-helper-text-color); } `"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "radioButtonGroupStyles",
+          "declaration": {
+            "name": "radioButtonGroupStyles",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/RadioButtonGroup/RadioButtonGroup.react.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "RadioButtonGroup"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "RadioButtonGroup",
+          "declaration": {
+            "name": "RadioButtonGroup",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.react.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "meta",
+          "type": {
+            "text": "Meta"
+          },
+          "default": "{ title: 'Components/Forms/RadioButtonGroup', component: 'biz-radio-button-group', tags: ['autodocs'], argTypes: { orientation: { control: { type: 'radio' }, options: ['vertical', 'horizontal'], }, size: { control: { type: 'select' }, options: ['small', 'medium', 'large'], }, variant: { control: { type: 'select' }, options: ['standard', 'card', 'button', 'outlined', 'filled'], }, disabled: { control: 'boolean' }, readonly: { control: 'boolean' }, error: { control: 'boolean' }, fullWidth: { control: 'boolean' }, }, args: { label: '결제 수단 선택', helperText: '원하시는 결제 수단을 하나 선택해 주세요.', value: 'card', orientation: 'vertical', size: 'medium', variant: 'standard', disabled: false, readonly: false, error: false, fullWidth: false, }, render: (args) => html` <biz-radio-button-group .label=${args.label} .helperText=${args.helperText} .value=${args.value} .orientation=${args.orientation} .size=${args.size} .variant=${args.variant} ?disabled=${args.disabled} ?readonly=${args.readonly} ?error=${args.error} ?full-width=${args.fullWidth} > <input type=\"radio\" name=\"payment\" value=\"card\" id=\"card\" /> <label for=\"card\">신용/체크카드</label> <input type=\"radio\" name=\"payment\" value=\"trans\" id=\"trans\" /> <label for=\"trans\">실시간 계좌이체</label> <input type=\"radio\" name=\"payment\" value=\"vbank\" id=\"vbank\" /> <label for=\"vbank\">가상계좌</label> </biz-radio-button-group> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Default",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{}"
+        },
+        {
+          "kind": "variable",
+          "name": "Variants",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-radio-button-group label=\"Standard Variant\" variant=\"standard\" value=\"1\"> <input type=\"radio\" name=\"v1\" value=\"1\" id=\"v1-1\" /><label for=\"v1-1\">Option 1</label> <input type=\"radio\" name=\"v1\" value=\"2\" id=\"v1-2\" /><label for=\"v1-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Card Variant\" variant=\"card\" value=\"1\"> <input type=\"radio\" name=\"v2\" value=\"1\" id=\"v2-1\" /><label for=\"v2-1\">Option 1</label> <input type=\"radio\" name=\"v2\" value=\"2\" id=\"v2-2\" /><label for=\"v2-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Outlined Variant\" variant=\"outlined\" value=\"1\"> <input type=\"radio\" name=\"v3\" value=\"1\" id=\"v3-1\" /><label for=\"v3-1\">Option 1</label> <input type=\"radio\" name=\"v3\" value=\"2\" id=\"v3-2\" /><label for=\"v3-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Filled Variant\" variant=\"filled\" value=\"1\"> <input type=\"radio\" name=\"v4\" value=\"1\" id=\"v4-1\" /><label for=\"v4-1\">Option 1</label> <input type=\"radio\" name=\"v4\" value=\"2\" id=\"v4-2\" /><label for=\"v4-2\">Option 2</label> </biz-radio-button-group> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Sizes",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-radio-button-group label=\"Small Size\" size=\"small\" value=\"1\"> <input type=\"radio\" name=\"s1\" value=\"1\" id=\"s1-1\" /><label for=\"s1-1\">Small 1</label> <input type=\"radio\" name=\"s1\" value=\"2\" id=\"s1-2\" /><label for=\"s1-2\">Small 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Medium Size\" size=\"medium\" value=\"1\"> <input type=\"radio\" name=\"s2\" value=\"1\" id=\"s2-1\" /><label for=\"s2-1\">Medium 1</label> <input type=\"radio\" name=\"s2\" value=\"2\" id=\"s2-2\" /><label for=\"s2-2\">Medium 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Large Size\" size=\"large\" value=\"1\"> <input type=\"radio\" name=\"s3\" value=\"1\" id=\"s3-1\" /><label for=\"s3-1\">Large 1</label> <input type=\"radio\" name=\"s3\" value=\"2\" id=\"s3-2\" /><label for=\"s3-2\">Large 2</label> </biz-radio-button-group> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "States",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <biz-radio-button-group label=\"Disabled State\" disabled value=\"1\"> <input type=\"radio\" name=\"st1\" value=\"1\" id=\"st1-1\" /><label for=\"st1-1\">Option 1</label> <input type=\"radio\" name=\"st1\" value=\"2\" id=\"st1-2\" /><label for=\"st1-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Readonly State\" readonly value=\"1\"> <input type=\"radio\" name=\"st2\" value=\"1\" id=\"st2-1\" /><label for=\"st2-1\">Option 1</label> <input type=\"radio\" name=\"st2\" value=\"2\" id=\"st2-2\" /><label for=\"st2-2\">Option 2</label> </biz-radio-button-group> <biz-radio-button-group label=\"Error State\" error helperText=\"필수 선택 항목입니다.\" value=\"\"> <input type=\"radio\" name=\"st3\" value=\"1\" id=\"st3-1\" /><label for=\"st3-1\">Option 1</label> <input type=\"radio\" name=\"st3\" value=\"2\" id=\"st3-2\" /><label for=\"st3-2\">Option 2</label> </biz-radio-button-group> </div> `, }"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "meta",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Default",
+          "declaration": {
+            "name": "Default",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Variants",
+          "declaration": {
+            "name": "Variants",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Sizes",
+          "declaration": {
+            "name": "Sizes",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "States",
+          "declaration": {
+            "name": "States",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.stories.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/RadioButtonGroup/RadioButtonGroup.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "RadioButtonGroupTemplate",
+          "parameters": [
+            {
+              "name": "context",
+              "type": {
+                "text": "RadioButtonGroupContext"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "RadioButtonGroupTemplate",
+          "declaration": {
+            "name": "RadioButtonGroupTemplate",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/RadioButtonGroup/RadioButtonGroup.wc.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "BizRadioButtonGroup",
+          "slots": [
+            {
+              "name": "label-slot"
+            },
+            {
+              "name": "(default)"
+            },
+            {
+              "name": "helper-text-slot"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "attribute": "orientation"
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "readonly",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "error",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large'"
+              },
+              "default": "'medium'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'standard' | 'card' | 'button' | 'outlined' | 'filled'"
+              },
+              "default": "'standard'",
+              "attribute": "variant"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helperText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "helper-text"
+            },
+            {
+              "kind": "field",
+              "name": "fullWidth",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "full-width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "labelId",
+              "privacy": "private",
+              "default": "`biz-radio-group-label-${Math.random().toString(36).substring(2, 9)}`"
+            },
+            {
+              "kind": "field",
+              "name": "helperTextId",
+              "privacy": "private",
+              "default": "`biz-radio-group-helper-${Math.random().toString(36).substring(2, 9)}`"
+            },
+            {
+              "kind": "method",
+              "name": "getRadios",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLElement[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncSubRadioButtons",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "handleSlotChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "handleValueChange",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "dispatchChangeEvent",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "clear",
+              "privacy": "public"
+            },
+            {
+              "kind": "method",
+              "name": "handleKeyDown",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "CustomEvent"
+              }
+            },
+            {
+              "name": "clear",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "value"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "name"
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "fieldName": "orientation"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "required"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "readonly"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "error"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large'"
+              },
+              "default": "'medium'",
+              "fieldName": "size"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'standard' | 'card' | 'button' | 'outlined' | 'filled'"
+              },
+              "default": "'standard'",
+              "fieldName": "variant"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "label"
+            },
+            {
+              "name": "helper-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "helperText"
+            },
+            {
+              "name": "full-width",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "fullWidth"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "biz-radio-button-group",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BizRadioButtonGroup",
+          "declaration": {
+            "name": "BizRadioButtonGroup",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.wc.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "biz-radio-button-group",
+          "declaration": {
+            "name": "BizRadioButtonGroup",
+            "module": "src/components/RadioButtonGroup/RadioButtonGroup.wc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/RadioButtonGroup/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BizRadioButtonGroup",
+          "declaration": {
+            "name": "BizRadioButtonGroup",
+            "module": "./RadioButtonGroup.wc"
           }
         }
       ]
@@ -20151,6 +19910,228 @@
           "declaration": {
             "name": "BizTransferList",
             "module": "./TransferList.wc"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/examples/Cart/Cart.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "cartStyles",
+          "default": "css` .cart { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; } .cart-header { font-size: 1.2rem; margin-bottom: 1rem; } .cart-items { list-style: none; padding: 0; margin: 0; } .cart-item { display: flex; justify-content: space-between; margin-bottom: 0.5rem; } .cart-total { margin-top: 1rem; font-weight: bold; } `"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "cartStyles",
+          "declaration": {
+            "name": "cartStyles",
+            "module": "src/examples/Cart/Cart.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/examples/Cart/Cart.stories.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "meta",
+          "type": {
+            "text": "Meta<CartProps>"
+          },
+          "default": "{ title: 'Examples/Cart', render: (args) => { const handleAddItem = () => { const cartEl = document.querySelector('shop-cart'); if (cartEl) { const newItem: CartItem = { id: Math.floor(Math.random() * 5), name: `추가된 상품 (${Date.now().toString().slice(-4)})`, price: 1500, quantity: 1 }; cartEl.addItem(newItem); } }; const handleCheckout = () => { const cartEl = document.querySelector('shop-cart'); if (cartEl) { // public getter를 통해 병합된 내부 상태 수집 const finalItems = cartEl.itemsInCart; alert(`총 ${finalItems.length}개의 종류 상품 결재를 진행합니다.`); } }; return html` <div style=\"margin-bottom: 16px;\"> <button @click=${handleAddItem}>상품추가</button> </div> <shop-cart .items=${args.items} ></shop-cart> <div style=\"margin-top: 16px; display: flex; gap: 8px;\"> <button @click=${handleCheckout}>결재하기</button> </div> `; }, argTypes: { items: { control: { type: 'object' } } } }"
+        },
+        {
+          "kind": "variable",
+          "name": "Default",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { items: [ { id: 1, name: \"notebook\", price: 1000, quantity: 1 }, { id: 2, name: \"macbook\", price: 2300, quantity: 1 }, { id: 1, name: \"notebook\", price: 1000, quantity: 2 }, ] } }"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "meta",
+            "module": "src/examples/Cart/Cart.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Default",
+          "declaration": {
+            "name": "Default",
+            "module": "src/examples/Cart/Cart.stories.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/examples/Cart/Cart.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "CartTemplate",
+          "parameters": [
+            {
+              "name": "{\n    items,\n    }",
+              "type": {
+                "text": "CartProps"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CartTemplate",
+          "declaration": {
+            "name": "CartTemplate",
+            "module": "src/examples/Cart/Cart.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/examples/Cart/Cart.wc.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "CartWC",
+          "members": [
+            {
+              "kind": "field",
+              "name": "items",
+              "type": {
+                "text": "CartItem[]"
+              },
+              "default": "[]",
+              "attribute": "items"
+            },
+            {
+              "kind": "field",
+              "name": "_items",
+              "type": {
+                "text": "CartItem[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "itemsInCart",
+              "type": {
+                "text": "CartItem[]"
+              },
+              "privacy": "public",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "addItem",
+              "privacy": "public",
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "CartItem"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleRemoveItem",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "CustomEvent<{ id: number }>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_mergeItems",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "CartItem[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "items",
+                  "type": {
+                    "text": "CartItem[]"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "items",
+              "type": {
+                "text": "CartItem[]"
+              },
+              "default": "[]",
+              "fieldName": "items"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "shop-cart",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CartWC",
+          "declaration": {
+            "name": "CartWC",
+            "module": "src/examples/Cart/Cart.wc.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "shop-cart",
+          "declaration": {
+            "name": "CartWC",
+            "module": "src/examples/Cart/Cart.wc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/examples/Cart/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/examples/Cart/Cart.wc"
           }
         }
       ]

@@ -1,6 +1,6 @@
 import { html } from 'lit';
 
-export interface ContentContainerTemplateHost {
+export interface ContentContainerHost {
   variant?: 'standard' | 'fluid' | 'card';
   size?: 'small' | 'medium' | 'large' | 'full';
   centered?: boolean;
@@ -11,7 +11,7 @@ export interface ContentContainerTemplateHost {
   handleScroll?: (event: Event) => void;
 }
 
-export const ContentContainerTemplate = (host: ContentContainerTemplateHost) => {
+export const ContentContainerTemplate = (host: ContentContainerHost) => {
   const {
     variant = 'standard',
     size = 'medium',
