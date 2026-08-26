@@ -1,65 +1,75 @@
-import { html, nothing } from 'lit';
+import { html } from "lit";
 
-export interface PageHeaderContext {
+export interface PageHeaderHost {
   title?: string;
   subtitle?: string;
-  variant: 'standard' | 'filled' | 'ghost';
-  size: 'small' | 'medium' | 'large';
-  fullWidth: boolean;
-  compact: boolean;
-  loading: boolean;
-  disabled: boolean;
-  error: boolean;
-  titleId?: string;
-  subtitleId?: string;
-  handleActionClick?: (e: MouseEvent) => void;
-  handleKeyDown?: (e: KeyboardEvent) => void;
-  handleSlotChange?: (e: Event) => void;
+  variant?: 'standard' | 'filled' | 'ghost' | 'outlined';
+  size?: 'small' | 'medium' | 'large';
+  compact?: boolean;
+  loading?: boolean;
+  disabled?: boolean;
+  error?: boolean;
+  handleActionClick?: (actionId: string, event: Event) => void;
 }
 
-export const PageHeaderTemplate = (context: PageHeaderContext) => html`
-  <header
-    class="biz-page-header ${context.variant} ${context.size} ${context.fullWidth ? 'full-width' : ''} ${context.compact ? 'compact' : ''} ${context.disabled ? 'disabled' : ''} ${context.error ? 'error' : ''} ${context.loading ? 'loading' : ''}"
-    role="region"
-    aria-label="Page Header"
-    aria-invalid=${context.error ? 'true' : 'false'}
-    aria-disabled=${context.disabled ? 'true' : 'false'}
-    @click=${context.handleActionClick}
-    @keydown=${context.handleKeyDown}
-  >
-    ${context.loading
-      ? html`
-          <div class="biz-page-header__skeleton">
-            <div class="biz-page-header__skeleton-breadcrumb"></div>
-            <div class="biz-page-header__skeleton-title"></div>
-            <div class="biz-page-header__skeleton-subtitle"></div>
-          </div>
-        `
-      : html`
-          <div class="biz-page-header__breadcrumb">
-            <slot name="breadcrumb-slot" @slotchange=${context.handleSlotChange}></slot>
-          </div>
+export const PageHeaderTemplate = (host: PageHeaderHost) => {
+  const {
+    title = '',
+    subtitle = '',
+    variant = 'standard',
+    size = 'medium',
+    compact = false,
+    loading = false,
+    disabled = false,
+    error = false
+  } = host;
 
-          <div class="biz-page-header__main">
-            <div class="biz-page-header__title-container">
-              <slot name="title-slot" id=${context.titleId || 'title-slot'} @slotchange=${context.handleSlotChange}>
-                ${context.title ? html`<h1 class="biz-page-header__title">${context.title}</h1>` : nothing}
-              </slot>
-              <div class="biz-page-header__meta-status">
-                <slot name="meta-status-slot" @slotchange=${context.handleSlotChange}></slot>
-              </div>
+  return html`
+    <header
+      class="biz-page-header"
+      role="region"
+      aria-label="Page Header"
+      data-variant="${variant}"
+      data-size="${size}"
+      ?data-compact="${compact}"
+      ?data-loading="${loading}"
+      ?data-disabled="${disabled}"
+      ?data-error="${error}"
+    >
+      <div class="biz-page-header__breadcrumb">
+        <slot name="breadcrumb-slot"></slot>
+      </div>
+
+      <div class="biz-page-header__main">
+        <div class="biz-page-header__title-container">
+          <div class="biz-page-header__title-wrapper">
+            ${title
+              ? html`<h1 class="biz-page-header__title">${title}</h1>`
+              : html`<slot name="title-slot"></slot>`}
+            <div class="biz-page-header__meta-status">
+              <slot name="meta-status-slot"></slot>
             </div>
-
-            <div class="biz-page-header__extra-actions">
-              <slot name="extra-actions-slot" @slotchange=${context.handleSlotChange}></slot>
-            </div>
           </div>
-
-          <div class="biz-page-header__subtitle-container">
-            <slot name="subtitle-slot" id=${context.subtitleId || 'subtitle-slot'} @slotchange=${context.handleSlotChange}>
-              ${context.subtitle ? html`<p class="biz-page-header__subtitle">${context.subtitle}</p>` : nothing}
-            </slot>
+          <div class="biz-page-header__subtitle-wrapper">
+            ${subtitle
+              ? html`<p class="biz-page-header__subtitle">${subtitle}</p>`
+              : html`<slot name="subtitle-slot"></slot>`}
           </div>
-        `}
-  </header>
-`;
+        </div>
+
+        <div
+          class="biz-page-header__extra-actions"
+          @click="${(e: Event) => {
+            const target = (e.target as HTMLElement).closest('[data-action-id]');
+            if (target) {
+              const actionId = target.getAttribute('data-action-id') || '';
+              host.handleActionClick?.(actionId, e);
+            }
+          }}"
+        >
+          <slot name="extra-actions-slot"></slot>
+        </div>
+      </div>
+    </header>
+  `;
+};

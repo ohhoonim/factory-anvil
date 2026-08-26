@@ -1,1 +1,1 @@
-export * from './PageHeader.wc';
+export { BizPageHeader } from './PageHeader.wc.js';

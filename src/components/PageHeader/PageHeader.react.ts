@@ -1,15 +1,13 @@
-import { createComponent } from '@lit/react';
 import React from 'react';
-
-import { PageHeader as PageHeaderWc } from "./PageHeader.wc";
+import { createComponent } from '@lit/react';
+import { BizPageHeader } from './PageHeader.wc.js';
 
 export const PageHeader = createComponent({
-  react: React,
   tagName: 'biz-page-header',
-  elementClass: PageHeaderWc,
+  elementClass: BizPageHeader,
+  react: React,
   events: {
     onActionClick: 'action-click',
     onClear: 'clear',
-    onSlotChange: 'slot-change',
   },
 });
