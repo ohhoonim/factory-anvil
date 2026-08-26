@@ -1,42 +1,76 @@
-import { html } from 'lit';
+import { html } from "lit";
+import { classMap } from "lit/directives/class-map.js";
 
-export const SplitPaneTemplate = (props: any) => html`
-  <div 
-    class="biz-split-pane ${props.direction} ${props.variant} ${props.size} ${props.disabled ? 'disabled' : ''} ${props.collapsible ? 'collapsible' : ''} ${props.fullWidth ? 'full-width' : ''} ${props.fullHeight ? 'full-height' : ''}"
-  >
-    <div 
-      id="pane-1"
-      class="pane pane-1 ${props.collapsed === 1 ? 'collapsed' : ''}" 
-      style="flex: ${props.sizes[0]} 1 0%; min-width: ${props.minSizes[0]}px; max-width: ${props.maxSizes[0] ? props.maxSizes[0] + 'px' : 'none'};"
-    >
-      <slot name="pane-1-slot"></slot>
-    </div>
-    
+export interface SplitPaneHost {
+  direction: 'horizontal' | 'vertical';
+  variant: 'line' | 'grip' | 'invisible';
+  size: 'small' | 'medium' | 'large';
+  sizes: number[];
+  minSizes: number[];
+  maxSizes: number[];
+  disabled: boolean;
+  collapsible: boolean;
+  collapsed: boolean;
+  isDragging: boolean;
+  handleMouseDown: (event: MouseEvent) => void;
+  handleKeyDown: (event: KeyboardEvent) => void;
+  handleDoubleClick: () => void;
+}
+
+export const SplitPaneTemplate = (host: SplitPaneHost) => {
+  const isHorizontal = host.direction === 'horizontal';
+  const primarySize = host.sizes[0] ?? 50;
+  const secondarySize = host.sizes[1] ?? (100 - primarySize);
+
+  const pane1Style = isHorizontal
+    ? `width: ${primarySize}%; height: 100%;`
+    : `width: 100%; height: ${primarySize}%;`;
+
+  const pane2Style = isHorizontal
+    ? `width: ${secondarySize}%; height: 100%;`
+    : `width: 100%; height: ${secondarySize}%;`;
+
+  return html`
     <div
-      class="resizer ${props.isDragging ? 'active' : ''}"
-      role="separator"
-      aria-orientation="${props.direction}"
-      aria-valuenow="${props.sizes[0]}"
-      aria-valuemin="${props.minSizes[0]}"
-      aria-valuemax="${props.maxSizes[0] || 100}"
-      aria-controls="pane-1 pane-2"
-      tabindex="${props.disabled ? '-1' : '0'}"
-      @mousedown="${props.onResizeStart}"
-      @touchstart="${props.onResizeStart}"
-      @keydown="${props.onKeyDown}"
-      @dblclick="${props.onDoubleClick}"
+      class=${classMap({
+        'biz-split-pane': true,
+        'biz-split-pane--horizontal': isHorizontal,
+        'biz-split-pane--vertical': !isHorizontal,
+        [`biz-split-pane--${host.variant}`]: Boolean(host.variant),
+        [`biz-split-pane--${host.size}`]: Boolean(host.size),
+        'biz-split-pane--disabled': host.disabled,
+        'biz-split-pane--dragging': host.isDragging,
+        'biz-split-pane--collapsed': host.collapsed,
+      })}
     >
-      <slot name="resizer-slot">
-        ${props.variant === 'Grip' ? html`<div class="grip-icon"></div>` : html``}
-      </slot>
-    </div>
+      <div class="biz-split-pane__pane biz-split-pane__pane--1" style=${pane1Style} id="pane-1">
+        <slot name="pane-1-slot"></slot>
+      </div>
 
-    <div 
-      id="pane-2"
-      class="pane pane-2 ${props.collapsed === 2 ? 'collapsed' : ''}" 
-      style="flex: ${props.sizes[1]} 1 0%; min-width: ${props.minSizes[1]}px; max-width: ${props.maxSizes[1] ? props.maxSizes[1] + 'px' : 'none'};"
-    >
-      <slot name="pane-2-slot"></slot>
+      <div
+        class="biz-split-pane__resizer"
+        role="separator"
+        tabindex=${host.disabled ? '-1' : '0'}
+        aria-orientation=${host.direction}
+        aria-valuenow=${Math.round(primarySize)}
+        aria-valuemin=${host.minSizes[0] ?? 0}
+        aria-valuemax=${host.maxSizes[0] ?? 100}
+        aria-controls="pane-1 pane-2"
+        aria-disabled=${host.disabled ? 'true' : 'false'}
+        @mousedown=${host.handleMouseDown}
+        @keydown=${host.handleKeyDown}
+        @dblclick=${host.handleDoubleClick}
+      >
+        <slot name="resizer-slot">
+          ${host.variant === 'grip'
+            ? html`<div class="biz-split-pane__grip-icon"></div>`
+            : html`<div class="biz-split-pane__resizer-bar"></div>`}
+        </slot>
+      </div>
+
+      <div class="biz-split-pane__pane biz-split-pane__pane--2" style=${pane2Style} id="pane-2">
+        <slot name="pane-2-slot"></slot>
+      </div>
     </div>
-  </div>
-`;
+  `;
+};
