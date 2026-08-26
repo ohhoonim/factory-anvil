@@ -530,6 +530,45 @@
       "references": []
     },
     {
+      "name": "biz-inline-edit-wrapper",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **mode-change** - undefined\n- **save** - undefined\n- **cancel** - undefined",
+      "attributes": [
+        { "name": "value", "values": [] },
+        { "name": "mode", "values": [{ "name": "view" }, { "name": "edit" }] },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "standard" },
+            { "name": "outlined" },
+            { "name": "ghost" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        {
+          "name": "trigger",
+          "values": [
+            { "name": "click" },
+            { "name": "dblclick" },
+            { "name": "focus" }
+          ]
+        },
+        { "name": "show-actions", "values": [] },
+        { "name": "auto-save", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "error", "values": [] },
+        { "name": "loading", "values": [] },
+        { "name": "full-width", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-ip-address-input",
       "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **clear** - undefined\n- **input** - undefined\n\n### **Slots:**\n - **separator-slot** - undefined\n- **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined",
       "attributes": [
@@ -604,45 +643,6 @@
         { "name": "error", "values": [] },
         { "name": "variant", "values": [] },
         { "name": "size", "values": [] },
-        { "name": "full-width", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-inline-edit-wrapper",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **mode-change** - undefined\n- **save** - undefined\n- **cancel** - undefined",
-      "attributes": [
-        { "name": "value", "values": [] },
-        { "name": "mode", "values": [{ "name": "view" }, { "name": "edit" }] },
-        {
-          "name": "variant",
-          "values": [
-            { "name": "standard" },
-            { "name": "outlined" },
-            { "name": "ghost" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        {
-          "name": "trigger",
-          "values": [
-            { "name": "click" },
-            { "name": "dblclick" },
-            { "name": "focus" }
-          ]
-        },
-        { "name": "show-actions", "values": [] },
-        { "name": "auto-save", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "error", "values": [] },
-        { "name": "loading", "values": [] },
         { "name": "full-width", "values": [] }
       ],
       "references": []
@@ -786,6 +786,25 @@
       "references": []
     },
     {
+      "name": "biz-rating",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **hover-change** - undefined\n- **clear** - undefined\n- **input** - undefined\n- **change** - undefined\n\n### **Slots:**\n - **icon-empty-slot** - undefined\n- **icon-half-slot** - isHalf == true\n- **icon-filled-slot** - undefined\n- **value-label-slot** - undefined\n- **biz-rating__helper** - undefined",
+      "attributes": [
+        { "name": "value", "values": [] },
+        { "name": "max", "values": [] },
+        { "name": "precision", "values": [] },
+        { "name": "allow-clear", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "show-tooltip", "values": [] },
+        {
+          "name": "size",
+          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
+        },
+        { "name": "name", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-radio-button-group",
       "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **change** - undefined\n- **clear** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **(default)** - undefined\n- **helper-text-slot** - undefined",
       "attributes": [
@@ -820,25 +839,6 @@
         { "name": "label", "values": [] },
         { "name": "helper-text", "values": [] },
         { "name": "full-width", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-rating",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **hover-change** - undefined\n- **clear** - undefined\n- **input** - undefined\n- **change** - undefined\n\n### **Slots:**\n - **icon-empty-slot** - undefined\n- **icon-half-slot** - isHalf == true\n- **icon-filled-slot** - undefined\n- **value-label-slot** - undefined\n- **biz-rating__helper** - undefined",
-      "attributes": [
-        { "name": "value", "values": [] },
-        { "name": "max", "values": [] },
-        { "name": "precision", "values": [] },
-        { "name": "allow-clear", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "show-tooltip", "values": [] },
-        {
-          "name": "size",
-          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
-        },
-        { "name": "name", "values": [] }
       ],
       "references": []
     },
@@ -959,29 +959,6 @@
       "references": []
     },
     {
-      "name": "biz-tile-layout-grid",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **layout-change** - undefined\n- **tile-click** - undefined\n\n### **Slots:**\n - **header-slot** - undefined\n- **(default)** - undefined\n- **empty-slot** - undefined",
-      "attributes": [
-        {
-          "name": "mode",
-          "values": [{ "name": "fixed" }, { "name": "masonry" }]
-        },
-        { "name": "columns", "values": [] },
-        { "name": "min-tile-width", "values": [] },
-        {
-          "name": "gap",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "aspect-ratio", "values": [] },
-        { "name": "loading", "values": [] }
-      ],
-      "references": []
-    },
-    {
       "name": "biz-text-input",
       "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **input** - undefined\n- **change** - undefined\n- **focus** - undefined\n- **blur** - undefined\n- **clear** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **start-slot** - undefined\n- **end-slot** - undefined\n- **helper-text-slot** - undefined",
       "attributes": [
@@ -1010,6 +987,22 @@
           ]
         },
         { "name": "full-width", "values": [] },
+        { "name": "loading", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-tile-layout-grid",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **layout-change** - undefined\n- **tile-click** - undefined",
+      "attributes": [
+        {
+          "name": "mode",
+          "values": [{ "name": "fixed" }, { "name": "masonry" }]
+        },
+        { "name": "columns", "values": [] },
+        { "name": "min-tile-width", "values": [] },
+        { "name": "gap", "values": [] },
+        { "name": "aspect-ratio", "values": [] },
         { "name": "loading", "values": [] }
       ],
       "references": []
