@@ -17,13 +17,13 @@
    - SplitPane.wc.ts (LitElement 기반 웹 컴포넌트 클래스)
    - SplitPane.react.ts (@lit/react 기반 React 래퍼)
    - SplitPane.stories.ts (Storybook 문서 및 a11y 검증)
-   - SplitPane.test.ts (Vitest 및 Playwright 테스트)
    - index.ts (통합 export)
 3. 네임스페이스 및 명명 규칙:
    - 커스텀 엘리먼트 태그명: `biz-split-pane`
    - CSS Design Token / Custom Properties: `--biz-split-pane-*`
    - 루트 CSS 클래스명: `biz-split-pane`
    - Lit 코어 템플릿 export 명칭: `SplitPaneTemplate`
+   - 템플릿 함수 파라미터 'host'의 인터페이스 export 명칭:`SplitPaneHost` 
    - Lit 스타일 export 변수명: `export const splitPaneStyles = css`...``
    - React Event Handler 매핑: Custom Event `clear` -> React Prop `onClear`
 
@@ -143,7 +143,7 @@
 - 스크린 리더에서 리사이저 조작 시 변경되는 크기 비율 정보를 `aria-valuenow`를 통해 실시간 수치로 제공합니다.
 ---
 
-위 컨텍스트와 요구사항을 완벽히 이해했음을 확인하고, 다음 단계(코어 템플릿 및 스타일 생성) 진행 준비가 되었음을 알려주세요. 아직 코드를 작성하지 마세요.
+현 단계는 1단계입니다. 위 컨텍스트와 요구사항을 완벽히 이해했음을 확인하고, 다음 단계(코어 템플릿 및 스타일 생성) 진행 준비가 되었음을 알려주세요. 아직 코드를 작성하지 마세요.
 ````
 
 ---
@@ -159,6 +159,8 @@
 2. 템플릿 함수는 `SplitPaneTemplate` 명칭으로 export 하세요.
 3. 요구사항 정의서 2절의 슬롯 명세(`label-slot`, `start-slot`, `end-slot`, `helper-text-slot` 등)를 올바르게 배치하세요.
 4. 속성(Properties), 상태(States), 이벤트 핸들러 바인딩 구조를 템플릿 내에 반영하세요.
+5. 템플릿 함수의 파라미터명은 'host'를 사용하고, host타입을 인터페이스로 작성해주세요. 
+6. host타입은 `SplitPaneHost` 명칭으로 export 하세요.
 
 [작성 조건 - SplitPane.css.ts]
 1. `import { css } from 'lit';` 구문을 작성하세요.
@@ -183,8 +185,8 @@
 1단계의 요구사항 정의서와 2단계에서 작성된 코어 템플릿/스타일을 바탕으로 웹 컴포넌트 클래스 파일(`SplitPane.wc.ts`) 코드를 작성해 주세요.
 
 [작성 조건 - SplitPane.wc.ts]
-1. `LitElement`를 상속받아 클래스를 구현하고, `@customElement('biz-split-pane')` 디코레이터를 사용하여 커스텀 엘리먼트로 등록하세요.
-2. 2단계에서 생성한 `SplitPaneTemplate` 및 `SplitPane.css.ts`의 `splitPaneStyles`를 임포트하세요.
+1. `LitElement`를 상속받고, 2단계에서 생성한 `SplitPaneHost`를 implements 하여  클래스를 구현하고, `@customElement('biz-split-pane')` 디코레이터를 사용하여 커스텀 엘리먼트로 등록하세요.
+2. 2단계에서 생성한 `SplitPaneTemplate` 및 `SplitPane.css.ts`의 `splitPaneStyles`를 임포트하세요. `SplitPaneHost`를 type 임포트하세요.
 3. 정적 클래스 속성으로 `static styles = splitPaneStyles;` 구문을 사용하여 스타일을 연결하고, `render()` 메서드에 `SplitPaneTemplate`을 바인딩하세요.
 4. 요구사항 정의서 3.1절의 속성(Properties/Attributes)을 Lit의 `@property` 및 `@state` 디코레이터로 정의하세요.
 5. 요구사항 정의서 3.3절의 이벤트(`input`, `change`, `clear` 등)를 발생시키는 내부 이벤트 핸들러 및 `CustomEvent` 방출 메서드를 구현하세요. (`bubbles: true`, `composed: true`, `detail` 객체 구성 준수)
@@ -223,7 +225,7 @@
 
 ---
 
-## [Prompt 5] 5단계: Storybook 및 테스트 코드 생성 프롬프트
+## [Prompt 5] 5단계: Storybook 코드 생성 프롬프트
 
 ````text
 [요청 사항]
@@ -231,16 +233,13 @@
 
 [작성 조건 - SplitPane.stories.ts]
 1. Storybook v7+ CSF 3.0 명세를 준수하여 기본 Meta 및 Stories를 구현하세요.
-2. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 및 1.3절의 Sizes(`Small`, `Medium`, `Large`)를 시연하는 Story를 작성하세요.
-3. 요구사항 정의서 3.2절의 주요 States(`Disabled`, `Readonly`, `Error`, `Loading` 등)를 시연하는 Story를 작성하세요.
-4. `@storybook/addon-a11y` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
-
-[작성 조건 - SplitPane.test.ts]
-1. Vitest 및 Playwright 환경에서 실행 가능한 테스트 스위트를 구현하세요.
-2. [단위 테스트]: Properties 변경에 따른 DOM 반영, 3.3절 커스텀 이벤트(`input`, `change`, `clear` 등) 방출 여부 및 `detail` 데이터 검증을 수행하세요.
-3. [통합 및 접근성 테스트]: 5.1절 ARIA 속성(`aria-invalid`, `aria-describedby` 등) 바인딩 및 5.2절 키보드 네비게이션(`Tab`, `Escape`, `Enter` 등) 동작을 브라우저 상에서 검증하는 시나리오를 구현하세요.
+2. 컴포넌트의 Host 속성 타입(e.g., `SplitPaneHost`)에 `Required<T>`를 적용하여 모든 프로퍼티를 필수화한 후, Slot 관련 컨트롤 키를 추가한 `Args` 타입을 정의하세요.
+3. `Args` 타입을 Meta와 StoryObj 의 제네릭 타입으로 사용하시오.
+4. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 및 1.3절의 Sizes(`Small`, `Medium`, `Large`)를 시연하는 Story를 작성하세요.
+5. 요구사항 정의서 3.2절의 주요 States(`Disabled`, `Readonly`, `Error`, `Loading` 등)를 시연하는 Story를 작성하세요.
+6. `@storybook/addon-a11y` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
 
 [출력 형식]
-- 각 파일별 경로(`src/components/SplitPane/SplitPane.stories.ts`, `src/components/SplitPane/SplitPane.test.ts`)를 명시하고 해당 코드 블록만 출력하세요.
+- 파일 경로(`src/components/SplitPane/SplitPane.stories.ts`)를 명시하고 해당 코드 블록만 출력하세요.
 - 모든 코드 작성이 완료되면 전체 개발 공정(Phase 1~5)이 성공적으로 종료되었음을 최종 안내해 주세요.
 ````
