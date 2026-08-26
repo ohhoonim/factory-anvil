@@ -1,186 +1,184 @@
-import { LitElement } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { TileLayoutGridTemplate } from "./TileLayoutGrid";
-import { tileLayoutGridStyles } from "./TileLayoutGrid.css";
+import { LitElement, type PropertyValues } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { TileLayoutGridTemplate, type TileLayoutGridHost } from './TileLayoutGrid';
+import { tileLayoutGridStyles } from './TileLayoutGrid.css';
 
-/**
- * @element biz-tile-layout-grid
- * 
- * @slot header-slot
- * @slot (default)
- * @slot empty-slot
- */
 @customElement('biz-tile-layout-grid')
-export class TileLayoutGrid extends LitElement {
+export class TileLayoutGrid extends LitElement implements TileLayoutGridHost {
   static styles = tileLayoutGridStyles;
 
   @property({ type: String, reflect: true })
   mode: 'fixed' | 'masonry' = 'fixed';
 
-  @property({ type: String, reflect: true })
+  @property({ type: String })
   columns: number | string = 'auto-fit';
 
-  @property({ type: String, attribute: 'min-tile-width', reflect: true })
+  @property({ type: String, attribute: 'min-tile-width' })
   minTileWidth: string = '280px';
 
-  @property({ type: String, reflect: true })
-  gap: 'small' | 'medium' | 'large' | string = 'medium';
+  @property({ type: String })
+  gap: string = 'medium';
 
-  @property({ type: String, attribute: 'aspect-ratio', reflect: true })
+  @property({ type: String, attribute: 'aspect-ratio' })
   aspectRatio: string = '1/1';
 
   @property({ type: Boolean, reflect: true })
   loading: boolean = false;
 
   @state()
-  private _isEmpty: boolean = false;
+  isEmpty: boolean = false;
 
-  private _resizeObserver: ResizeObserver | null = null;
-  private _previousCalculatedColumns: number = 0;
+  private resizeObserver: ResizeObserver | null = null;
 
   connectedCallback(): void {
     super.connectedCallback();
-    this._setupResizeObserver();
+    this.setupResizeObserver();
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
-    if (this._resizeObserver) {
-      this._resizeObserver.disconnect();
-      this._resizeObserver = null;
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
     }
   }
 
-  private _setupResizeObserver(): void {
-    this._resizeObserver = new ResizeObserver(() => {
-      this._handleResize();
-    });
-    this._resizeObserver.observe(this);
-  }
+  protected updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
 
-  private _handleResize(): void {
-    const computedColumns = this._calculateCurrentColumns();
-    if (computedColumns !== this._previousCalculatedColumns) {
-      this._previousCalculatedColumns = computedColumns;
+    if (changedProperties.has('mode') || changedProperties.has('columns')) {
       this.dispatchEvent(
         new CustomEvent('layout-change', {
-          bubbles: true,
-          composed: true,
           detail: {
-            columns: computedColumns,
+            columns: this.computedColumnCount(),
             mode: this.mode,
           },
-        })
-      );
-    }
-  }
-
-  private _calculateCurrentColumns(): number {
-    if (typeof this.columns === 'number') {
-      return this.columns;
-    }
-    const containerWidth = this.getBoundingClientRect().width;
-    const minWidthPx = parseFloat(this.minTileWidth) || 280;
-    const computed = Math.floor(containerWidth / minWidthPx);
-    return computed > 0 ? computed : 1;
-  }
-
-  private _handleSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    const assignedElements = slot.assignedElements({ flatten: true });
-    this._isEmpty = assignedElements.length === 0;
-    this._updateAriaAttributes(assignedElements.length);
-  }
-
-  private _updateAriaAttributes(itemCount: number): void {
-    const cols = this._calculateCurrentColumns();
-    const rows = cols > 0 ? Math.ceil(itemCount / cols) : 0;
-    this.setAttribute('aria-rowcount', String(rows));
-    this.setAttribute('aria-colcount', String(cols));
-  }
-
-  private _handleTileClick(e: MouseEvent): void {
-    const target = e.target as HTMLElement;
-    const defaultSlot = this.shadowRoot?.querySelector('main slot') as HTMLSlotElement;
-    if (!defaultSlot) return;
-
-    const assignedNodes = defaultSlot.assignedElements({ flatten: true });
-    const clickedItem = assignedNodes.find((node) => node.contains(target) || node === target);
-
-    if (clickedItem) {
-      const index = assignedNodes.indexOf(clickedItem);
-      this.dispatchEvent(
-        new CustomEvent('tile-click', {
           bubbles: true,
           composed: true,
-          detail: {
-            item: clickedItem as HTMLElement,
-            index,
-          },
         })
       );
     }
   }
 
-  private _handleKeyDown(e: KeyboardEvent): void {
-    const defaultSlot = this.shadowRoot?.querySelector('main slot') as HTMLSlotElement;
-    if (!defaultSlot) return;
+  handleSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const assignedElements = slot.assignedElements({ flatten: true });
+    this.isEmpty = assignedElements.length === 0;
 
-    const assignedNodes = defaultSlot.assignedElements({ flatten: true }) as HTMLElement[];
-    if (assignedNodes.length === 0) return;
+    assignedElements.forEach((element, index) => {
+      element.setAttribute('data-grid-index', String(index));
+      if (!element.hasAttribute('tabindex')) {
+        element.setAttribute('tabindex', index === 0 ? '0' : '-1');
+      }
+    });
+  }
 
-    const activeElement = document.activeElement as HTMLElement;
-    let currentIndex = assignedNodes.findIndex(
-      (node) => node === activeElement || node.contains(activeElement)
-    );
+  handleTileClick(e: MouseEvent): void {
+    const path = e.composedPath();
+    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement;
+    if (!slot) return;
+
+    const assignedElements = slot.assignedElements({ flatten: true }) as HTMLElement[];
+    const clickedItem = path.find((target) =>
+      assignedElements.includes(target as HTMLElement)
+    ) as HTMLElement | undefined;
+
+    if (clickedItem) {
+      const index = assignedElements.indexOf(clickedItem);
+      this.dispatchEvent(
+        new CustomEvent('tile-click', {
+          detail: {
+            item: clickedItem,
+            index,
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+  }
+
+  handleKeyDown(e: KeyboardEvent): void {
+    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement;
+    if (!slot) return;
+
+    const items = slot.assignedElements({ flatten: true }) as HTMLElement[];
+    if (items.length === 0) return;
+
+    const activeElement = (document.activeElement ||
+      this.shadowRoot?.activeElement) as HTMLElement;
+    const currentIndex = items.indexOf(activeElement);
 
     if (currentIndex === -1) return;
 
-    const cols = this._calculateCurrentColumns();
+    const cols = this.computedColumnCount();
     let targetIndex = currentIndex;
 
     switch (e.key) {
       case 'ArrowRight':
-        targetIndex = Math.min(currentIndex + 1, assignedNodes.length - 1);
+        targetIndex = (currentIndex + 1) % items.length;
+        e.preventDefault();
         break;
       case 'ArrowLeft':
-        targetIndex = Math.max(currentIndex - 1, 0);
+        targetIndex = (currentIndex - 1 + items.length) % items.length;
+        e.preventDefault();
         break;
       case 'ArrowDown':
-        targetIndex = Math.min(currentIndex + cols, assignedNodes.length - 1);
+        if (currentIndex + cols < items.length) {
+          targetIndex = currentIndex + cols;
+          e.preventDefault();
+        }
         break;
       case 'ArrowUp':
-        targetIndex = Math.max(currentIndex - cols, 0);
+        if (currentIndex - cols >= 0) {
+          targetIndex = currentIndex - cols;
+          e.preventDefault();
+        }
         break;
       case 'Home':
         targetIndex = 0;
+        e.preventDefault();
         break;
       case 'End':
-        targetIndex = assignedNodes.length - 1;
+        targetIndex = items.length - 1;
+        e.preventDefault();
         break;
       default:
         return;
     }
 
-    if (targetIndex !== currentIndex) {
-      e.preventDefault();
-      assignedNodes[targetIndex].focus();
+    if (targetIndex !== currentIndex && items[targetIndex]) {
+      items.forEach((item) => item.setAttribute('tabindex', '-1'));
+      items[targetIndex].setAttribute('tabindex', '0');
+      items[targetIndex].focus();
+    }
+  }
+
+  private computedColumnCount(): number {
+    if (typeof this.columns === 'number') {
+      return this.columns;
+    }
+    const parsedNum = Number(this.columns);
+    if (!isNaN(parsedNum) && this.columns !== '') {
+      return parsedNum;
+    }
+
+    const containerWidth = this.clientWidth || 1024;
+    const minWidthNum = parseInt(this.minTileWidth, 10) || 280;
+    return Math.max(1, Math.floor(containerWidth / minWidthNum));
+  }
+
+  private setupResizeObserver(): void {
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.requestUpdate();
+      });
+      this.resizeObserver.observe(this);
     }
   }
 
   render() {
-    return TileLayoutGridTemplate({
-      mode: this.mode,
-      columns: this.columns,
-      minTileWidth: this.minTileWidth,
-      gap: this.gap,
-      aspectRatio: this.aspectRatio,
-      loading: this.loading,
-      isEmpty: this._isEmpty,
-      onSlotChange: this._handleSlotChange.bind(this),
-      onTileClick: this._handleTileClick.bind(this),
-      onKeyDown: this._handleKeyDown.bind(this),
-    });
+    return TileLayoutGridTemplate(this);
   }
 }
 

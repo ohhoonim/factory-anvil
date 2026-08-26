@@ -1,82 +1,83 @@
-import { html } from 'lit';
+import { html, type TemplateResult } from 'lit';
 
-export interface TileLayoutGridTemplateProps {
+export interface TileLayoutGridHost {
   mode: 'fixed' | 'masonry';
   columns: number | string;
   minTileWidth: string;
-  gap: 'small' | 'medium' | 'large' | string;
+  gap: string;
   aspectRatio: string;
   loading: boolean;
   isEmpty: boolean;
-  onSlotChange: (e: Event) => void;
-  onTileClick: (e: MouseEvent) => void;
-  onKeyDown: (e: KeyboardEvent) => void;
+  handleSlotChange: (e: Event) => void;
+  handleTileClick: (e: MouseEvent) => void;
+  handleKeyDown: (e: KeyboardEvent) => void;
 }
 
-export const TileLayoutGridTemplate = (props: TileLayoutGridTemplateProps) => {
+export const TileLayoutGridTemplate = (host: TileLayoutGridHost): TemplateResult => {
   const getGapValue = (gap: string) => {
     switch (gap) {
       case 'small':
         return 'var(--biz-tile-layout-grid-gap-sm, 12px)';
-      case 'medium':
-        return 'var(--biz-tile-layout-grid-gap-md, 16px)';
       case 'large':
         return 'var(--biz-tile-layout-grid-gap-lg, 24px)';
+      case 'medium':
       default:
-        return gap;
+        return 'var(--biz-tile-layout-grid-gap-md, 16px)';
     }
   };
 
-  const getColumnsValue = (columns: number | string, minWidth: string) => {
-    if (typeof columns === 'number') {
+  const getColumnsStyle = (columns: number | string, minWidth: string) => {
+    if (typeof columns === 'number' || (!isNaN(Number(columns)) && columns !== '')) {
       return `repeat(${columns}, minmax(0, 1fr))`;
     }
-    if (columns === 'auto-fit' || columns === 'auto-fill') {
-      return `repeat(${columns}, minmax(${minWidth}, 1fr))`;
+    if (columns === 'auto-fill') {
+      return `repeat(auto-fill, minmax(${minWidth}, 1fr))`;
     }
-    return columns;
+    return `repeat(auto-fit, minmax(${minWidth}, 1fr))`;
   };
 
-  const inlineStyles = `
-    --biz-tile-layout-grid-columns: ${getColumnsValue(props.columns, props.minTileWidth)};
-    --biz-tile-layout-grid-gap-current: ${getGapValue(props.gap)};
-    --biz-tile-layout-grid-aspect-ratio-current: ${props.aspectRatio};
+  const containerStyle = `
+    --biz-tile-layout-grid-gap-current: ${getGapValue(host.gap)};
+    --biz-tile-layout-grid-columns-current: ${getColumnsStyle(host.columns, host.minTileWidth)};
+    --biz-tile-layout-grid-aspect-ratio-current: ${host.aspectRatio};
   `;
 
   return html`
     <div
-      class="biz-tile-layout-grid ${props.mode === 'masonry' ? 'biz-tile-layout-grid--masonry' : 'biz-tile-layout-grid--fixed'} ${props.loading ? 'biz-tile-layout-grid--loading' : ''} ${props.isEmpty ? 'biz-tile-layout-grid--empty' : ''}"
-      style="${inlineStyles}"
+      class="biz-tile-layout-grid ${host.mode === 'masonry' ? 'biz-tile-layout-grid--masonry' : 'biz-tile-layout-grid--fixed'} ${host.loading ? 'biz-tile-layout-grid--loading' : ''} ${host.isEmpty ? 'biz-tile-layout-grid--empty' : ''}"
+      style="${containerStyle}"
       role="grid"
-      aria-busy="${props.loading ? 'true' : 'false'}"
-      @click="${props.onTileClick}"
-      @keydown="${props.onKeyDown}"
+      aria-busy="${host.loading ? 'true' : 'false'}"
+      @click="${host.handleTileClick}"
+      @keydown="${host.handleKeyDown}"
     >
-      <header class="biz-tile-layout-grid__header">
+      <div class="biz-tile-layout-grid__header">
         <slot name="header-slot"></slot>
-      </header>
+      </div>
 
-      ${props.loading
+      ${host.loading
         ? html`
-            <div class="biz-tile-layout-grid__skeleton-container" aria-hidden="true">
+            <div class="biz-tile-layout-grid__skeleton-container">
               ${Array.from({ length: 6 }).map(
                 () => html`<div class="biz-tile-layout-grid__skeleton-item"></div>`
               )}
             </div>
           `
         : html`
-            <main class="biz-tile-layout-grid__body">
-              <slot @slotchange="${props.onSlotChange}"></slot>
-              ${props.isEmpty
-                ? html`
-                    <div class="biz-tile-layout-grid__empty">
-                      <slot name="empty-slot">
-                        <p class="biz-tile-layout-grid__empty-text">표시할 타일이 없습니다.</p>
-                      </slot>
-                    </div>
-                  `
-                : ''}
-            </main>
+            <div
+              class="biz-tile-layout-grid__content ${host.isEmpty ? 'biz-tile-layout-grid__content--hidden' : ''}"
+            >
+              <slot @slotchange="${host.handleSlotChange}"></slot>
+            </div>
+            ${host.isEmpty
+              ? html`
+                  <div class="biz-tile-layout-grid__empty">
+                    <slot name="empty-slot">
+                      <p class="biz-tile-layout-grid__empty-text">No items available</p>
+                    </slot>
+                  </div>
+                `
+              : ''}
           `}
     </div>
   `;
