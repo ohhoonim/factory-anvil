@@ -19,7 +19,7 @@ type FormWrapperStoryArgs = Required<FormWrapperHost> & {
 };
 
 const meta: Meta<FormWrapperStoryArgs> = {
-  title: 'Components/FormWrapper',
+  title: 'Components/Layout/FormWrapper',
   component: 'biz-form-wrapper',
   tags: ['autodocs'],
   argTypes: {
@@ -52,25 +52,25 @@ const meta: Meta<FormWrapperStoryArgs> = {
     disabled: { control: 'boolean' },
     defaultSlot: { 
       name: '(default)',
-      description: '',
+      description: '단일 입력 컴포넌트 주입 영역',
       control: {type: 'text'},
       table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
     },
     labelSlot: { 
       name: 'label-slot',
-      description: '',
+      description: '상단/좌측 레이블 영역',
       control: {type: 'text'},
       table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
     },
     helperTextSlot: {
       name: 'helper-text-slot',
-      description: '',
+      description: '하단 안내/에러/성공 메시지 영역',
       control: {type: 'text'},
       table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
     },
     extraSlot: {
-      name: '',
-      description: '',
+      name: 'extra-slot',
+      description: '레이블 우측 부가 영역 (툴팁, 링크 등',
       control: {type: 'text'},
       table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
     },

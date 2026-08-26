@@ -1,1 +1,1 @@
-export { InlineEditWrapper as InlineEditWrapperWc } from './InlineEditWrapper.wc';
+export { BizInlineEditWrapper } from './InlineEditWrapper.wc';
