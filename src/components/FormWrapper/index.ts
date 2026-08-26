@@ -1,1 +1,1 @@
-export { BizFormWrapper } from './FormWrapper.wc';
+export { FormWrapper as FormWrapperWc } from './FormWrapper.wc';

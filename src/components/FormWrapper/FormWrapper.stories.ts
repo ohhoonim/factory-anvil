@@ -1,106 +1,193 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import './FormWrapper.wc';
+import type { FormWrapperHost } from './FormWrapper';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-const meta: Meta = {
-  title: 'Components/Layout/FormWrapper',
+type FormWrapperStoryArgs = Required<FormWrapperHost> & {
+  defaultSlot: string;
+  labelSlot: string;
+  helperTextSlot: string;
+  extraSlot: string;
+  "helper-text": string;
+  "error-message": string;
+  "success-message": string;
+  "label-width": string;
+  "full-width": boolean;
+  _generatedId: object;
+  helperTextId: string;
+};
+
+const meta: Meta<FormWrapperStoryArgs> = {
+  title: 'Components/FormWrapper',
   component: 'biz-form-wrapper',
   tags: ['autodocs'],
   argTypes: {
+    label: { control: 'text' },
+    required: { control: 'boolean' },
+    helperText: { control: 'text' },
+    "helper-text": { table: {disable: true} },
+    errorMessage: { 
+      description: '빨간 글자로 표시됨',
+      control: 'text' 
+    },
+    "error-message": { table: {disable: true} },
+    successMessage: { 
+      description: '`errorMessage`가 비어있어야 합니다.',
+      control: 'text' 
+    },
+    "success-message": { table: {disable: true} },
     layout: {
       control: 'select',
-      options: ['vertical', 'horizontal', 'inline']
+      options: ['vertical', 'horizontal', 'inline'],
     },
-    disabled: { control: 'boolean' },
-    required: { control: 'boolean' },
+    size: {
+      control: 'select',
+      options: ['small', 'medium', 'large'],
+    },
     fullWidth: { control: 'boolean' },
+    "full-width": { table: { disable: true}},
     labelWidth: { control: 'text' },
-    label: { control: 'text' },
-    helperText: { control: 'text' },
-    errorMessage: { control: 'text' },
-    successMessage: { control: 'text' }
+    "label-width": { table: { disable: true} },
+    disabled: { control: 'boolean' },
+    defaultSlot: { 
+      name: '(default)',
+      description: '',
+      control: {type: 'text'},
+      table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
+    },
+    labelSlot: { 
+      name: 'label-slot',
+      description: '',
+      control: {type: 'text'},
+      table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
+    },
+    helperTextSlot: {
+      name: 'helper-text-slot',
+      description: '',
+      control: {type: 'text'},
+      table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
+    },
+    extraSlot: {
+      name: '',
+      description: '',
+      control: {type: 'text'},
+      table: {category: 'slots', type: {summary: 'string | HTMLElement'}}
+    },
+    handleLabelClick: {table: {disable: true}},
+    handleSlotChange: {table: {disable: true}},
+    _generatedId: {table: {disable: true}},
+    helperTextId: {table: {disable: true}},
   },
   args: {
-    label: '사용자 이름',
-    layout: 'vertical',
+    label: '이메일 주소',
     required: false,
-    disabled: false,
+    helperText: '로그인에 사용할 이메일을 입력하세요.',
+    errorMessage: '',
+    successMessage: '',
+    layout: 'vertical',
+    size: 'medium',
     fullWidth: false,
-    helperText: '올바른 성명을 입력하세요.'
+    labelWidth: '420px',
+    disabled: false,
+    helperTextId: '',
+    handleLabelClick: () => {},
+    handleSlotChange: () => {},
+    defaultSlot: '<input type="email" placeholder="example@biz.com" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />',
+    labelSlot: '',
+    helperTextSlot: '',
+    extraSlot: '',
   },
   render: (args) => html`
     <biz-form-wrapper
-      .label=${args.label}
-      .layout=${args.layout}
-      ?required=${args.required}
-      ?disabled=${args.disabled}
-      ?full-width=${args.fullWidth}
-      .labelWidth=${args.labelWidth}
-      .helperText=${args.helperText}
-      .errorMessage=${args.errorMessage}
-      .successMessage=${args.successMessage}
+      .label="${args.label}"
+      ?required="${args.required}"
+      .helperText="${args.helperText}"
+      .errorMessage="${args.errorMessage}"
+      .successMessage="${args.successMessage}"
+      .layout="${args.layout}"
+      .size="${args.size}"
+      ?full-width="${args.fullWidth}"
+      .labelWidth="${args.labelWidth}"
+      ?disabled="${args.disabled}"
     >
-      <input type="text" placeholder="입력하세요1" style="width: 100%; padding: 8px; box-sizing: border-box;" />
+      ${args.labelSlot ? html`<span slot="label-slot">${unsafeHTML(args.labelSlot)}</span>` : ''}
+      ${args.extraSlot ? html`<span slot="extra-slot">${unsafeHTML(args.extraSlot)}</span>` : ''}
+      ${unsafeHTML(args.defaultSlot)}
+      ${args.helperTextSlot ? html`<span slot="helper-text-slot">${unsafeHTML(args.helperTextSlot)}</span>` : ''}
     </biz-form-wrapper>
-  `
+  `,
 };
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<FormWrapperStoryArgs>;
 
 export const Default: Story = {};
 
-export const Vertical: Story = {
+export const RequiredField: Story = {
+  args: {
+    required: true,
+  },
+};
+
+export const VerticalLayout: Story = {
   args: {
     layout: 'vertical',
-    label: '수직 레이아웃 (Vertical)',
-    helperText: '기본 수직 정렬 레이아웃입니다.'
-  }
+  },
 };
 
-export const Horizontal: Story = {
+export const HorizontalLayout: Story = {
   args: {
     layout: 'horizontal',
-    label: '수평 레이아웃',
     labelWidth: '140px',
-    helperText: '좌측 레이블 고정 너비가 적용된 레이아웃입니다.'
-  }
+  },
 };
 
-export const Inline: Story = {
+export const InlineLayout: Story = {
   args: {
     layout: 'inline',
-    label: '인라인',
-    helperText: '한 줄로 배치되는 축소형 레이아웃입니다.'
-  }
+  },
 };
 
-export const Required: Story = {
+export const SmallSize: Story = {
   args: {
-    label: '필수 입력 항목',
-    required: true
-  }
+    size: 'small',
+  },
+};
+
+export const MediumSize: Story = {
+  args: {
+    size: 'medium',
+  },
+};
+
+export const LargeSize: Story = {
+  args: {
+    size: 'large',
+  },
 };
 
 export const ErrorState: Story = {
   args: {
-    label: '이메일 주소',
-    errorMessage: '유효하지 않은 이메일 형식입니다.'
-  }
+    errorMessage: '유효한 이메일 형식이 아닙니다.',
+  },
 };
 
 export const SuccessState: Story = {
   args: {
-    label: '아이디',
-    successMessage: '사용 가능한 아이디입니다.'
-  }
+    successMessage: '사용 가능한 이메일입니다.',
+  },
 };
 
-export const Disabled: Story = {
+export const DisabledState: Story = {
   args: {
-    label: '비활성화 필드',
     disabled: true,
-    helperText: '수정할 수 없는 항목입니다.'
-  }
+  },
+};
+
+export const WithExtraSlot: Story = {
+  args: {
+    extraSlot: '<a href="#" style="font-size: 12px; color: #2563eb; text-decoration: none;">도움말</a>',
+  },
 };
