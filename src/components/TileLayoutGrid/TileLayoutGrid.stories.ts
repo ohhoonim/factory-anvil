@@ -1,136 +1,246 @@
-import type { Meta , StoryObj} from '@storybook/web-components-vite';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import './TileLayoutGrid.wc';
+import type { TileLayoutGridHost } from './TileLayoutGrid';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { fn } from 'storybook/test';
 
-const meta: Meta = {
-  title: 'Components/Layout/TileLayoutGrid',
-  component: 'biz-tile-layout-grid',
-  tags: ['autodocs'],
-  argTypes: {
-    mode: {
-      control: { type: 'select' },
-      options: ['fixed', 'masonry'],
+type TileLayoutGridArgs = Required<TileLayoutGridHost> & {
+    headerSlot: string;
+    defaultSlot: string;
+    emptySlot: string;
+    "header-slot": string;
+    "(default)": string;
+    "empty-slot": string;
+    resizeObserver: object;
+    onLayoutChange?: (e: CustomEvent) => void;
+    onTileClick?: (e: CustomEvent) => void;
+};
+
+const meta: Meta<TileLayoutGridArgs> = {
+    title: 'Components/Layout/TileLayoutGrid',
+    component: 'biz-tile-layout-grid',
+    tags: ['autodocs'],
+    argTypes: {
+        mode: {
+            control: { type: 'select' },
+            options: ['fixed', 'masonry'],
+            description: '그리드 모드 (fixed: 정격 높이, masonry: 가변 높이)',
+        },
+        columns: {
+            control: { type: 'text' },
+            description: '컬럼 수 설정 (auto-fit, auto-fill 또는 지정 숫자)',
+        },
+        minTileWidth: {
+            control: { type: 'text' },
+            description: '타일의 최소 너비 규격',
+        },
+        gap: {
+            control: { type: 'select' },
+            options: ['small', 'medium', 'large'],
+            description: '타일 간 간격 규격',
+        },
+        aspectRatio: {
+            control: { type: 'text' },
+            description: 'fixed 모드 시 적용할 타일의 가로세로 비율',
+        },
+        loading: {
+            control: { type: 'boolean' },
+            description: '스켈레톤 로딩 상태 여부',
+        },
+        isEmpty: {
+            control: { type: 'boolean' },
+            description: '내부 요소 비어있음 여부',
+        },
+        "header-slot": { table: { disable: true } },
+        "(default)": { table: { disable: true } },
+        "empty-slot": { table: { disable: true } },
+        headerSlot: {
+            name: 'header-slot',
+            description: '그리드 상단 툴바/필터링 영역',
+            control: { type: 'text' },
+            table: { category: 'slots', type: { summary: 'string | HTMLElement' } }
+        },
+        defaultSlot: {
+            name: '(default)',
+            description: 'Grid 내부에 배치될 자식 Tile 요소 주입 영역',
+            control: { type: 'text' },
+            table: { category: 'slots', type: { summary: 'string | HTMLElement' } }
+        },
+        emptySlot: {
+            name: 'empty-slot',
+            description: '내부 Tile 요소가 없을 때 표시할 대체 UI 영역',
+            control: { type: 'text' },
+            table: { category: 'slots', type: { summary: 'string | HTMLElement' } }
+        },
+        resizeObserver: { table: { disable: true } },
     },
-    columns: {
-      control: { type: 'text' },
+    args: {
+        mode: 'fixed',
+        columns: 'auto-fit',
+        minTileWidth: '280px',
+        gap: 'medium',
+        aspectRatio: '1/1',
+        loading: false,
+        isEmpty: false,
+        defaultSlot: `
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">Tile 1</div>
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">Tile 2</div>
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">Tile 3</div>
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">Tile 4</div>
+        `,
+        onLayoutChange: fn(),
+        onTileClick: fn(),
     },
-    minTileWidth: {
-      control: { type: 'text' },
-    },
-    gap: {
-      control: { type: 'select' },
-      options: ['small', 'medium', 'large'],
-    },
-    aspectRatio: {
-      control: { type: 'text' },
-    },
-    loading: {
-      control: { type: 'boolean' },
-    },
-  },
+    render: (args) => html`
+  <biz-tile-layout-grid
+    .mode="${args.mode}"
+    .columns="${args.columns}"
+    .minTileWidth="${args.minTileWidth}"
+    .gap="${args.gap}"
+    .aspectRatio="${args.aspectRatio}"
+    ?loading="${args.loading}"
+  >
+    ${args.headerSlot
+            ? html`<div slot="header-slot">${unsafeHTML(args.headerSlot)}</div>`
+            : ''}
+    ${!args.isEmpty
+            ? unsafeHTML(args.defaultSlot) : ''}
+    ${args.emptySlot
+            ? html`<div slot="empty-slot">${unsafeHTML(args.emptySlot)}</div>`
+            : ''}
+  </biz-tile-layout-grid>
+`
 };
 
 export default meta;
-
-type Story = StoryObj;
-
-const renderTiles = (count: number) =>
-  Array.from(
-    { length: count },
-    (_, i) => html`
-      <div
-        tabindex="0"
-        style="padding: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
-      >
-        <h4 style="margin: 0 0 8px 0;">타일 카드 #${i + 1}</h4>
-        <p style="margin: 0; color: #4b5563; font-size: 14px;">콘텐츠 영역입니다.</p>
-      </div>
-    `
-  );
+type Story = StoryObj<TileLayoutGridArgs>;
 
 export const Default: Story = {
-  args: {
-    mode: 'fixed',
-    columns: 'auto-fit',
-    minTileWidth: '240px',
-    gap: 'medium',
-    aspectRatio: '1/1',
-    loading: false,
-  },
-  render: (args) => html`
+    args: {},
+};
+
+export const FixedMode: Story = {
+    args: {
+        mode: 'fixed',
+        aspectRatio: '16/9',
+    },
+};
+
+export const MasonryMode: Story = {
+    args: {
+        mode: 'masonry',
+    },
+    render: (args) => html`
     <biz-tile-layout-grid
-      mode="${args.mode}"
-      columns="${args.columns}"
+      .mode="${args.mode}"
+      .columns="${args.columns}"
       min-tile-width="${args.minTileWidth}"
-      gap="${args.gap}"
-      aspect-ratio="${args.aspectRatio}"
+      .gap="${args.gap}"
       ?loading="${args.loading}"
     >
-      ${renderTiles(6)}
+      <div style="background: #e0f2fe; padding: 40px; border-radius: 8px;">Tall Tile 1</div>
+      <div style="background: #fef3c7; padding: 20px; border-radius: 8px;">Short Tile 2</div>
+      <div style="background: #dcfce7; padding: 60px; border-radius: 8px;">Very Tall Tile 3</div>
+      <div style="background: #fce7f3; padding: 30px; border-radius: 8px;">Medium Tile 4</div>
     </biz-tile-layout-grid>
   `,
 };
 
-export const Variants: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 32px;">
-      <div>
-        <h3>Fixed Mode (1/1 Ratio)</h3>
-        <biz-tile-layout-grid mode="fixed" columns="auto-fit" min-tile-width="200px" aspect-ratio="1/1">
-          ${renderTiles(4)}
-        </biz-tile-layout-grid>
-      </div>
-      <div>
-        <h3>Masonry Mode ( 가변 높이 )</h3>
-        <biz-tile-layout-grid mode="masonry" columns="auto-fit" min-tile-width="200px">
-          <div style="padding: 16px; background: #f3f4f6; height: 100px;">가변 높이 100px</div>
-          <div style="padding: 16px; background: #f3f4f6; height: 180px;">가변 높이 180px</div>
-          <div style="padding: 16px; background: #f3f4f6; height: 120px;">가변 높이 120px</div>
-          <div style="padding: 16px; background: #f3f4f6; height: 220px;">가변 높이 220px</div>
-        </biz-tile-layout-grid>
-      </div>
-    </div>
-  `,
+export const LoadingState: Story = {
+    args: {
+        loading: true,
+    },
 };
 
-export const Sizes: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 32px;">
-      <div>
-        <h3>Small Gap</h3>
-        <biz-tile-layout-grid gap="small" min-tile-width="180px">
-          ${renderTiles(3)}
-        </biz-tile-layout-grid>
-      </div>
-      <div>
-        <h3>Medium Gap</h3>
-        <biz-tile-layout-grid gap="medium" min-tile-width="180px">
-          ${renderTiles(3)}
-        </biz-tile-layout-grid>
-      </div>
-      <div>
-        <h3>Large Gap</h3>
-        <biz-tile-layout-grid gap="large" min-tile-width="180px">
-          ${renderTiles(3)}
-        </biz-tile-layout-grid>
-      </div>
-    </div>
-  `,
+export const EmptyState: Story = {
+    args: {
+        isEmpty: true,
+        emptySlot: '표시할 타일 데이터가 존재하지 않습니다.',
+    },
 };
 
-export const States: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 32px;">
+export const WithHeader: Story = {
+    args: {
+        headerSlot: '### 타일 레이아웃 그리드 목록',
+    },
+};
+
+export const OnLayoutChange: Story = {
+    render: (args) => {
+        const handleLayoutChange = (e: CustomEvent) => {
+            args.onLayoutChange?.(e);
+            const logArea = document.getElementById('layout-change-log');
+            if (logArea) {
+                logArea.textContent = `Columns: ${e.detail.columns}, Mode: ${e.detail.mode}`;
+            }
+        };
+
+        return html`
       <div>
-        <h3>Loading State (Skeleton)</h3>
-        <biz-tile-layout-grid loading min-tile-width="200px">
-          ${renderTiles(4)}
+        <div style="margin-bottom: 12px; padding: 8px; background: #e0f2fe; border-radius: 4px; font-size: 14px;">
+          <strong>Layout Change Event Log:</strong> <span id="layout-change-log">반응형 크기 변경 시 이벤트가 갱신됩니다.</span>
+        </div>
+        <biz-tile-layout-grid
+          .mode="${args.mode}"
+          .columns="${args.columns}"
+          .minTileWidth="${args.minTileWidth}"
+          .gap="${args.gap}"
+          .aspectRatio="${args.aspectRatio}"
+          ?loading="${args.loading}"
+          @layout-change="${handleLayoutChange}"
+        >
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">Tile 1</div>
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">Tile 2</div>
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">Tile 3</div>
         </biz-tile-layout-grid>
       </div>
+    `;
+    },
+};
+
+export const OnTileClick: Story = {
+    parameters: {
+        docs: {
+            source: {
+                code: `
+<biz-tile-layout-grid @tile-click="handleTileClick">
+  <div>Clickable Tile 0</div>
+  <div>Clickable Tile 1</div>
+  <div>Clickable Tile 2</div>
+</biz-tile-layout-grid>
+        `.trim(),
+            },
+        },
+    },
+    render: (args) => {
+        const handleTileClick = (e: CustomEvent) => {
+            args.onTileClick?.(e);
+            const logArea = document.getElementById('tile-click-log');
+            if (logArea) {
+                logArea.textContent = `Clicked Tile Index: ${e.detail.index}`;
+            }
+        };
+
+        return html`
       <div>
-        <h3>Empty State</h3>
-        <biz-tile-layout-grid min-tile-width="200px"></biz-tile-layout-grid>
+        <div style="margin-bottom: 12px; padding: 8px; background: #fef3c7; border-radius: 4px; font-size: 14px;">
+          <strong>Tile Click Event Log:</strong> <span id="tile-click-log">타일을 클릭하면 인덱스가 표시됩니다.</span>
+        </div>
+        <biz-tile-layout-grid
+          .mode="${args.mode}"
+          .columns="${args.columns}"
+          .minTileWidth="${args.minTileWidth}"
+          .gap="${args.gap}"
+          .aspectRatio="${args.aspectRatio}"
+          ?loading="${args.loading}"
+          @tile-click="${handleTileClick}"
+        >
+          <div style="background: #e0e7ff; padding: 20px; border-radius: 8px; cursor: pointer;">Clickable Tile 0</div>
+          <div style="background: #e0e7ff; padding: 20px; border-radius: 8px; cursor: pointer;">Clickable Tile 1</div>
+          <div style="background: #e0e7ff; padding: 20px; border-radius: 8px; cursor: pointer;">Clickable Tile 2</div>
+        </biz-tile-layout-grid>
       </div>
-    </div>
-  `,
+    `;
+    },
 };
