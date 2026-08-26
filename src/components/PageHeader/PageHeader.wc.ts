@@ -1,129 +1,103 @@
-import { LitElement } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { PageHeaderTemplate } from "./PageHeader";
-import { pageHeaderStyles } from "./PageHeader.css";
+import { LitElement, html } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { PageHeaderTemplate } from './PageHeader.js';
+import type { PageHeaderHost } from './PageHeader.js';
+import { pageHeaderStyles } from './PageHeader.css.js';
 
-/**
- * @element biz-page-header
- * 
- * @slot breadcrumb-slot
- * @slot title-slot
- * @slot meta-status-slot
- * @slot extra-actions-slot
- * @slot subtitle-slot
- */
 @customElement('biz-page-header')
-export class PageHeader extends LitElement {
+export class BizPageHeader extends LitElement implements PageHeaderHost {
   static styles = pageHeaderStyles;
 
-  @property({ type: String })
-  title = '';
+  @property({ type: String }) title = '';
+  @property({ type: String }) subtitle = '';
+  @property({ type: String }) variant: 'standard' | 'filled' | 'ghost' | 'outlined' = 'standard';
+  @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
+  @property({ type: Boolean, reflect: true }) compact = false;
+  @property({ type: Boolean, reflect: true }) loading = false;
+  @property({ type: Boolean, reflect: true }) disabled = false;
+  @property({ type: Boolean, reflect: true }) error = false;
 
-  @property({ type: String })
-  subtitle = '';
+  @state() private activeFocusIndex = -1;
 
-  @property({ type: String })
-  variant: 'standard' | 'filled' | 'ghost' = 'standard';
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('keydown', this.handleKeyDown);
+  }
 
-  @property({ type: String })
-  size: 'small' | 'medium' | 'large' = 'medium';
+  disconnectedCallback() {
+    this.removeEventListener('keydown', this.handleKeyDown);
+    super.disconnectedCallback();
+  }
 
-  @property({ type: Boolean, attribute: 'full-width' })
-  fullWidth = false;
-
-  @property({ type: Boolean })
-  compact = false;
-
-  @property({ type: Boolean })
-  disabled = false;
-
-  @property({ type: Boolean })
-  error = false;
-
-  @property({ type: String })
-  titleId = 'title-slot';
-
-  @property({ type: String })
-  subtitleId = 'subtitle-slot';
-
-  @state()
-  private loading = false;
-
-  private handleActionClick = (e: MouseEvent) => {
+  handleActionClick = (actionId: string, originalEvent: Event) => {
     if (this.disabled) return;
 
-    const target = (e.target as HTMLElement).closest('[data-action-id]') as HTMLElement;
-    if (target) {
-      const actionId = target.dataset.actionId || '';
-      this.dispatchEvent(
-        new CustomEvent('action-click', {
-          bubbles: true,
-          composed: true,
-          detail: { actionId },
-        })
-      );
-    }
-  };
-
-  private handleKeyDown = (e: KeyboardEvent) => {
-    if (this.disabled) return;
-
-    if (e.key === 'Enter' || e.key === ' ') {
-      const target = e.target as HTMLElement;
-      const actionId = target.dataset.actionId;
-      if (actionId) {
-        e.preventDefault();
-        this.dispatchEvent(
-          new CustomEvent('action-click', {
-            bubbles: true,
-            composed: true,
-            detail: { actionId },
-          })
-        );
-      }
-    } else if (e.key === 'Escape') {
-      this.dispatchEvent(
-        new CustomEvent('clear', {
-          bubbles: true,
-          composed: true,
-          detail: {},
-        })
-      );
-    }
-  };
-
-  private handleSlotChange = (e: Event) => {
     this.dispatchEvent(
-      new CustomEvent('slot-change', {
+      new CustomEvent('action-click', {
+        detail: { actionId, originalEvent },
         bubbles: true,
         composed: true,
-        detail: { targetSlot: (e.target as HTMLSlotElement).name },
       })
     );
   };
 
+  private handleKeyDown = (event: KeyboardEvent) => {
+    if (this.disabled) return;
+
+    const focusableElements = Array.from(
+      this.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+    );
+
+    if (event.key === 'Tab') {
+      if (focusableElements.length > 0) {
+        if (event.shiftKey) {
+          if (this.activeFocusIndex > 0) {
+            this.activeFocusIndex--;
+          } else {
+            this.activeFocusIndex = focusableElements.length - 1;
+          }
+        } else {
+          if (this.activeFocusIndex < focusableElements.length - 1) {
+            this.activeFocusIndex++;
+          } else {
+            this.activeFocusIndex = 0;
+          }
+        }
+      }
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      const target = event.target as HTMLElement;
+      const actionId = target.getAttribute('data-action-id');
+      if (actionId) {
+        event.preventDefault();
+        this.handleActionClick(actionId, event);
+      }
+    } else if (event.key === 'Escape') {
+      this.dispatchEvent(
+        new CustomEvent('clear', {
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+  };
+
   render() {
-    return PageHeaderTemplate({
-      title: this.title,
-      subtitle: this.subtitle,
-      variant: this.variant,
-      size: this.size,
-      fullWidth: this.fullWidth,
-      compact: this.compact,
-      loading: this.loading,
-      disabled: this.disabled,
-      error: this.error,
-      titleId: this.titleId,
-      subtitleId: this.subtitleId,
-      handleActionClick: this.handleActionClick,
-      handleKeyDown: this.handleKeyDown,
-      handleSlotChange: this.handleSlotChange,
-    });
+    return html`
+      <div
+        aria-disabled="${this.disabled ? 'true' : 'false'}"
+        aria-busy="${this.loading ? 'true' : 'false'}"
+        aria-invalid="${this.error ? 'true' : 'false'}"
+      >
+        ${PageHeaderTemplate(this)}
+      </div>
+    `;
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'biz-page-header': PageHeader;
+    'biz-page-header': BizPageHeader;
   }
 }

@@ -8,6 +8,24 @@
       "references": []
     },
     {
+      "name": "biz-application-shell",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [
+            { "name": "default" },
+            { "name": "full-width" },
+            { "name": "minimal" }
+          ]
+        },
+        { "name": "sidebar-collapsed", "values": [] },
+        { "name": "sticky-header", "values": [] },
+        { "name": "fixed-sidebar", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-breadcrumb",
       "description": "\n\n\n---\n\n\n\n\n### **Slots:**\n - **(no)** - undefined",
       "attributes": [
@@ -120,33 +138,15 @@
       "references": []
     },
     {
-      "name": "biz-application-shell",
-      "description": "\n\n\n---\n\n\n",
+      "name": "biz-card-container",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **card-click** - undefined",
       "attributes": [
         {
           "name": "variant",
           "values": [
-            { "name": "default" },
-            { "name": "full-width" },
-            { "name": "minimal" }
-          ]
-        },
-        { "name": "sidebar-collapsed", "values": [] },
-        { "name": "sticky-header", "values": [] },
-        { "name": "fixed-sidebar", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-content-container",
-      "description": "\n\n\n---\n\n\n",
-      "attributes": [
-        {
-          "name": "variant",
-          "values": [
-            { "name": "standard" },
-            { "name": "fluid" },
-            { "name": "card" }
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "elevated" }
           ]
         },
         {
@@ -154,15 +154,15 @@
           "values": [
             { "name": "small" },
             { "name": "medium" },
-            { "name": "large" },
-            { "name": "full" }
+            { "name": "large" }
           ]
         },
-        { "name": "centered", "values": [] },
-        { "name": "scrollable", "values": [] },
-        { "name": "padding", "values": [] },
+        { "name": "full-width", "values": [] },
+        { "name": "bordered-divider", "values": [] },
+        { "name": "hoverable", "values": [] },
+        { "name": "disabled", "values": [] },
         { "name": "loading", "values": [] },
-        { "name": "empty", "values": [] }
+        { "name": "aria-labelledby", "values": [] }
       ],
       "references": []
     },
@@ -201,15 +201,15 @@
       "references": []
     },
     {
-      "name": "biz-card-container",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **card-click** - undefined",
+      "name": "biz-content-container",
+      "description": "\n\n\n---\n\n\n",
       "attributes": [
         {
           "name": "variant",
           "values": [
-            { "name": "outlined" },
-            { "name": "filled" },
-            { "name": "elevated" }
+            { "name": "standard" },
+            { "name": "fluid" },
+            { "name": "card" }
           ]
         },
         {
@@ -217,15 +217,15 @@
           "values": [
             { "name": "small" },
             { "name": "medium" },
-            { "name": "large" }
+            { "name": "large" },
+            { "name": "full" }
           ]
         },
-        { "name": "full-width", "values": [] },
-        { "name": "bordered-divider", "values": [] },
-        { "name": "hoverable", "values": [] },
-        { "name": "disabled", "values": [] },
+        { "name": "centered", "values": [] },
+        { "name": "scrollable", "values": [] },
+        { "name": "padding", "values": [] },
         { "name": "loading", "values": [] },
-        { "name": "aria-labelledby", "values": [] }
+        { "name": "empty", "values": [] }
       ],
       "references": []
     },
@@ -253,61 +253,6 @@
           "values": [
             { "name": "(string" },
             { "name": "Date)[]" },
-            { "name": "((date: Date) => boolean)" }
-          ]
-        },
-        { "name": "placeholder", "values": [] },
-        { "name": "clearable", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "error", "values": [] },
-        {
-          "name": "variant",
-          "values": [
-            { "name": "outlined" },
-            { "name": "filled" },
-            { "name": "standard" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "full-width", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-dialog",
-      "description": "\n\n\n---\n\n\n",
-      "attributes": [
-        { "name": "open", "values": [] },
-        { "name": "modal", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-date-time-picker",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **input** - undefined\n- **clear** - undefined\n- **change** - undefined\n- **date-change** - undefined\n- **time-change** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined\n- **header-slot** - undefined\n- **date-cell-slot** - undefined\n- **time-option-slot** - undefined\n- **footer-slot** - undefined",
-      "attributes": [
-        { "name": "value", "values": [{ "name": "Date" }] },
-        { "name": "format", "values": [] },
-        {
-          "name": "layout-mode",
-          "values": [{ "name": "side-by-side" }, { "name": "tabbed" }]
-        },
-        { "name": "use12-hours", "values": [] },
-        { "name": "show-seconds", "values": [] },
-        { "name": "min-datetime", "values": [{ "name": "Date" }] },
-        { "name": "max-datetime", "values": [{ "name": "Date" }] },
-        {
-          "name": "disabledDates",
-          "values": [
-            { "name": "any[]" },
             { "name": "((date: Date) => boolean)" }
           ]
         },
@@ -396,6 +341,61 @@
       "references": []
     },
     {
+      "name": "biz-dialog",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "open", "values": [] },
+        { "name": "modal", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-date-time-picker",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **input** - undefined\n- **clear** - undefined\n- **change** - undefined\n- **date-change** - undefined\n- **time-change** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined\n- **header-slot** - undefined\n- **date-cell-slot** - undefined\n- **time-option-slot** - undefined\n- **footer-slot** - undefined",
+      "attributes": [
+        { "name": "value", "values": [{ "name": "Date" }] },
+        { "name": "format", "values": [] },
+        {
+          "name": "layout-mode",
+          "values": [{ "name": "side-by-side" }, { "name": "tabbed" }]
+        },
+        { "name": "use12-hours", "values": [] },
+        { "name": "show-seconds", "values": [] },
+        { "name": "min-datetime", "values": [{ "name": "Date" }] },
+        { "name": "max-datetime", "values": [{ "name": "Date" }] },
+        {
+          "name": "disabledDates",
+          "values": [
+            { "name": "any[]" },
+            { "name": "((date: Date) => boolean)" }
+          ]
+        },
+        { "name": "placeholder", "values": [] },
+        { "name": "clearable", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "error", "values": [] },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "standard" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "full-width", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-dropdown",
       "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **change** - undefined\n- **tag-remove** - undefined\n\n### **Slots:**\n - **tag-slot** - undefined\n- **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **header-slot** - undefined\n- **empty-slot** - undefined\n- **option-slot** - undefined\n- **footer-slot** - undefined\n- **helper-text-wrapper** - undefined",
       "attributes": [
@@ -475,33 +475,26 @@
       "references": []
     },
     {
-      "name": "biz-form-wrapper",
-      "description": "\n\n\n---\n\n\n",
+      "name": "biz-image-upload",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **error** - undefined\n- **crop-start** - undefined\n- **change** - undefined\n- **remove** - undefined\n- **clear** - undefined\n- **crop-complete** - undefined\n- **crop-cancel** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **preview-mask-slot** - undefined\n- **drop-zone-slot** - undefined\n- **helper-text-slot** - undefined\n- **crop-toolbar-slot** - undefined\n- **crop-footer-slot** - undefined",
       "attributes": [
-        { "name": "label", "values": [] },
-        { "name": "required", "values": [] },
-        { "name": "helper-text", "values": [] },
-        { "name": "error-message", "values": [] },
-        { "name": "success-message", "values": [] },
         {
-          "name": "layout",
-          "values": [
-            { "name": "vertical" },
-            { "name": "horizontal" },
-            { "name": "inline" }
-          ]
+          "name": "value",
+          "values": [{ "name": "File" }, { "name": "CropResult" }]
         },
+        { "name": "accept", "values": [] },
+        { "name": "max-size", "values": [] },
+        { "name": "aspect-ratio", "values": [] },
+        { "name": "shape", "values": [{ "name": "ImageUploadShape" }] },
+        { "name": "enable-crop", "values": [] },
         {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
+          "name": "output-type",
+          "values": [{ "name": "ImageUploadOutputType" }]
         },
-        { "name": "full-width", "values": [] },
-        { "name": "label-width", "values": [] },
-        { "name": "disabled", "values": [] }
+        { "name": "output-quality", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "error", "values": [] }
       ],
       "references": []
     },
@@ -541,6 +534,37 @@
         { "name": "error", "values": [] },
         { "name": "loading", "values": [] },
         { "name": "full-width", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-form-wrapper",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "label", "values": [] },
+        { "name": "required", "values": [] },
+        { "name": "helper-text", "values": [] },
+        { "name": "error-message", "values": [] },
+        { "name": "success-message", "values": [] },
+        {
+          "name": "layout",
+          "values": [
+            { "name": "vertical" },
+            { "name": "horizontal" },
+            { "name": "inline" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "full-width", "values": [] },
+        { "name": "label-width", "values": [] },
+        { "name": "disabled", "values": [] }
       ],
       "references": []
     },
@@ -624,30 +648,6 @@
       "references": []
     },
     {
-      "name": "biz-image-upload",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **error** - undefined\n- **crop-start** - undefined\n- **change** - undefined\n- **remove** - undefined\n- **clear** - undefined\n- **crop-complete** - undefined\n- **crop-cancel** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **preview-mask-slot** - undefined\n- **drop-zone-slot** - undefined\n- **helper-text-slot** - undefined\n- **crop-toolbar-slot** - undefined\n- **crop-footer-slot** - undefined",
-      "attributes": [
-        {
-          "name": "value",
-          "values": [{ "name": "File" }, { "name": "CropResult" }]
-        },
-        { "name": "accept", "values": [] },
-        { "name": "max-size", "values": [] },
-        { "name": "aspect-ratio", "values": [] },
-        { "name": "shape", "values": [{ "name": "ImageUploadShape" }] },
-        { "name": "enable-crop", "values": [] },
-        {
-          "name": "output-type",
-          "values": [{ "name": "ImageUploadOutputType" }]
-        },
-        { "name": "output-quality", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "error", "values": [] }
-      ],
-      "references": []
-    },
-    {
       "name": "biz-number-input",
       "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **eventName** - undefined\n- **focus** - undefined\n- **blur** - undefined\n\n### **Slots:**\n - **decrement-icon-slot** - undefined\n- **increment-icon-slot** - undefined\n- **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined",
       "attributes": [
@@ -692,7 +692,7 @@
     },
     {
       "name": "biz-page-header",
-      "description": "\n\n\n---\n\n\n\n\n### **Slots:**\n - **breadcrumb-slot** - undefined\n- **title-slot** - undefined\n- **meta-status-slot** - undefined\n- **extra-actions-slot** - undefined\n- **subtitle-slot** - undefined",
+      "description": "\n\n\n---\n\n\n",
       "attributes": [
         { "name": "title", "values": [] },
         { "name": "subtitle", "values": [] },
@@ -701,7 +701,8 @@
           "values": [
             { "name": "standard" },
             { "name": "filled" },
-            { "name": "ghost" }
+            { "name": "ghost" },
+            { "name": "outlined" }
           ]
         },
         {
@@ -712,12 +713,42 @@
             { "name": "large" }
           ]
         },
-        { "name": "full-width", "values": [] },
         { "name": "compact", "values": [] },
+        { "name": "loading", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "error", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-password-input",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **input** - undefined\n- **change** - undefined\n- **toggle-visibility** - undefined\n- **clear** - undefined\n- **focus** - undefined\n- **blur** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **start-slot** - undefined\n- **toggle-icon-slot** - undefined\n- **end-slot** - undefined\n- **helper-text-slot** - undefined",
+      "attributes": [
+        { "name": "value", "values": [] },
+        { "name": "placeholder", "values": [] },
+        { "name": "visible", "values": [] },
+        { "name": "required", "values": [] },
+        { "name": "readonly", "values": [] },
         { "name": "disabled", "values": [] },
         { "name": "error", "values": [] },
-        { "name": "titleId", "values": [] },
-        { "name": "subtitleId", "values": [] }
+        { "name": "clearable", "values": [] },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "standard" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "full-width", "values": [] }
       ],
       "references": []
     },
@@ -751,6 +782,55 @@
         { "name": "readonly", "values": [] },
         { "name": "disabled", "values": [] },
         { "name": "error", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-slider",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **focus** - undefined\n- **blur** - undefined\n- **clear** - undefined\n- **input** - undefined\n- **change** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **prefix-icon-slot** - undefined\n- **tooltip-slot** - undefined\n- **tooltip-slot** - undefined\n- **tick-label-slot** - undefined\n- **suffix-icon-slot** - undefined\n- **helper-text-slot** - undefined",
+      "attributes": [
+        { "name": "value", "values": [{ "name": "number[]" }] },
+        { "name": "min", "values": [] },
+        { "name": "max", "values": [] },
+        { "name": "step", "values": [] },
+        {
+          "name": "mode",
+          "values": [{ "name": "single" }, { "name": "range" }]
+        },
+        {
+          "name": "orientation",
+          "values": [{ "name": "horizontal" }, { "name": "vertical" }]
+        },
+        { "name": "show-ticks", "values": [] },
+        {
+          "name": "show-tooltip",
+          "values": [
+            { "name": "always" },
+            { "name": "hover" },
+            { "name": "drag" },
+            { "name": "never" }
+          ]
+        },
+        { "name": "readonly", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "error", "values": [] },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "standard" },
+            { "name": "outlined" },
+            { "name": "filled" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "name", "values": [] }
       ],
       "references": []
     },
@@ -828,87 +908,6 @@
       "references": []
     },
     {
-      "name": "biz-slider",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **focus** - undefined\n- **blur** - undefined\n- **clear** - undefined\n- **input** - undefined\n- **change** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **prefix-icon-slot** - undefined\n- **tooltip-slot** - undefined\n- **tooltip-slot** - undefined\n- **tick-label-slot** - undefined\n- **suffix-icon-slot** - undefined\n- **helper-text-slot** - undefined",
-      "attributes": [
-        { "name": "value", "values": [{ "name": "number[]" }] },
-        { "name": "min", "values": [] },
-        { "name": "max", "values": [] },
-        { "name": "step", "values": [] },
-        {
-          "name": "mode",
-          "values": [{ "name": "single" }, { "name": "range" }]
-        },
-        {
-          "name": "orientation",
-          "values": [{ "name": "horizontal" }, { "name": "vertical" }]
-        },
-        { "name": "show-ticks", "values": [] },
-        {
-          "name": "show-tooltip",
-          "values": [
-            { "name": "always" },
-            { "name": "hover" },
-            { "name": "drag" },
-            { "name": "never" }
-          ]
-        },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "error", "values": [] },
-        {
-          "name": "variant",
-          "values": [
-            { "name": "standard" },
-            { "name": "outlined" },
-            { "name": "filled" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "name", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-password-input",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **input** - undefined\n- **change** - undefined\n- **toggle-visibility** - undefined\n- **clear** - undefined\n- **focus** - undefined\n- **blur** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **start-slot** - undefined\n- **toggle-icon-slot** - undefined\n- **end-slot** - undefined\n- **helper-text-slot** - undefined",
-      "attributes": [
-        { "name": "value", "values": [] },
-        { "name": "placeholder", "values": [] },
-        { "name": "visible", "values": [] },
-        { "name": "required", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "error", "values": [] },
-        { "name": "clearable", "values": [] },
-        {
-          "name": "variant",
-          "values": [
-            { "name": "outlined" },
-            { "name": "filled" },
-            { "name": "standard" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "full-width", "values": [] }
-      ],
-      "references": []
-    },
-    {
       "name": "biz-split-pane",
       "description": "\n\n\n---\n\n\n\n\n### **Slots:**\n - **pane-1-slot** - undefined\n- **resizer-slot** - undefined\n- **pane-2-slot** - undefined",
       "attributes": [
@@ -922,6 +921,25 @@
         { "name": "size", "values": [] },
         { "name": "full-width", "values": [] },
         { "name": "full-height", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-rating",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **hover-change** - undefined\n- **clear** - undefined\n- **input** - undefined\n- **change** - undefined\n\n### **Slots:**\n - **icon-empty-slot** - undefined\n- **icon-half-slot** - isHalf == true\n- **icon-filled-slot** - undefined\n- **value-label-slot** - undefined\n- **biz-rating__helper** - undefined",
+      "attributes": [
+        { "name": "value", "values": [] },
+        { "name": "max", "values": [] },
+        { "name": "precision", "values": [] },
+        { "name": "allow-clear", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "show-tooltip", "values": [] },
+        {
+          "name": "size",
+          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
+        },
+        { "name": "name", "values": [] }
       ],
       "references": []
     },
@@ -955,33 +973,6 @@
         },
         { "name": "full-width", "values": [] },
         { "name": "loading", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-rating",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **hover-change** - undefined\n- **clear** - undefined\n- **input** - undefined\n- **change** - undefined\n\n### **Slots:**\n - **icon-empty-slot** - undefined\n- **icon-half-slot** - isHalf == true\n- **icon-filled-slot** - undefined\n- **value-label-slot** - undefined\n- **biz-rating__helper** - undefined",
-      "attributes": [
-        { "name": "value", "values": [] },
-        { "name": "max", "values": [] },
-        { "name": "precision", "values": [] },
-        { "name": "allow-clear", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "show-tooltip", "values": [] },
-        {
-          "name": "size",
-          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
-        },
-        { "name": "name", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-toast-manager",
-      "description": "\n\n\n---\n\n\n",
-      "attributes": [
-        { "name": "toasts", "values": [{ "name": "ToastMessage[]" }] }
       ],
       "references": []
     },
@@ -1041,25 +1032,40 @@
       "references": []
     },
     {
-      "name": "biz-tile-layout-grid",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **layout-change** - undefined\n- **tile-click** - undefined\n\n### **Slots:**\n - **header-slot** - undefined\n- **(default)** - undefined\n- **empty-slot** - undefined",
+      "name": "biz-toast-manager",
+      "description": "\n\n\n---\n\n\n",
       "attributes": [
+        { "name": "toasts", "values": [{ "name": "ToastMessage[]" }] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-toggle-button",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "checked", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "readonly", "values": [] },
         {
-          "name": "mode",
-          "values": [{ "name": "fixed" }, { "name": "masonry" }]
+          "name": "variant",
+          "values": [
+            { "name": "standard" },
+            { "name": "filled" },
+            { "name": "outlined" }
+          ]
         },
-        { "name": "columns", "values": [] },
-        { "name": "min-tile-width", "values": [] },
         {
-          "name": "gap",
+          "name": "size",
           "values": [
             { "name": "small" },
             { "name": "medium" },
             { "name": "large" }
           ]
         },
-        { "name": "aspect-ratio", "values": [] },
-        { "name": "loading", "values": [] }
+        {
+          "name": "label-position",
+          "values": [{ "name": "left" }, { "name": "right" }]
+        }
       ],
       "references": []
     },
@@ -1096,32 +1102,25 @@
       "references": []
     },
     {
-      "name": "biz-toggle-button",
-      "description": "\n\n\n---\n\n\n",
+      "name": "biz-tile-layout-grid",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **layout-change** - undefined\n- **tile-click** - undefined\n\n### **Slots:**\n - **header-slot** - undefined\n- **(default)** - undefined\n- **empty-slot** - undefined",
       "attributes": [
-        { "name": "checked", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "readonly", "values": [] },
         {
-          "name": "variant",
-          "values": [
-            { "name": "standard" },
-            { "name": "filled" },
-            { "name": "outlined" }
-          ]
+          "name": "mode",
+          "values": [{ "name": "fixed" }, { "name": "masonry" }]
         },
+        { "name": "columns", "values": [] },
+        { "name": "min-tile-width", "values": [] },
         {
-          "name": "size",
+          "name": "gap",
           "values": [
             { "name": "small" },
             { "name": "medium" },
             { "name": "large" }
           ]
         },
-        {
-          "name": "label-position",
-          "values": [{ "name": "left" }, { "name": "right" }]
-        }
+        { "name": "aspect-ratio", "values": [] },
+        { "name": "loading", "values": [] }
       ],
       "references": []
     }
