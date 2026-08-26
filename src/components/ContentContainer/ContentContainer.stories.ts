@@ -1,11 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import { expect, vi } from 'vitest';
 import { html } from 'lit';
-import type { ContentContainer } from './ContentContainer.wc';
 import './ContentContainer.wc';
-import { BizApplicationShell } from '../ApplicationShell/ApplicationShell.wc';
+import type { ContentContainerHost } from './ContentContainer';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-const meta: Meta<ContentContainer> = {
+type Args = Required<ContentContainerHost> & {
+  default: string,
+  headerSlot: string,
+  footerSlot: string,
+  loadingSlot: string,
+  emptySlot: string,
+}
+
+const meta: Meta<Args> = {
   title: 'Components/Layout/ContentContainer',
   component: 'biz-content-container',
   tags: ['autodocs'],
@@ -13,16 +20,49 @@ const meta: Meta<ContentContainer> = {
     variant: {
       control: 'select',
       options: ['standard', 'fluid', 'card'],
+      description: `- \`Standard\`: 여백 및 최대 너비가 제한된 표준 업무 화면 스타일
+- \`Fluid\`: 최대 너비 제한 없이 부모 영역을 전체 사용하는 스타일
+- \`Card\`: 독립된 배경 영역 및 그림자 효과가 적용된 스타일`,
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large', 'full'],
     },
     centered: { control: 'boolean' },
-    scrollable: { control: 'boolean' },
-    padding: { control: 'boolean' },
+    scrollable: { control: 'boolean', description: '컨테이너 내부 자체 스크롤 적용 여부' },
+    padding: { control: 'boolean', description: '내부 패딩 활성화 여부' },
     loading: { control: 'boolean' },
     empty: { control: 'boolean' },
+    default: {
+      name: 'default slot',
+      description: '실제 업무 화면 콘텐츠 주입 영역',
+      control: 'text',
+      table: { category: 'slots' , type: {summary: 'string | HTMLElement'}}
+    },
+    headerSlot: {
+      name: 'header-slot',
+      description: '컨테이너 상단 고정 영역 (PageHeader 등)',
+      control: {type: 'text'},
+      table: { category: 'slots', type: {summary: 'string | HTMLElement'} }
+    },
+    footerSlot: {
+      name: 'footer-slot',
+      description: '컨테이너 하단 고정 영역',
+      control: {type: 'text'},
+      table: { category: 'slots' , type: {summary: 'string | HTMLElement'}}
+    },
+    loadingSlot: {
+      name: 'loading-slot',
+      description: 'loading == true 일 때',
+      control: {type: 'text'},
+      table: { category: 'slots' , type: {summary: 'string | HTMLElement'}}
+    },
+    emptySlot: {
+      name: 'empty-slot',
+      description: 'loading=false && empty=true 일 때',
+      control: {type: 'text'},
+      table: { category: 'slots' , type: {summary: 'string | HTMLElement'}}
+    }
   },
   args: {
     variant: 'standard',
@@ -32,11 +72,14 @@ const meta: Meta<ContentContainer> = {
     padding: true,
     loading: false,
     empty: false,
+    default: `<p>기본 콘텐츠 영역입니다. 업무 화면에 필요한 컴포넌트들을 이 위치에 배치합니다.</p>`,
+    headerSlot: `<h2 style="margin: 0; font-size: 1.25rem;">페이지 타이틀</h2>`,
+    footerSlot: `<button type="button">확인</button>`,
   },
 };
 
 export default meta;
-type Story = StoryObj<ContentContainer>;
+type Story = StoryObj<Args>;
 
 export const Default: Story = {
   render: (args) => html`
@@ -50,13 +93,13 @@ export const Default: Story = {
       ?empty="${args.empty}"
     >
       <div slot="header-slot" style="padding: 16px; border-bottom: 1px solid #e5e7eb;">
-        <h2 style="margin: 0; font-size: 1.25rem;">페이지 타이틀</h2>
+        ${unsafeHTML(args.headerSlot)} 
       </div>
       <div style="padding: 16px;">
-        <p>기본 콘텐츠 영역입니다. 업무 화면에 필요한 컴포넌트들을 이 위치에 배치합니다.</p>
+        ${unsafeHTML(args.default)} 
       </div>
       <div slot="footer-slot" style="padding: 16px; border-top: 1px solid #e5e7eb; text-align: right;">
-        <button type="button">확인</button>
+        ${unsafeHTML(args.footerSlot)} 
       </div>
     </biz-content-container>
   `,
