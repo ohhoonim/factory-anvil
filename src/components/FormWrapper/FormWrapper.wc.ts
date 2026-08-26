@@ -1,24 +1,17 @@
-import { LitElement } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { FormWrapperTemplate } from "./FormWrapper";
-import { formWrapperStyles } from "./FormWrapper.css";
-/**
- * @element 
- * 
- * @slot label-slot
- * @slot extra-slot
- * @slot helper-text-slot
- * @slot helper-text-slot
- * @slot (default)
- */
+import { LitElement, type TemplateResult } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import type { FormWrapperHost } from './FormWrapper';
+import { FormWrapperTemplate } from './FormWrapper';
+import { formWrapperStyles } from './FormWrapper.css';
+
 @customElement('biz-form-wrapper')
-export class BizFormWrapper extends LitElement {
+export class FormWrapper extends LitElement implements FormWrapperHost {
   static styles = formWrapperStyles;
 
   @property({ type: String })
   label = '';
 
-  @property({ type: Boolean })
+  @property({ type: Boolean, reflect: true })
   required = false;
 
   @property({ type: String, attribute: 'helper-text' })
@@ -30,28 +23,31 @@ export class BizFormWrapper extends LitElement {
   @property({ type: String, attribute: 'success-message' })
   successMessage = '';
 
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   layout: 'vertical' | 'horizontal' | 'inline' = 'vertical';
+
+  @property({ type: String, reflect: true })
+  size: 'small' | 'medium' | 'large' = 'medium';
+
+  @property({ type: Boolean, attribute: 'full-width', reflect: true })
+  fullWidth = false;
+
+  @property({ type: String, attribute: 'label-width' })
+  labelWidth = '120px';
 
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
-  @property({ type: String, attribute: 'label-width' })
-  labelWidth = '';
-
-  @property({ type: Boolean, attribute: 'full-width' })
-  fullWidth = false;
-
   @state()
-  private isFocused = false;
+  private _generatedId = `biz-form-wrapper-msg-${Math.random().toString(36).substring(2, 9)}`;
 
-  private helperTextId = `biz-form-wrapper-helper-${Math.random().toString(36).substring(2, 9)}`;
-
-  firstUpdated() {
-    this.updateTargetAttributes();
+  get helperTextId(): string {
+    return this._generatedId;
   }
 
-  updated(changedProperties: Map<string, any>) {
+  protected updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
+
     if (
       changedProperties.has('errorMessage') ||
       changedProperties.has('required') ||
@@ -59,95 +55,77 @@ export class BizFormWrapper extends LitElement {
       changedProperties.has('helperText') ||
       changedProperties.has('successMessage')
     ) {
-      this.updateTargetAttributes();
+      this._updateSubComponentAria();
     }
   }
 
-  private getTargetElement(): HTMLElement | null {
-    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement;
-    if (!slot) return null;
-    const assignedElements = slot.assignedElements({ flatten: true });
-    return (assignedElements[0] as HTMLElement) || null;
+  handleSlotChange(): void {
+    this._updateSubComponentAria();
   }
 
-  private updateTargetAttributes() {
-    const target = this.getTargetElement();
-    if (!target) return;
+  handleLabelClick(event: MouseEvent): void {
+    event.preventDefault();
+
+    if (this.disabled) {
+      return;
+    }
+
+    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
+    if (!slot) return;
+
+    const assignedElements = slot.assignedElements({ flatten: true }) as HTMLElement[];
+    if (assignedElements.length === 0) return;
+
+    const targetElement = assignedElements[0];
+    if (typeof targetElement.focus === 'function') {
+      targetElement.focus();
+    }
+  }
+
+  private _updateSubComponentAria(): void {
+    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
+    if (!slot) return;
+
+    const assignedElements = slot.assignedElements({ flatten: true }) as HTMLElement[];
+    if (assignedElements.length === 0) return;
+
+    const targetElement = assignedElements[0];
 
     if (this.errorMessage) {
-      target.setAttribute('aria-invalid', 'true');
+      targetElement.setAttribute('aria-invalid', 'true');
     } else {
-      target.removeAttribute('aria-invalid');
+      targetElement.removeAttribute('aria-invalid');
     }
 
     if (this.required) {
-      target.setAttribute('aria-required', 'true');
+      targetElement.setAttribute('aria-required', 'true');
     } else {
-      target.removeAttribute('aria-required');
+      targetElement.removeAttribute('aria-required');
     }
 
     if (this.disabled) {
-      target.setAttribute('aria-disabled', 'true');
-      target.setAttribute('disabled', '');
+      targetElement.setAttribute('aria-disabled', 'true');
+      targetElement.setAttribute('disabled', '');
     } else {
-      target.removeAttribute('aria-disabled');
-      target.removeAttribute('disabled');
+      targetElement.removeAttribute('aria-disabled');
+      targetElement.removeAttribute('disabled');
     }
 
-    const describedBy: string[] = [];
-    if (this.helperText || this.errorMessage || this.successMessage) {
-      describedBy.push(this.helperTextId);
-    }
-
-    if (describedBy.length > 0) {
-      target.setAttribute('aria-describedby', describedBy.join(' '));
+    const hasMessage = Boolean(this.errorMessage || this.successMessage || this.helperText);
+    if (hasMessage) {
+      targetElement.setAttribute('aria-describedby', this.helperTextId);
     } else {
-      target.removeAttribute('aria-describedby');
+      targetElement.removeAttribute('aria-describedby');
     }
   }
 
-  private handleSlotChange() {
-    this.updateTargetAttributes();
-  }
-
-  private handleLabelClick() {
-    if (this.disabled) return;
-    const target = this.getTargetElement();
-    if (target) {
-      target.focus();
-    }
-  }
-
-  private handleFocusIn() {
-    this.isFocused = true;
-  }
-
-  private handleFocusOut() {
-    this.isFocused = false;
-  }
-
-  private handleKeyDown(event: KeyboardEvent) {
-    if (this.disabled) return;
-
-    if (event.key === 'Escape') {
-      const target = this.getTargetElement();
-      if (target && 'value' in target) {
-        (target as HTMLInputElement).value = '';
-        target.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-        target.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-        
-        this.dispatchEvent(
-          new CustomEvent('clear', {
-            bubbles: true,
-            composed: true,
-            detail: { source: 'keyboard', key: event.key }
-          })
-        );
-      }
-    }
-  }
-
-  render() {
+  render(): TemplateResult {
     return FormWrapperTemplate(this);
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'biz-form-wrapper': FormWrapper;
   }
 }

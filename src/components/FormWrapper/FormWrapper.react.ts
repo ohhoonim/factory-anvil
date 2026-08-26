@@ -1,14 +1,14 @@
+import * as React from 'react';
 import { createComponent } from '@lit/react';
-import { BizFormWrapper } from "./FormWrapper.wc";
-import React from 'react';
+import { FormWrapper as FormWrapperWc } from './FormWrapper.wc';
 
 export const FormWrapper = createComponent({
   tagName: 'biz-form-wrapper',
-  elementClass: BizFormWrapper,
+  elementClass: FormWrapperWc,
   react: React,
   events: {
     onInput: 'input',
     onChange: 'change',
-    onClear: 'clear'
-  }
+    onClear: 'clear',
+  },
 });
