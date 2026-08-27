@@ -1,42 +1,67 @@
-import { html } from 'lit';
+import { html } from "lit";
+import { classMap } from "lit/directives/class-map.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 
-export interface RadioButtonGroupContext {
+export interface RadioButtonGroupHost {
   value: string;
   name: string;
   orientation: 'vertical' | 'horizontal';
+  variant: 'standard' | 'card' | 'button';
+  size: 'small' | 'medium' | 'large';
   required: boolean;
   disabled: boolean;
   readonly: boolean;
   error: boolean;
-  size: 'small' | 'medium' | 'large';
-  variant: 'standard' | 'card' | 'button' | 'outlined' | 'filled';
-  label?: string;
-  helperText?: string;
-  labelId?: string;
-  helperTextId?: string;
-  handleSlotChange?: (e: Event) => void;
-  handleValueChange?: (e: Event) => void;
+  fullWidth: boolean;
+  labelId: string;
+  helperTextId: string;
+  hasLabel: boolean;
+  hasHelperText: boolean;
+  handleSlotChange: (e: Event) => void;
+  handleLabelSlotChange: (e: Event) => void;
+  handleHelperSlotChange: (e: Event) => void;
 }
 
-export const RadioButtonGroupTemplate = (context: RadioButtonGroupContext) => html`
+export const RadioButtonGroupTemplate = (host: RadioButtonGroupHost) => html`
   <div
-    class="biz-radio-button-group ${context.orientation} ${context.size} ${context.variant} ${context.disabled ? 'disabled' : ''} ${context.error ? 'error' : ''} ${context.readonly ? 'readonly' : ''}"
+    class=${classMap({
+      'biz-radio-button-group': true,
+      [`biz-radio-button-group--${host.orientation}`]: true,
+      [`biz-radio-button-group--${host.variant}`]: true,
+      [`biz-radio-button-group--${host.size}`]: true,
+      'biz-radio-button-group--disabled': host.disabled,
+      'biz-radio-button-group--readonly': host.readonly,
+      'biz-radio-button-group--error': host.error,
+      'biz-radio-button-group--full-width': host.fullWidth,
+    })}
     role="radiogroup"
-    aria-labelledby=${context.labelId || 'label-slot'}
-    aria-describedby=${context.helperTextId || 'helper-text-slot'}
-    aria-invalid=${context.error ? 'true' : 'false'}
-    aria-required=${context.required ? 'true' : 'false'}
-    aria-disabled=${context.disabled ? 'true' : 'false'}
-    aria-readonly=${context.readonly ? 'true' : 'false'}
+    aria-labelledby=${ifDefined(host.hasLabel ? host.labelId : undefined)}
+    aria-describedby=${ifDefined(host.hasHelperText ? host.helperTextId : undefined)}
+    aria-invalid=${host.error ? 'true' : 'false'}
+    aria-required=${host.required ? 'true' : 'false'}
   >
-    <div class="biz-radio-button-group__label" id=${context.labelId || 'label-slot'}>
-      <slot name="label-slot">${context.label}</slot>
+    <div
+      id=${host.labelId}
+      class=${classMap({
+        'biz-radio-button-group__label-container': true,
+        'biz-radio-button-group__label-container--hidden': !host.hasLabel,
+      })}
+    >
+      <slot name="label-slot" @slotchange=${host.handleLabelSlotChange}></slot>
     </div>
-    <div class="biz-radio-button-group__items" @change=${context.handleValueChange}>
-      <slot @slotchange=${context.handleSlotChange}></slot>
+
+    <div class="biz-radio-button-group__container">
+      <slot @slotchange=${host.handleSlotChange}></slot>
     </div>
-    <div class="biz-radio-button-group__helper-text" id=${context.helperTextId || 'helper-text-slot'}>
-      <slot name="helper-text-slot">${context.helperText}</slot>
+
+    <div
+      id=${host.helperTextId}
+      class=${classMap({
+        'biz-radio-button-group__helper-container': true,
+        'biz-radio-button-group__helper-container--hidden': !host.hasHelperText,
+      })}
+    >
+      <slot name="helper-text-slot" @slotchange=${host.handleHelperSlotChange}></slot>
     </div>
   </div>
 `;

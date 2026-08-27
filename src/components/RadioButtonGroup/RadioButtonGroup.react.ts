@@ -1,6 +1,6 @@
-import React from 'react';
+import { createComponent } from "@lit/react";
 import { BizRadioButtonGroup } from "./RadioButtonGroup.wc";
-import { createComponent } from '@lit/react';
+import React from "react";
 
 export const RadioButtonGroup = createComponent({
   tagName: 'biz-radio-button-group',
@@ -8,7 +8,7 @@ export const RadioButtonGroup = createComponent({
   react: React,
   events: {
     onChange: 'change',
+    onInput: 'input',
     onClear: 'clear',
-    onInput: 'input'
-  }
+  },
 });
