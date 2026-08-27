@@ -1,11 +1,11 @@
-import { createComponent } from '@lit/react';
 import React from 'react';
-import { BizNumberInput } from "./NumberInput.wc";
+import { createComponent } from '@lit/react';
+import { BizNumberInput } from './NumberInput.wc.js';
 
 export const NumberInput = createComponent({
-  react: React,
   tagName: 'biz-number-input',
   elementClass: BizNumberInput,
+  react: React,
   events: {
     onInput: 'input',
     onChange: 'change',

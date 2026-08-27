@@ -1,6 +1,7 @@
-import { html } from 'lit';
+import { html, type TemplateResult } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
-export interface NumberInputProps {
+export interface NumberInputHost {
   value: number | null;
   min: number;
   max: number;
@@ -16,114 +17,151 @@ export interface NumberInputProps {
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium' | 'large';
   fullWidth: boolean;
-  inputValue: string;
-  onInputChange: (e: Event) => void;
-  onInputBlur: (e: FocusEvent) => void;
-  onInputFocus: (e: FocusEvent) => void;
-  onKeyDown: (e: KeyboardEvent) => void;
-  onDecrement: (e: MouseEvent) => void;
-  onIncrement: (e: MouseEvent) => void;
+  placeholder?: string;
+  formattedValue: string;
+  isMinReached: boolean;
+  isMaxReached: boolean;
+  
+  handleInput(e: InputEvent): void;
+  handleChange(e: Event): void;
+  handleFocus(e: FocusEvent): void;
+  handleBlur(e: FocusEvent): void;
+  handleKeyDown(e: KeyboardEvent): void;
+  handleStepUp(): void;
+  handleStepDown(): void;
 }
 
-export const NumberInputTemplate = (props: NumberInputProps) => {
-  const isMinReached = props.value !== null && props.value <= props.min;
-  const isMaxReached = props.value !== null && props.value >= props.max;
-  const isControlDisabled = props.disabled || props.readonly;
+export const NumberInputTemplate = (host: NumberInputHost): TemplateResult => {
+  const isControlsVisible = host.controls && !host.readonly;
+  const isSplit = host.controlsPosition === 'split' && isControlsVisible;
+  const isStacked = host.controlsPosition === 'stacked' && isControlsVisible;
+  const isEnd = host.controlsPosition === 'end' && isControlsVisible;
 
-  const containerClasses = [
-    'biz-number-input',
-    `biz-number-input--variant-${props.variant}`,
-    `biz-number-input--size-${props.size}`,
-    `biz-number-input--controls-${props.controlsPosition}`,
-    props.disabled ? 'biz-number-input--disabled' : '',
-    props.readonly ? 'biz-number-input--readonly' : '',
-    props.error ? 'biz-number-input--error' : '',
-    props.fullWidth ? 'biz-number-input--full-width' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  const renderDecrementButton = () => html`
-    <button
-      type="button"
-      class="biz-number-input__control biz-number-input__control--decrement"
-      ?disabled=${isControlDisabled || isMinReached}
-      aria-label="값 감소"
-      tabindex="-1"
-      @click=${props.onDecrement}
-    >
-      <slot name="decrement-icon-slot">-</slot>
-    </button>
-  `;
-
-  const renderIncrementButton = () => html`
-    <button
-      type="button"
-      class="biz-number-input__control biz-number-input__control--increment"
-      ?disabled=${isControlDisabled || isMaxReached}
-      aria-label="값 증가"
-      tabindex="-1"
-      @click=${props.onIncrement}
-    >
-      <slot name="increment-icon-slot">+</slot>
-    </button>
-  `;
+  const minAttr = host.min !== -Infinity ? host.min : undefined;
+  const maxAttr = host.max !== Infinity ? host.max : undefined;
 
   return html`
-    <div class=${containerClasses}>
-      <div class="biz-number-input__label-wrapper">
+    <div
+      class="biz-number-input ${host.variant} ${host.size} ${host.fullWidth ? 'full-width' : ''} ${host.disabled ? 'disabled' : ''} ${host.readonly ? 'readonly' : ''} ${host.error ? 'error' : ''}"
+    >
+      <div class="label-wrapper">
         <slot name="label-slot"></slot>
       </div>
 
-      <div class="biz-number-input__field-wrapper">
-        ${props.controls && props.controlsPosition === 'split'
-          ? renderDecrementButton()
+      <div class="input-container">
+        ${isSplit
+          ? html`
+              <button
+                type="button"
+                class="control-btn decrement-btn"
+                ?disabled="${host.disabled || host.readonly || host.isMinReached}"
+                tabindex="-1"
+                aria-label="값 감소"
+                @click="${host.handleStepDown}"
+              >
+                <slot name="decrement-icon-slot">-</slot>
+              </button>
+            `
           : ''}
 
-        <div class="biz-number-input__input-container">
+        <div class="input-wrapper">
           <slot name="prefix-slot"></slot>
+          
           <input
             type="text"
             role="spinbutton"
-            class="biz-number-input__input"
-            .value=${props.inputValue}
-            ?disabled=${props.disabled}
-            ?readonly=${props.readonly}
-            ?required=${props.required}
-            aria-valuenow=${props.value !== null ? props.value : ''}
-            aria-valuemin=${props.min !== -Infinity ? props.min : ''}
-            aria-valuemax=${props.max !== Infinity ? props.max : ''}
-            aria-invalid=${props.error ? 'true' : 'false'}
-            aria-required=${props.required ? 'true' : 'false'}
-            aria-describedby="helper-text"
-            @input=${props.onInputChange}
-            @focus=${props.onInputFocus}
-            @blur=${props.onInputBlur}
-            @keydown=${props.onKeyDown}
+            class="native-input"
+            .value="${host.formattedValue}"
+            ?disabled="${host.disabled}"
+            ?readonly="${host.readonly}"
+            ?required="${host.required}"
+            placeholder="${host.placeholder ?? ''}"
+            aria-valuenow="${ifDefined(host.value !== null ? host.value : undefined)}"
+            aria-valuemin="${ifDefined(minAttr)}"
+            aria-valuemax="${ifDefined(maxAttr)}"
+            aria-invalid="${host.error ? 'true' : 'false'}"
+            aria-required="${host.required ? 'true' : 'false'}"
+            @input="${host.handleInput}"
+            @change="${host.handleChange}"
+            @focus="${host.handleFocus}"
+            @blur="${host.handleBlur}"
+            @keydown="${host.handleKeyDown}"
           />
+
           <slot name="suffix-slot"></slot>
         </div>
 
-        ${props.controls && props.controlsPosition === 'end'
+        ${isEnd
           ? html`
-              <div class="biz-number-input__controls-group">
-                ${renderDecrementButton()} ${renderIncrementButton()}
+              <div class="controls-end">
+                <button
+                  type="button"
+                  class="control-btn decrement-btn"
+                  ?disabled="${host.disabled || host.readonly || host.isMinReached}"
+                  tabindex="-1"
+                  aria-label="값 감소"
+                  @click="${host.handleStepDown}"
+                >
+                  <slot name="decrement-icon-slot">-</slot>
+                </button>
+                <button
+                  type="button"
+                  class="control-btn increment-btn"
+                  ?disabled="${host.disabled || host.readonly || host.isMaxReached}"
+                  tabindex="-1"
+                  aria-label="값 증가"
+                  @click="${host.handleStepUp}"
+                >
+                  <slot name="increment-icon-slot">+</slot>
+                </button>
               </div>
             `
           : ''}
-        ${props.controls && props.controlsPosition === 'stacked'
+
+        ${isStacked
           ? html`
-              <div class="biz-number-input__controls-stacked">
-                ${renderIncrementButton()} ${renderDecrementButton()}
+              <div class="controls-stacked">
+                <button
+                  type="button"
+                  class="control-btn increment-btn"
+                  ?disabled="${host.disabled || host.readonly || host.isMaxReached}"
+                  tabindex="-1"
+                  aria-label="값 증가"
+                  @click="${host.handleStepUp}"
+                >
+                  <slot name="increment-icon-slot">▲</slot>
+                </button>
+                <button
+                  type="button"
+                  class="control-btn decrement-btn"
+                  ?disabled="${host.disabled || host.readonly || host.isMinReached}"
+                  tabindex="-1"
+                  aria-label="값 감소"
+                  @click="${host.handleStepDown}"
+                >
+                  <slot name="decrement-icon-slot">▼</slot>
+                </button>
               </div>
             `
           : ''}
-        ${props.controls && props.controlsPosition === 'split'
-          ? renderIncrementButton()
+
+        ${isSplit
+          ? html`
+              <button
+                type="button"
+                class="control-btn increment-btn"
+                ?disabled="${host.disabled || host.readonly || host.isMaxReached}"
+                tabindex="-1"
+                aria-label="값 증가"
+                @click="${host.handleStepUp}"
+              >
+                <slot name="increment-icon-slot">+</slot>
+              </button>
+            `
           : ''}
       </div>
 
-      <div id="helper-text" class="biz-number-input__helper-wrapper">
+      <div class="helper-wrapper">
         <slot name="helper-text-slot"></slot>
       </div>
     </div>
