@@ -1,10 +1,10 @@
 import React from 'react';
-import { SearchInputWC } from "./SearchInput.wc";
 import { createComponent } from '@lit/react';
+import { BizSearchInput } from './SearchInput.wc.js';
 
 export const SearchInput = createComponent({
   tagName: 'biz-search-input',
-  elementClass: SearchInputWC,
+  elementClass: BizSearchInput,
   react: React,
   events: {
     onInput: 'input',

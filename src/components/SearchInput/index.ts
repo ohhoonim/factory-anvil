@@ -1,1 +1,1 @@
-export { SearchInputWC } from './SearchInput.wc';
+export { BizSearchInput } from './SearchInput.wc';
