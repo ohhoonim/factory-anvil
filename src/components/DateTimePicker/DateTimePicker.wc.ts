@@ -1,34 +1,28 @@
 import { LitElement } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { DateTimePickerTemplate } from "./DateTimePicker";
-import { dateTimePickerStyles } from "./DateTimePicker.css";
+import { customElement, property, state } from 'lit/decorators.js';
+import { dateTimePickerStyles } from './DateTimePicker.css.js';
+import {
+  DateTimePickerTemplate,
+  type DateTimePickerHost,
+  type DateTimeCell,
+  type TimeOption,
+} from './DateTimePicker.js';
 
-/**
- * @element biz-date-time-picker
- * 
- * @slot label-slot
- * @slot prefix-slot
- * @slot suffix-slot
- * @slot helper-text-slot
- * @slot header-slot
- * @slot date-cell-slot
- * @slot time-option-slot
- * @slot footer-slot
- */
 @customElement('biz-date-time-picker')
-export class BizDateTimePicker extends LitElement {
-  static styles = dateTimePickerStyles;
+export class BizDateTimePicker extends LitElement implements DateTimePickerHost {
+  static override styles = dateTimePickerStyles;
 
-  @property({ type: String, reflect: true }) value: string | Date | null = null;
+  /* Properties */
+  @property({ type: String }) value: string | Date | null = null;
   @property({ type: String }) format = 'YYYY-MM-DD HH:mm';
   @property({ type: String, attribute: 'layout-mode' }) layoutMode: 'side-by-side' | 'tabbed' = 'side-by-side';
   @property({ type: Boolean, attribute: 'use12-hours' }) use12Hours = false;
   @property({ type: Boolean, attribute: 'show-seconds' }) showSeconds = false;
-  @property({ type: String, attribute: 'min-datetime' }) minDatetime: string | Date | null = null;
-  @property({ type: String, attribute: 'max-datetime' }) maxDatetime: string | Date | null = null;
-  @property({ type: Array }) disabledDates: any[] | ((date: Date) => boolean) = [];
-  @property({ attribute: false }) disabledHours: ((hour: number) => boolean) | null = null;
-  @property({ attribute: false }) disabledMinutes: ((minute: number) => boolean) | null = null;
+  @property({ type: String }) minDatetime: string | Date | null = null;
+  @property({ type: String }) maxDatetime: string | Date | null = null;
+  @property({ type: Array }) disabledDates: Date[] | ((date: Date) => boolean) = [];
+  @property({ type: Object }) disabledHours: ((hour: number) => boolean) | null = null;
+  @property({ type: Object }) disabledMinutes: ((minute: number) => boolean) | null = null;
   @property({ type: String }) placeholder = 'YYYY-MM-DD HH:mm';
   @property({ type: Boolean }) clearable = false;
   @property({ type: Boolean }) readonly = false;
@@ -37,289 +31,322 @@ export class BizDateTimePicker extends LitElement {
   @property({ type: String }) variant: 'outlined' | 'filled' | 'standard' = 'outlined';
   @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
   @property({ type: Boolean, attribute: 'full-width' }) fullWidth = false;
+  @property({ type: String, attribute: 'label-layout' }) labelLayout: 'vertical' | 'horizontal' = 'vertical';
 
-  @state() private isOpen = false;
-  @state() private activeTab: 'date' | 'time' = 'date';
-  @state() private viewDate = new Date();
-  @state() private selectedDate: Date | null = null;
-  @state() private selectedTime = { hour: 0, minute: 0, second: 0, period: 'AM' as 'AM' | 'PM' };
-  @state() private displayValue = '';
-  @state() private liveMessage = '';
+  /* States */
+  @state() isOpen = false;
+  @state() activeTab: 'date' | 'time' = 'date';
+  @state() displayMonth = new Date();
+  @state() selectedDate: Date | null = null;
+  @state() hours = 0;
+  @state() minutes = 0;
+  @state() seconds = 0;
+  @state() ampm: 'AM' | 'PM' = 'AM';
+  @state() liveAnnounceText = '';
 
-  connectedCallback() {
+  override connectedCallback(): void {
     super.connectedCallback();
-    this.initValue();
-    document.addEventListener('click', this.handleOutsideClick);
+    this.initSelectedState();
+    window.addEventListener('keydown', this.handleGlobalKeydown);
+    window.addEventListener('click', this.handleOutsideClick);
   }
 
-  disconnectedCallback() {
+  override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this.handleOutsideClick);
+    window.removeEventListener('keydown', this.handleGlobalKeydown);
+    window.removeEventListener('click', this.handleOutsideClick);
   }
 
-  willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
-    if (changedProperties.has('value')) {
-      this.initValue();
-    }
-  }
-
-  private initValue() {
-    if (!this.value) {
-      this.displayValue = '';
-      this.selectedDate = null;
-      return;
-    }
-    const d = new Date(this.value);
-    if (!isNaN(d.getTime())) {
-      this.selectedDate = d;
-      this.viewDate = new Date(d);
-      let hour = d.getHours();
-      let period: 'AM' | 'PM' = 'AM';
-      if (this.use12Hours) {
-        period = hour >= 12 ? 'PM' : 'AM';
-        hour = hour % 12 || 12;
+  private initSelectedState(): void {
+    if (this.value) {
+      const parsed = new Date(this.value);
+      if (!isNaN(parsed.getTime())) {
+        this.selectedDate = parsed;
+        this.displayMonth = new Date(parsed.getFullYear(), parsed.getMonth(), 1);
+        let h = parsed.getHours();
+        if (this.use12Hours) {
+          this.ampm = h >= 12 ? 'PM' : 'AM';
+          h = h % 12 || 12;
+        }
+        this.hours = h;
+        this.minutes = parsed.getMinutes();
+        this.seconds = parsed.getSeconds();
       }
-      this.selectedTime = {
-        hour,
-        minute: d.getMinutes(),
-        second: d.getSeconds(),
-        period,
-      };
-      this.updateDisplayValue();
     }
   }
 
-  private updateDisplayValue() {
-    if (!this.selectedDate) {
-      this.displayValue = '';
-      return;
-    }
-    const year = this.selectedDate.getFullYear();
-    const month = String(this.selectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(this.selectedDate.getDate()).padStart(2, '0');
-    let h = this.selectedTime.hour;
-    if (this.use12Hours && this.selectedTime.period === 'PM' && h < 12) h += 12;
-    if (this.use12Hours && this.selectedTime.period === 'AM' && h === 12) h = 0;
-
-    const hourStr = String(this.use12Hours ? this.selectedTime.hour : h).padStart(2, '0');
-    const minStr = String(this.selectedTime.minute).padStart(2, '0');
-    const secStr = String(this.selectedTime.second).padStart(2, '0');
-
-    let formatted = this.format
-      .replace('YYYY', String(year))
-      .replace('MM', month)
-      .replace('DD', day)
-      .replace('HH', String(h).padStart(2, '0'))
-      .replace('hh', hourStr)
-      .replace('mm', minStr)
-      .replace('ss', secStr);
-
+  get formattedValue(): string {
+    if (!this.selectedDate) return '';
+    const yyyy = this.selectedDate.getFullYear();
+    const mm = String(this.selectedDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(this.selectedDate.getDate()).padStart(2, '0');
+    let hh = this.hours;
     if (this.use12Hours) {
-      formatted = formatted.replace('A', this.selectedTime.period);
+      hh = this.hours;
     }
+    const hhStr = String(hh).padStart(2, '0');
+    const minStr = String(this.minutes).padStart(2, '0');
+    const secStr = String(this.seconds).padStart(2, '0');
 
-    this.displayValue = formatted;
+    let res = `${yyyy}-${mm}-${dd} ${hhStr}:${minStr}`;
+    if (this.showSeconds) res += `:${secStr}`;
+    if (this.use12Hours) res += ` ${this.ampm}`;
+    return res;
   }
 
-  private handleOutsideClick = (e: MouseEvent) => {
-    if (this.isOpen && !e.composedPath().includes(this)) {
+  get calendarGrid(): DateTimeCell[] {
+    const year = this.displayMonth.getFullYear();
+    const month = this.displayMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startWeekday = firstDay.getDay();
+
+    const cells: DateTimeCell[] = [];
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+    for (let i = startWeekday - 1; i >= 0; i--) {
+      const d = new Date(year, month - 1, prevMonthLastDay - i);
+      cells.push(this.createCell(d, false));
+    }
+
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+      const d = new Date(year, month, i);
+      cells.push(this.createCell(d, true));
+    }
+
+    const remaining = 42 - cells.length;
+    for (let i = 1; i <= remaining; i++) {
+      const d = new Date(year, month + 1, i);
+      cells.push(this.createCell(d, false));
+    }
+
+    return cells;
+  }
+
+  private createCell(d: Date, isCurrentMonth: boolean): DateTimeCell {
+    const today = new Date();
+    const isToday =
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate();
+
+    const isSelected = !!(
+      this.selectedDate &&
+      d.getFullYear() === this.selectedDate.getFullYear() &&
+      d.getMonth() === this.selectedDate.getMonth() &&
+      d.getDate() === this.selectedDate.getDate()
+    );
+
+    let isDisabled = false;
+    if (typeof this.disabledDates === 'function') {
+      isDisabled = this.disabledDates(d);
+    } else if (Array.isArray(this.disabledDates)) {
+      isDisabled = this.disabledDates.some(
+        (disabledDate) =>
+          disabledDate.getFullYear() === d.getFullYear() &&
+          disabledDate.getMonth() === d.getMonth() &&
+          disabledDate.getDate() === d.getDate()
+      );
+    }
+
+    const label = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+
+    return {
+      date: d,
+      day: d.getDate(),
+      isCurrentMonth,
+      isSelected,
+      isToday,
+      isDisabled,
+      label,
+    };
+  }
+
+  get hoursList(): TimeOption[] {
+    const max = this.use12Hours ? 12 : 23;
+    const min = this.use12Hours ? 1 : 0;
+    const options: TimeOption[] = [];
+    for (let i = min; i <= max; i++) {
+      const isDisabled = this.disabledHours ? this.disabledHours(i) : false;
+      options.push({
+        value: i,
+        label: String(i).padStart(2, '0'),
+        isSelected: this.hours === i,
+        isDisabled,
+      });
+    }
+    return options;
+  }
+
+  get minutesList(): TimeOption[] {
+    const options: TimeOption[] = [];
+    for (let i = 0; i < 60; i++) {
+      const isDisabled = this.disabledMinutes ? this.disabledMinutes(i) : false;
+      options.push({
+        value: i,
+        label: String(i).padStart(2, '0'),
+        isSelected: this.minutes === i,
+        isDisabled,
+      });
+    }
+    return options;
+  }
+
+  get secondsList(): TimeOption[] {
+    const options: TimeOption[] = [];
+    for (let i = 0; i < 60; i++) {
+      options.push({
+        value: i,
+        label: String(i).padStart(2, '0'),
+        isSelected: this.seconds === i,
+        isDisabled: false,
+      });
+    }
+    return options;
+  }
+
+  get ampmList(): TimeOption[] {
+    return [
+      { value: 0, label: 'AM', isSelected: this.ampm === 'AM', isDisabled: false },
+      { value: 1, label: 'PM', isSelected: this.ampm === 'PM', isDisabled: false },
+    ];
+  }
+
+  /* Handlers */
+  handleInputClick(): void {
+    if (this.disabled || this.readonly) return;
+    this.isOpen ? this.closePopover() : this.openPopover();
+  }
+
+  handleInputKeydown(e: KeyboardEvent): void {
+    if (this.disabled || this.readonly) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.handleInputClick();
+    } else if (e.key === 'Escape' && this.isOpen) {
+      e.preventDefault();
+      this.closePopover();
+    }
+  }
+
+  private handleGlobalKeydown = (e: KeyboardEvent): void => {
+    if (this.isOpen && e.key === 'Escape') {
       this.closePopover();
     }
   };
 
-  private togglePickerPopover() {
-    if (this.disabled || this.readonly) return;
-    if (this.isOpen) {
+  private handleOutsideClick = (e: MouseEvent): void => {
+    if (!this.isOpen) return;
+    const path = e.composedPath();
+    if (!path.includes(this)) {
       this.closePopover();
-    } else {
-      this.openPopover();
     }
-  }
+  };
 
-  private openPopover() {
+  openPopover(): void {
     this.isOpen = true;
     this.dispatchEvent(new CustomEvent('open', { bubbles: true, composed: true }));
   }
 
-  private closePopover() {
+  closePopover(): void {
     this.isOpen = false;
     this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
-  private handleInputType(e: InputEvent) {
-    const rawValue = (e.target as HTMLInputElement).value;
-    this.displayValue = rawValue;
-    this.dispatchEvent(new CustomEvent('input', { detail: { rawValue }, bubbles: true, composed: true }));
-  }
-
-  private handleClearClick(e: Event) {
+  handleClear(e: MouseEvent): void {
     e.stopPropagation();
     this.value = null;
     this.selectedDate = null;
-    this.displayValue = '';
     this.dispatchEvent(new CustomEvent('clear', { bubbles: true, composed: true }));
-    this.dispatchEvent(new CustomEvent('change', { detail: { value: null, date: null }, bubbles: true, composed: true }));
-  }
-
-  private handlePrevMonth(e: Event) {
-    e.stopPropagation();
-    this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() - 1, 1);
-  }
-
-  private handleNextMonth(e: Event) {
-    e.stopPropagation();
-    this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 1);
-  }
-
-  private handleDateSelect(date: Date) {
-    this.selectedDate = date;
-    this.updateDisplayValue();
-    this.liveMessage = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 선택됨`;
-    this.dispatchEvent(new CustomEvent('date-change', { detail: { date }, bubbles: true, composed: true }));
-  }
-
-  private handleHourSelect(hour: number) {
-    this.selectedTime = { ...this.selectedTime, hour };
-    this.updateDisplayValue();
-    this.dispatchEvent(new CustomEvent('time-change', { detail: { time: this.getTimeString() }, bubbles: true, composed: true }));
-  }
-
-  private handleMinuteSelect(minute: number) {
-    this.selectedTime = { ...this.selectedTime, minute };
-    this.updateDisplayValue();
-    this.dispatchEvent(new CustomEvent('time-change', { detail: { time: this.getTimeString() }, bubbles: true, composed: true }));
-  }
-
-  private handleSecondSelect(second: number) {
-    this.selectedTime = { ...this.selectedTime, second };
-    this.updateDisplayValue();
-    this.dispatchEvent(new CustomEvent('time-change', { detail: { time: this.getTimeString() }, bubbles: true, composed: true }));
-  }
-
-  private handlePeriodSelect(period: 'AM' | 'PM') {
-    this.selectedTime = { ...this.selectedTime, period };
-    this.updateDisplayValue();
-    this.dispatchEvent(new CustomEvent('time-change', { detail: { time: this.getTimeString() }, bubbles: true, composed: true }));
-  }
-
-  private getTimeString(): string {
-    return `${String(this.selectedTime.hour).padStart(2, '0')}:${String(this.selectedTime.minute).padStart(2, '0')}:${String(this.selectedTime.second).padStart(2, '0')}`;
-  }
-
-  private handleTabChange(tab: 'date' | 'time') {
-    this.activeTab = tab;
-  }
-
-  private handleNowClick(e: Event) {
-    e.stopPropagation();
-    const now = new Date();
-    this.selectedDate = now;
-    let hour = now.getHours();
-    let period: 'AM' | 'PM' = 'AM';
-    if (this.use12Hours) {
-      period = hour >= 12 ? 'PM' : 'AM';
-      hour = hour % 12 || 12;
-    }
-    this.selectedTime = {
-      hour,
-      minute: now.getMinutes(),
-      second: now.getSeconds(),
-      period,
-    };
-    this.updateDisplayValue();
-    this.confirmSelection();
-  }
-
-  private handleConfirmClick(e: Event) {
-    e.stopPropagation();
-    this.confirmSelection();
-  }
-
-  private handleCancelClick(e: Event) {
-    e.stopPropagation();
-    this.closePopover();
-  }
-
-  private confirmSelection() {
-    if (!this.selectedDate) return;
-    let h = this.selectedTime.hour;
-    if (this.use12Hours && this.selectedTime.period === 'PM' && h < 12) h += 12;
-    if (this.use12Hours && this.selectedTime.period === 'AM' && h === 12) h = 0;
-
-    const finalDate = new Date(
-      this.selectedDate.getFullYear(),
-      this.selectedDate.getMonth(),
-      this.selectedDate.getDate(),
-      h,
-      this.selectedTime.minute,
-      this.selectedTime.second
-    );
-
-    this.value = finalDate.toISOString();
-    this.updateDisplayValue();
-    this.closePopover();
     this.dispatchEvent(
       new CustomEvent('change', {
-        detail: { value: this.displayValue, date: finalDate },
         bubbles: true,
         composed: true,
+        detail: { value: '', date: null },
       })
     );
   }
 
-  private handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Escape' && this.isOpen) {
-      e.preventDefault();
-      this.closePopover();
-    } else if (e.key === 'Enter' && this.isOpen) {
-      e.preventDefault();
-      this.confirmSelection();
-    }
+  handlePrevMonth(): void {
+    this.displayMonth = new Date(this.displayMonth.getFullYear(), this.displayMonth.getMonth() - 1, 1);
   }
 
-  render() {
-    return DateTimePickerTemplate({
-      value: this.value,
-      format: this.format,
-      layoutMode: this.layoutMode,
-      use12Hours: this.use12Hours,
-      showSeconds: this.showSeconds,
-      minDatetime: this.minDatetime,
-      maxDatetime: this.maxDatetime,
-      disabledDates: this.disabledDates,
-      disabledHours: this.disabledHours,
-      disabledMinutes: this.disabledMinutes,
-      placeholder: this.placeholder,
-      clearable: this.clearable,
-      readonly: this.readonly,
-      disabled: this.disabled,
-      error: this.error,
-      variant: this.variant,
-      size: this.size,
-      fullWidth: this.fullWidth,
-      isOpen: this.isOpen,
-      activeTab: this.activeTab,
-      viewDate: this.viewDate,
-      selectedDate: this.selectedDate,
-      selectedTime: this.selectedTime,
-      displayValue: this.displayValue,
-      liveMessage: this.liveMessage,
-      onInputClick: () => this.togglePickerPopover(),
-      onInputType: (e) => this.handleInputType(e),
-      onClearClick: (e) => this.handleClearClick(e),
-      onPrevMonth: (e) => this.handlePrevMonth(e),
-      onNextMonth: (e) => this.handleNextMonth(e),
-      onDateSelect: (d) => this.handleDateSelect(d),
-      onHourSelect: (h) => this.handleHourSelect(h),
-      onMinuteSelect: (m) => this.handleMinuteSelect(m),
-      onSecondSelect: (s) => this.handleSecondSelect(s),
-      onPeriodSelect: (p) => this.handlePeriodSelect(p),
-      onTabChange: (t) => this.handleTabChange(t),
-      onNowClick: (e) => this.handleNowClick(e),
-      onConfirmClick: (e) => this.handleConfirmClick(e),
-      onCancelClick: (e) => this.handleCancelClick(e),
-      onKeyDown: (e) => this.handleKeyDown(e),
-    });
+  handleNextMonth(): void {
+    this.displayMonth = new Date(this.displayMonth.getFullYear(), this.displayMonth.getMonth() + 1, 1);
+  }
+
+  handleDateSelect(cell: DateTimeCell): void {
+    this.selectedDate = new Date(cell.date);
+    this.announceSelection();
+    this.dispatchEvent(
+      new CustomEvent('date-change', {
+        bubbles: true,
+        composed: true,
+        detail: { date: this.selectedDate },
+      })
+    );
+  }
+
+  handleTimeSelect(type: 'hour' | 'minute' | 'second' | 'ampm', option: TimeOption): void {
+    if (type === 'hour') this.hours = option.value;
+    if (type === 'minute') this.minutes = option.value;
+    if (type === 'second') this.seconds = option.value;
+    if (type === 'ampm') this.ampm = option.label as 'AM' | 'PM';
+
+    this.announceSelection();
+    this.dispatchEvent(
+      new CustomEvent('time-change', {
+        bubbles: true,
+        composed: true,
+        detail: { time: `${this.hours}:${this.minutes}:${this.seconds}` },
+      })
+    );
+  }
+
+  handleTabChange(tab: 'date' | 'time'): void {
+    this.activeTab = tab;
+  }
+
+  handleNowClick(): void {
+    const now = new Date();
+    this.selectedDate = now;
+    let h = now.getHours();
+    if (this.use12Hours) {
+      this.ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+    }
+    this.hours = h;
+    this.minutes = now.getMinutes();
+    this.seconds = now.getSeconds();
+    this.handleConfirmClick();
+  }
+
+  handleConfirmClick(): void {
+    this.value = this.formattedValue;
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        bubbles: true,
+        composed: true,
+        detail: { value: this.value, date: this.selectedDate },
+      })
+    );
+    this.closePopover();
+  }
+
+  handleCancelClick(): void {
+    this.closePopover();
+  }
+
+  private announceSelection(): void {
+    if (!this.selectedDate) return;
+    const year = this.selectedDate.getFullYear();
+    const month = this.selectedDate.getMonth() + 1;
+    const date = this.selectedDate.getDate();
+    this.liveAnnounceText = `${year}년 ${month}월 ${date}일 ${this.ampm} ${this.hours}시 ${this.minutes}분 선택됨`;
+  }
+
+  override render() {
+    return DateTimePickerTemplate(this);
   }
 }
 
