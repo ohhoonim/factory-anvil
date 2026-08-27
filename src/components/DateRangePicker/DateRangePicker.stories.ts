@@ -1,154 +1,223 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import './DateRangePicker.wc';
+import { fn } from 'storybook/test';
+import type { DateRangePickerHost, PresetObject } from './DateRangePicker.js';
+import './DateRangePicker.wc.js';
 
-const meta: Meta = {
+type Args = Required<DateRangePickerHost> & {
+  labelSlot?: string;
+  prefixSlot?: string;
+  separatorSlot?: string;
+  suffixSlot?: string;
+  presetsSlot?: string;
+  headerSlot?: string;
+  footerSlot?: string;
+  helperTextSlot?: string;
+};
+
+const samplePresets: PresetObject[] = [
+  {
+    label: '오늘',
+    value: [new Date(), new Date()]
+  },
+  {
+    label: '최근 7일',
+    value: [
+      new Date(new Date().setDate(new Date().getDate() - 6)),
+      new Date()
+    ]
+  },
+  {
+    label: '이번 달',
+    value: [
+      new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+    ]
+  }
+];
+
+const meta: Meta<Args> = {
   title: 'Components/Forms/DateRangePicker',
   component: 'biz-date-range-picker',
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['outlined', 'filled', 'standard'],
+      options: ['outlined', 'filled', 'standard']
     },
     size: {
       control: { type: 'select' },
-      options: ['small', 'medium', 'large'],
+      options: ['small', 'medium', 'large']
     },
     calendarMode: {
-      control: { type: 'radio' },
-      options: ['dual', 'single'],
+      control: { type: 'inline-radio' },
+      options: ['dual', 'single']
     },
     inputMode: {
-      control: { type: 'radio' },
-      options: ['single', 'double'],
+      control: { type: 'inline-radio' },
+      options: ['single', 'double']
     },
-    clearable: { control: 'boolean' },
     disabled: { control: 'boolean' },
     readonly: { control: 'boolean' },
     error: { control: 'boolean' },
-    loading: { control: 'boolean' },
-    onchange: { action: 'change' },
-    oninput: { action: 'input' },
-    onclear: { action: 'clear' },
+    clearable: { control: 'boolean' },
+    fullWidth: { control: 'boolean' },
+    format: { control: 'text' }
   },
   args: {
-    variant: 'outlined',
-    size: 'medium',
+    value: [null, null],
+    format: 'YYYY-MM-DD',
     calendarMode: 'dual',
     inputMode: 'double',
+    minDate: null,
+    maxDate: null,
+    minRange: null,
+    maxRange: null,
+    disabledDates: [],
+    presets: samplePresets,
+    placeholder: ['시작일', '종료일'],
     clearable: true,
-    disabled: false,
     readonly: false,
+    disabled: false,
     error: false,
-    loading: false,
+    variant: 'outlined',
+    size: 'medium',
+    fullWidth: false,
+    isOpen: false,
+    focusedInput: null,
+    currentDisplayMonth: new Date(),
+    hoveredDate: null,
+    handleInputFocus: fn(),
+    handleInputChange: fn(),
+    handleTogglePopover: fn(),
+    handleClear: fn(),
+    handlePresetClick: fn(),
+    handleDateClick: fn(),
+    handleDateMouseEnter: fn(),
+    handleDateMouseLeave: fn(),
+    handlePrevMonth: fn(),
+    handleNextMonth: fn(),
+    handleApply: fn(),
+    handleCancel: fn(),
+    handleKeyDown: fn(),
+    formatDateValue: (date) => (date ? String(date) : ''),
+    isDateDisabled: () => false,
+    isDateSelected: () => false,
+    isDateInRange: () => false,
+    isRangeStart: () => false,
+    isRangeEnd: () => false,
+    renderCalendarGrid: () => html``,
+    labelSlot: '조회 기간',
+    prefixSlot: '',
+    separatorSlot: '~',
+    suffixSlot: '',
+    presetsSlot: '',
+    headerSlot: '',
+    footerSlot: '',
+    helperTextSlot: '시작일과 종료일을 선택하세요.'
   },
   render: (args) => html`
     <biz-date-range-picker
-      .value=${args.value || [null, null]}
-      .format=${args.format || 'YYYY-MM-DD'}
-      .calendarMode=${args.calendarMode}
-      .inputMode=${args.inputMode}
-      .variant=${args.variant}
-      .size=${args.size}
-      .placeholder=${args.placeholder || ['시작일', '종료일']}
-      ?clearable=${args.clearable}
-      ?readonly=${args.readonly}
-      ?disabled=${args.disabled}
-      ?error=${args.error}
-      ?loading=${args.loading}
-      .presets=${args.presets || []}
-      @change=${args.onChange}
-      @input=${args.onInput}
-      @clear=${args.onClear}
+      .value="${args.value}"
+      .format="${args.format}"
+      .calendarMode="${args.calendarMode}"
+      .inputMode="${args.inputMode}"
+      .minDate="${args.minDate}"
+      .maxDate="${args.maxDate}"
+      .minRange="${args.minRange}"
+      .maxRange="${args.maxRange}"
+      .disabledDates="${args.disabledDates}"
+      .presets="${args.presets}"
+      .placeholder="${args.placeholder}"
+      ?clearable="${args.clearable}"
+      ?readonly="${args.readonly}"
+      ?disabled="${args.disabled}"
+      ?error="${args.error}"
+      .variant="${args.variant}"
+      .size="${args.size}"
+      ?full-width="${args.fullWidth}"
+     
     >
-      <span slot="label-slot">조회 기간</span>
-      <span slot="helper-text-slot">시작일과 종료일을 선택해 주세요.</span>
+      ${args.labelSlot ? html`<span slot="label-slot">${args.labelSlot}</span>` : ''}
+      ${args.prefixSlot ? html`<span slot="prefix-slot">${args.prefixSlot}</span>` : ''}
+      ${args.separatorSlot ? html`<span slot="separator-slot">${args.separatorSlot}</span>` : ''}
+      ${args.suffixSlot ? html`<span slot="suffix-slot">${args.suffixSlot}</span>` : ''}
+      ${args.presetsSlot ? html`<span slot="presets-slot">${args.presetsSlot}</span>` : ''}
+      ${args.headerSlot ? html`<span slot="header-slot">${args.headerSlot}</span>` : ''}
+      ${args.footerSlot ? html`<span slot="footer-slot">${args.footerSlot}</span>` : ''}
+      ${args.helperTextSlot ? html`<span slot="helper-text-slot">${args.helperTextSlot}</span>` : ''}
     </biz-date-range-picker>
-  `,
+  `
 };
 
 export default meta;
-type Story = StoryObj;
 
-export const Default: Story = {};
+export const Default: StoryObj<Args> = {};
 
-export const Variants: Story = {
+export const Variants: StoryObj<Args> = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <biz-date-range-picker variant="outlined">
-        <span slot="label-slot">Outlined Variant</span>
+        <span slot="label-slot">Outlined (Default)</span>
       </biz-date-range-picker>
       <biz-date-range-picker variant="filled">
-        <span slot="label-slot">Filled Variant</span>
+        <span slot="label-slot">Filled</span>
       </biz-date-range-picker>
       <biz-date-range-picker variant="standard">
-        <span slot="label-slot">Standard Variant</span>
+        <span slot="label-slot">Standard</span>
       </biz-date-range-picker>
     </div>
-  `,
+  `
 };
 
-export const Sizes: Story = {
+export const Sizes: StoryObj<Args> = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <biz-date-range-picker size="small">
-        <span slot="label-slot">Small Size</span>
+        <span slot="label-slot">Small</span>
       </biz-date-range-picker>
       <biz-date-range-picker size="medium">
-        <span slot="label-slot">Medium Size</span>
+        <span slot="label-slot">Medium (Default)</span>
       </biz-date-range-picker>
       <biz-date-range-picker size="large">
-        <span slot="label-slot">Large Size</span>
+        <span slot="label-slot">Large</span>
       </biz-date-range-picker>
     </div>
-  `,
+  `
 };
 
-export const States: Story = {
+export const States: StoryObj<Args> = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-date-range-picker disabled>
-        <span slot="label-slot">Disabled State</span>
+      <biz-date-range-picker disabled .value="${[new Date('2026-08-01'), new Date('2026-08-07')] as [Date, Date]}">
+        <span slot="label-slot">Disabled</span>
       </biz-date-range-picker>
-      <biz-date-range-picker readonly .value=${[new Date('2026-08-01'), new Date('2026-08-07')] as [Date,Date]}>
-        <span slot="label-slot">Readonly State</span>
+      <biz-date-range-picker readonly .value="${[new Date('2026-08-01'), new Date('2026-08-07')] as [Date, Date]}">
+        <span slot="label-slot">Readonly</span>
       </biz-date-range-picker>
       <biz-date-range-picker error>
-        <span slot="label-slot">Error State</span>
-        <span slot="helper-text-slot" style="color: var(--biz-date-range-picker-error-color);">
-          유효하지 않은 날짜 범위입니다.
-        </span>
-      </biz-date-range-picker>
-      <biz-date-range-picker loading>
-        <span slot="label-slot">Loading State</span>
+        <span slot="label-slot">Error</span>
+        <span slot="helper-text-slot">올바른 날짜 범위를 선택하세요.</span>
       </biz-date-range-picker>
     </div>
-  `,
+  `
 };
 
-export const SingleInputAndCalendar: Story = {
+export const SingleInputMode: StoryObj<Args> = {
   args: {
     inputMode: 'single',
-    calendarMode: 'single',
-  },
+    placeholder: '기간을 선택하세요'
+  }
 };
 
-export const WithPresets: Story = {
+export const SingleCalendarMode: StoryObj<Args> = {
   args: {
-    presets: [
-      { label: '오늘', range: [new Date(), new Date()] },
-      {
-        label: '최근 7일',
-        range: [new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), new Date()],
-      },
-      {
-        label: '이번 달',
-        range: [
-          new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
-        ],
-      },
-    ],
-  },
+    calendarMode: 'single'
+  }
+};
+
+export const CustomPresets: StoryObj<Args> = {
+  args: {
+    presets: samplePresets
+  }
 };

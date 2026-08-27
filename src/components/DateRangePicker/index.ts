@@ -1,1 +1,1 @@
-export { DateRangePicker as DateRangePickerWc } from './DateRangePicker.wc.ts';
+export { BizDateRangePicker } from './DateRangePicker.wc.js';
