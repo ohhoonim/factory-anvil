@@ -11,6 +11,5 @@ export const MultilineTextInput = createComponent({
     onChange: 'change',
     onFocus: 'focus',
     onBlur: 'blur',
-    onClear: 'clear'
-  }
+  },
 });

@@ -1,23 +1,32 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { fn } from 'storybook/test';
+import type { MultilineTextInputHost } from './MultilineTextInput.js';
 import './MultilineTextInput.wc.js';
 
-const meta: Meta = {
+type MultilineTextInputArgs = Required<MultilineTextInputHost> & {
+  labelSlot?: string;
+  headerExtraSlot?: string;
+  helperTextSlot?: string;
+  footerExtraSlot?: string;
+};
+
+const meta: Meta<MultilineTextInputArgs> = {
   title: 'Components/Forms/MultilineTextInput',
   component: 'biz-multiline-text-input',
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['outlined', 'filled', 'standard']
+      options: ['outlined', 'filled', 'standard'],
     },
     size: {
       control: { type: 'select' },
-      options: ['small', 'medium', 'large']
+      options: ['small', 'medium', 'large'],
     },
     resize: {
       control: { type: 'select' },
-      options: ['none', 'both', 'horizontal', 'vertical']
+      options: ['none', 'both', 'horizontal', 'vertical'],
     },
     value: { control: 'text' },
     placeholder: { control: 'text' },
@@ -30,15 +39,18 @@ const meta: Meta = {
     readonly: { control: 'boolean' },
     disabled: { control: 'boolean' },
     error: { control: 'boolean' },
-    fullWidth: { control: 'boolean' }
+    fullWidth: { control: 'boolean' },
+    labelSlot: { control: 'text' },
+    headerExtraSlot: { control: 'text' },
+    helperTextSlot: { control: 'text' },
+    footerExtraSlot: { control: 'text' },
   },
   args: {
-    variant: 'outlined',
-    size: 'medium',
     value: '',
     placeholder: '내용을 입력하세요...',
     rows: 3,
     maxRows: 0,
+    maxlength: 200,
     showCount: true,
     autoResize: false,
     resize: 'vertical',
@@ -46,115 +58,160 @@ const meta: Meta = {
     readonly: false,
     disabled: false,
     error: false,
-    fullWidth: false
-  }
+    variant: 'outlined',
+    size: 'medium',
+    fullWidth: false,
+    labelSlot: '설명',
+    headerExtraSlot: '',
+    helperTextSlot: '안내 문구입니다.',
+    footerExtraSlot: '',
+    handleInput: fn(),
+    handleChange: fn(),
+    handleFocus: fn(),
+    handleBlur: fn(),
+  },
+  render: (args) => html`
+    <biz-multiline-text-input
+      .value=${args.value}
+      .placeholder=${args.placeholder}
+      .rows=${args.rows}
+      .maxRows=${args.maxRows}
+      .maxlength=${args.maxlength}
+      ?show-count=${args.showCount}
+      ?auto-resize=${args.autoResize}
+      .resize=${args.resize}
+      ?required=${args.required}
+      ?readonly=${args.readonly}
+      ?disabled=${args.disabled}
+      ?error=${args.error}
+      .variant=${args.variant}
+      .size=${args.size}
+      ?full-width=${args.fullWidth}
+      @input=${args.handleInput}
+      @change=${args.handleChange}
+      @focus=${args.handleFocus}
+      @blur=${args.handleBlur}
+    >
+      ${args.labelSlot ? html`<label slot="label-slot">${args.labelSlot}</label>` : ''}
+      ${args.headerExtraSlot ? html`<span slot="header-extra-slot">${args.headerExtraSlot}</span>` : ''}
+      ${args.helperTextSlot ? html`<span slot="helper-text-slot">${args.helperTextSlot}</span>` : ''}
+      ${args.footerExtraSlot ? html`<span slot="footer-extra-slot">${args.footerExtraSlot}</span>` : ''}
+    </biz-multiline-text-input>
+  `,
 };
 
 export default meta;
-type Story = StoryObj;
+type Story = StoryObj<MultilineTextInputArgs>;
 
-export const Default: Story = {
-  render: (args) => html`
-    <biz-multiline-text-input
-      .variant="${args.variant}"
-      .size="${args.size}"
-      .value="${args.value}"
-      .placeholder="${args.placeholder}"
-      .rows="${args.rows}"
-      .maxRows="${args.maxRows}"
-      .maxlength="${args.maxlength}"
-      ?show-count="${args.showCount}"
-      ?auto-resize="${args.autoResize}"
-      .resize="${args.resize}"
-      ?required="${args.required}"
-      ?readonly="${args.readonly}"
-      ?disabled="${args.disabled}"
-      ?error="${args.error}"
-      ?full-width="${args.fullWidth}"
-    >
-      <span slot="label-slot">문의 내용</span>
-      <span slot="helper-text-slot">상세히 작성해 주세요.</span>
-    </biz-multiline-text-input>
-  `
-};
+export const Default: Story = {};
 
 export const Variants: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-multiline-text-input variant="outlined" placeholder="Outlined Variant">
-        <span slot="label-slot">Outlined</span>
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 16px; width: 400px;">
+      <biz-multiline-text-input
+        ...=${args}
+        variant="outlined"
+        placeholder="Outlined 변형"
+      >
+        <label slot="label-slot">Outlined</label>
       </biz-multiline-text-input>
 
-      <biz-multiline-text-input variant="filled" placeholder="Filled Variant">
-        <span slot="label-slot">Filled</span>
+      <biz-multiline-text-input
+        ...=${args}
+        variant="filled"
+        placeholder="Filled 변형"
+      >
+        <label slot="label-slot">Filled</label>
       </biz-multiline-text-input>
 
-      <biz-multiline-text-input variant="standard" placeholder="Standard Variant">
-        <span slot="label-slot">Standard</span>
+      <biz-multiline-text-input
+        ...=${args}
+        variant="standard"
+        placeholder="Standard 변형"
+      >
+        <label slot="label-slot">Standard</label>
       </biz-multiline-text-input>
     </div>
-  `
+  `,
 };
 
 export const Sizes: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-multiline-text-input size="small" placeholder="Small Size">
-        <span slot="label-slot">Small</span>
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 16px; width: 400px;">
+      <biz-multiline-text-input
+        ...=${args}
+        size="small"
+        placeholder="Small 크기"
+      >
+        <label slot="label-slot">Small</label>
       </biz-multiline-text-input>
 
-      <biz-multiline-text-input size="medium" placeholder="Medium Size">
-        <span slot="label-slot">Medium</span>
+      <biz-multiline-text-input
+        ...=${args}
+        size="medium"
+        placeholder="Medium 크기"
+      >
+        <label slot="label-slot">Medium</label>
       </biz-multiline-text-input>
 
-      <biz-multiline-text-input size="large" placeholder="Large Size">
-        <span slot="label-slot">Large</span>
+      <biz-multiline-text-input
+        ...=${args}
+        size="large"
+        placeholder="Large 크기"
+      >
+        <label slot="label-slot">Large</label>
       </biz-multiline-text-input>
     </div>
-  `
+  `,
 };
 
 export const States: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-multiline-text-input disabled value="비활성화된 입력창입니다.">
-        <span slot="label-slot">Disabled</span>
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 16px; width: 400px;">
+      <biz-multiline-text-input
+        ...=${args}
+        disabled
+        value="비활성화된 입력값입니다."
+      >
+        <label slot="label-slot">Disabled State</label>
       </biz-multiline-text-input>
 
-      <biz-multiline-text-input readonly value="읽기 전용 입력창입니다.">
-        <span slot="label-slot">Readonly</span>
+      <biz-multiline-text-input
+        ...=${args}
+        readonly
+        value="읽기 전용 입력값입니다."
+      >
+        <label slot="label-slot">Readonly State</label>
       </biz-multiline-text-input>
 
-      <biz-multiline-text-input error value="잘못된 입력값입니다.">
-        <span slot="label-slot">Error</span>
-        <span slot="helper-text-slot">입력 형식이 바르지 않습니다.</span>
+      <biz-multiline-text-input
+        ...=${args}
+        error
+        value="잘못된 입력 내용입니다."
+      >
+        <label slot="label-slot">Error State</label>
+        <span slot="helper-text-slot" style="color: var(--biz-multiline-text-input-error-color);">
+          유효하지 않은 입력입니다.
+        </span>
       </biz-multiline-text-input>
     </div>
-  `
+  `,
 };
 
 export const AutoResize: Story = {
-  render: () => html`
-    <biz-multiline-text-input
-      auto-resize
-      .rows="${2}"
-      .maxRows="${5}"
-      placeholder="텍스트를 계속 입력하면 높이가 자동으로 늘어납니다 (최대 5줄)."
-    >
-      <span slot="label-slot">Auto Resize (Max 5 rows)</span>
-    </biz-multiline-text-input>
-  `
+  args: {
+    autoResize: true,
+    rows: 2,
+    maxRows: 5,
+    placeholder: '텍스트를 여러 줄 입력하면 높이가 자동으로 늘어납니다 (최대 5줄)...',
+  },
 };
 
-export const CharacterCount: Story = {
-  render: () => html`
-    <biz-multiline-text-input
-      show-count
-      .maxlength="${100}"
-      placeholder="100자 제한입니다."
-    >
-      <span slot="label-slot">Character Counter</span>
-      <span slot="helper-text-slot">글자 수 제한 상태 표시</span>
-    </biz-multiline-text-input>
-  `
+export const EventHandlers: Story = {
+  args: {
+    handleInput: fn(),
+    handleChange: fn(),
+    handleFocus: fn(),
+    handleBlur: fn(),
+  },
 };
