@@ -1,90 +1,123 @@
-import { LitElement, type PropertyValues } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { IpAddressInputTemplate } from "./IpAddressInput";
-import { ipAddressInputStyles } from "./IpAddressInput.css";
+import { LitElement } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { ipAddressInputStyles } from './IpAddressInput.css.js';
+import { IpAddressInputTemplate, type IpAddressInputHost } from './IpAddressInput.js';
 
-/**
- * @element biz-ip-address-input
- * 
- * @slot separator-slot
- * @slot label-slot
- * @slot prefix-slot
- * @slot suffix-slot
- * @slot helper-text-slot
- * 
- */
 @customElement('biz-ip-address-input')
-export class BizIpAddressInput extends LitElement {
+export class BizIpAddressInput extends LitElement implements IpAddressInputHost {
   static styles = ipAddressInputStyles;
 
-  @property({ type: String }) value = '';
-  @property({ type: String }) type: 'ipv4' | 'ipv6' = 'ipv4';
-  @property({ type: String }) variant: 'outlined' | 'filled' | 'standard' = 'outlined';
-  @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
-  @property({ type: Boolean, attribute: 'auto-focus-next' }) autoFocusNext = true;
-  @property({ type: Boolean, reflect: true }) required = false;
-  @property({ type: Boolean, reflect: true }) readonly = false;
-  @property({ type: Boolean, reflect: true }) disabled = false;
-  @property({ type: Boolean, reflect: true }) error = false;
-  @property({ type: Boolean, attribute: 'full-width', reflect: true }) fullWidth = false;
-  @property({ type: String }) label = '';
-  @property({ type: String, attribute: 'helper-text' }) helperText = '';
+  @property({ type: String })
+  type: 'ipv4' | 'ipv6' = 'ipv4';
 
-  @state() private segments: string[] = [];
+  @property({ type: String })
+  variant: 'outlined' | 'filled' | 'standard' = 'outlined';
 
-  private isFocused = false;
+  @property({ type: String })
+  size: 'small' | 'medium' | 'large' = 'medium';
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.updateSegmentsFromValue();
+  @property({ type: String })
+  value = '';
+
+  @property({ type: Boolean, attribute: 'auto-focus-next' })
+  autoFocusNext = true;
+
+  @property({ type: Boolean })
+  required = false;
+
+  @property({ type: Boolean })
+  readonly = false;
+
+  @property({ type: Boolean })
+  disabled = false;
+
+  @property({ type: Boolean })
+  error = false;
+
+  @property({ type: Boolean, attribute: 'full-width' })
+  fullWidth = false;
+
+  @state()
+  segments: string[] = [];
+
+  @state()
+  activeSegmentIndex = -1;
+
+  private initialValue = '';
+
+  constructor() {
+    super();
+    this.segments = this.getSegmentCount() === 8 ? Array(8).fill('') : Array(4).fill('');
   }
 
-  willUpdate(changedProperties: PropertyValues) {
-    if (changedProperties.has('value') || changedProperties.has('type')) {
-      this.updateSegmentsFromValue();
+  willUpdate(changedProperties: Map<string, unknown>): void {
+    if (changedProperties.has('type')) {
+      const targetLength = this.getSegmentCount();
+      if (this.segments.length !== targetLength) {
+        this.segments = Array(targetLength).fill('');
+        this.syncValueFromSegments();
+      }
+    }
+
+    if (changedProperties.has('value')) {
+      this.syncSegmentsFromValue();
     }
   }
 
-  private updateSegmentsFromValue() {
-    const segmentCount = this.type === 'ipv6' ? 8 : 4;
-    const separator = this.type === 'ipv6' ? ':' : '.';
-    
-    if (this.value) {
-      const splitValues = this.value.split(separator);
-      this.segments = Array.from({ length: segmentCount }, (_, i) => splitValues[i] || '');
-    } else {
-      this.segments = Array.from({ length: segmentCount }, () => '');
-    }
+  private getSegmentCount(): number {
+    return this.type === 'ipv6' ? 8 : 4;
   }
 
-  private updateValueFromSegments() {
-    const separator = this.type === 'ipv6' ? ':' : '.';
+  private getSeparator(): string {
+    return this.type === 'ipv6' ? ':' : '.';
+  }
+
+  private syncSegmentsFromValue(): void {
+    const separator = this.getSeparator();
+    const parsed = this.value ? this.value.split(separator) : [];
+    const count = this.getSegmentCount();
+    const newSegments = Array(count).fill('');
+
+    for (let i = 0; i < count; i++) {
+      newSegments[i] = parsed[i] || '';
+    }
+    this.segments = newSegments;
+  }
+
+  private syncValueFromSegments(): void {
+    const separator = this.getSeparator();
     this.value = this.segments.join(separator);
   }
 
-  private handleSegmentInput = (index: number, event: InputEvent) => {
-    if (this.disabled || this.readonly) return;
+  private getInputs(): HTMLInputElement[] {
+    return Array.from(this.shadowRoot?.querySelectorAll('.biz-ip-address-input__segment') || []);
+  }
 
+  private focusSegment(index: number): void {
+    const inputs = this.getInputs();
+    if (inputs[index]) {
+      inputs[index].focus();
+      inputs[index].select();
+    }
+  }
+
+  handleSegmentInput(event: InputEvent, index: number): void {
     const inputEl = event.target as HTMLInputElement;
-    let inputValue = inputEl.value;
+    let val = inputEl.value;
 
     if (this.type === 'ipv4') {
-      inputValue = inputValue.replace(/[^0-9]/g, '');
-      if (inputValue !== '') {
-        const num = parseInt(inputValue, 10);
-        if (num > 255) {
-          inputValue = '255';
-        }
+      val = val.replace(/[^0-9]/g, '');
+      if (val !== '' && Number(val) > 255) {
+        val = '255';
       }
     } else {
-      inputValue = inputValue.replace(/[^0-9a-fA-F]/g, '');
+      val = val.replace(/[^0-9a-fA-F]/g, '');
     }
 
-    inputEl.value = inputValue;
-    const newSegments = [...this.segments];
-    newSegments[index] = inputValue;
-    this.segments = newSegments;
-    this.updateValueFromSegments();
+    const nextSegments = [...this.segments];
+    nextSegments[index] = val;
+    this.segments = nextSegments;
+    this.syncValueFromSegments();
 
     this.dispatchEvent(
       new CustomEvent('input', {
@@ -94,30 +127,30 @@ export class BizIpAddressInput extends LitElement {
       })
     );
 
-    const maxLength = this.type === 'ipv6' ? 4 : 3;
-    if (this.autoFocusNext && inputValue.length === maxLength && index < this.segments.length - 1) {
-      this.focusSegment(index + 1);
+    if (this.autoFocusNext) {
+      const maxLength = this.type === 'ipv6' ? 4 : 3;
+      if (val.length >= maxLength && index < this.getSegmentCount() - 1) {
+        this.focusSegment(index + 1);
+      }
     }
-  };
+  }
 
-  private handleSegmentKeyDown = (index: number, event: KeyboardEvent) => {
-    if (this.disabled || this.readonly) return;
-
+  handleSegmentKeyDown(event: KeyboardEvent, index: number): void {
     const inputEl = event.target as HTMLInputElement;
-    const separator = this.type === 'ipv6' ? ':' : '.';
+    const separator = this.getSeparator();
 
-    if (event.key === separator || (event.key === 'Dot' || event.key === 'Decimal') || (this.type === 'ipv4' && event.key === '.')) {
+    if (event.key === separator) {
       event.preventDefault();
-      if (this.autoFocusNext && index < this.segments.length - 1) {
+      if (this.autoFocusNext && index < this.getSegmentCount() - 1) {
         this.focusSegment(index + 1);
       }
       return;
     }
 
     if (event.key === 'ArrowRight') {
-      if (inputEl.selectionStart === inputEl.value.length && index < this.segments.length - 1) {
+      if (inputEl.selectionEnd === inputEl.value.length && index < this.getSegmentCount() - 1) {
         event.preventDefault();
-        this.focusSegment(index + 1, 'start');
+        this.focusSegment(index + 1);
       }
       return;
     }
@@ -125,7 +158,7 @@ export class BizIpAddressInput extends LitElement {
     if (event.key === 'ArrowLeft') {
       if (inputEl.selectionStart === 0 && index > 0) {
         event.preventDefault();
-        this.focusSegment(index - 1, 'end');
+        this.focusSegment(index - 1);
       }
       return;
     }
@@ -133,65 +166,47 @@ export class BizIpAddressInput extends LitElement {
     if (event.key === 'Backspace') {
       if (inputEl.value === '' && index > 0) {
         event.preventDefault();
-        const prevInput = this.getSegmentInput(index - 1);
-        if (prevInput) {
-          prevInput.focus();
-          const prevVal = prevInput.value;
-          if (prevVal.length > 0) {
-            const updatedVal = prevVal.slice(0, -1);
-            prevInput.value = updatedVal;
-            const newSegments = [...this.segments];
-            newSegments[index - 1] = updatedVal;
-            this.segments = newSegments;
-            this.updateValueFromSegments();
-
-            this.dispatchEvent(
-              new CustomEvent('input', {
-                detail: { value: this.value, segments: [...this.segments] },
-                bubbles: true,
-                composed: true,
-              })
-            );
-          }
+        const prevIndex = index - 1;
+        const nextSegments = [...this.segments];
+        const prevVal = nextSegments[prevIndex];
+        if (prevVal.length > 0) {
+          nextSegments[prevIndex] = prevVal.slice(0, -1);
+          this.segments = nextSegments;
+          this.syncValueFromSegments();
         }
+        this.focusSegment(prevIndex);
       }
     }
-  };
+  }
 
-  private handleSegmentPaste = (index: number, event: ClipboardEvent) => {
-    if (this.disabled || this.readonly) return;
-
+  handleSegmentPaste(event: ClipboardEvent, index: number): void {
     event.preventDefault();
     const clipboardData = event.clipboardData?.getData('text') || '';
-    const separator = this.type === 'ipv6' ? ':' : '.';
-    
-    const parsedSegments = clipboardData
-      .trim()
-      .split(separator)
-      .map((seg) => {
-        if (this.type === 'ipv4') {
-          const clean = seg.replace(/[^0-9]/g, '').slice(0, 3);
-          if (!clean) return '';
-          const num = parseInt(clean, 10);
-          return num > 255 ? '255' : clean;
-        } else {
-          return seg.replace(/[^0-9a-fA-F]/g, '').slice(0, 4);
+    if (!clipboardData) return;
+
+    const separator = this.getSeparator();
+    const pastedParts = clipboardData.split(separator);
+    const count = this.getSegmentCount();
+    const nextSegments = [...this.segments];
+
+    let targetIdx = index;
+    for (let i = 0; i < pastedParts.length && targetIdx < count; i++) {
+      let part = pastedParts[i].trim();
+      if (this.type === 'ipv4') {
+        part = part.replace(/[^0-9]/g, '');
+        if (part !== '' && Number(part) > 255) {
+          part = '255';
         }
-      });
-
-    const newSegments = [...this.segments];
-    let lastFilledIndex = index;
-
-    for (let i = 0; i < parsedSegments.length; i++) {
-      const targetIndex = index + i;
-      if (targetIndex < newSegments.length) {
-        newSegments[targetIndex] = parsedSegments[i];
-        lastFilledIndex = targetIndex;
+      } else {
+        part = part.replace(/[^0-9a-fA-F]/g, '');
+        part = part.slice(0, 4);
       }
+      nextSegments[targetIdx] = part;
+      targetIdx++;
     }
 
-    this.segments = newSegments;
-    this.updateValueFromSegments();
+    this.segments = nextSegments;
+    this.syncValueFromSegments();
 
     this.dispatchEvent(
       new CustomEvent('paste', {
@@ -209,12 +224,13 @@ export class BizIpAddressInput extends LitElement {
       })
     );
 
-    this.focusSegment(lastFilledIndex, 'end');
-  };
+    const nextFocusIdx = Math.min(targetIdx, count - 1);
+    this.focusSegment(nextFocusIdx);
+  }
 
-  private handleSegmentFocus = (index: number, event: FocusEvent) => {
-    if (!this.isFocused) {
-      this.isFocused = true;
+  handleSegmentFocus(event: FocusEvent, index: number): void {
+    if (this.activeSegmentIndex === -1) {
+      this.initialValue = this.value;
       this.dispatchEvent(
         new CustomEvent('focus', {
           detail: event,
@@ -223,96 +239,37 @@ export class BizIpAddressInput extends LitElement {
         })
       );
     }
-  };
+    this.activeSegmentIndex = index;
+  }
 
-  private handleSegmentBlur = (_index: number, event: FocusEvent) => {
-    requestAnimationFrame(() => {
-      const activeElement = this.shadowRoot?.activeElement;
-      const isStillFocused = activeElement && activeElement.classList.contains('biz-ip-address-input__segment');
+  handleContainerBlur(event: FocusEvent): void {
+    const relatedTarget = event.relatedTarget as Node | null;
+    if (relatedTarget && this.shadowRoot?.contains(relatedTarget)) {
+      return;
+    }
 
-      if (!isStillFocused) {
-        this.isFocused = false;
-        this.dispatchEvent(
-          new CustomEvent('change', {
-            detail: { value: this.value, segments: [...this.segments] },
-            bubbles: true,
-            composed: true,
-          })
-        );
-        this.dispatchEvent(
-          new CustomEvent('blur', {
-            detail: event,
-            bubbles: true,
-            composed: true,
-          })
-        );
-      }
-    });
-  };
-
-  public clear() {
-    this.segments = this.segments.map(() => '');
-    this.updateValueFromSegments();
+    this.activeSegmentIndex = -1;
 
     this.dispatchEvent(
-      new CustomEvent('clear', {
+      new CustomEvent('blur', {
+        detail: event,
         bubbles: true,
         composed: true,
       })
     );
 
-    this.dispatchEvent(
-      new CustomEvent('input', {
-        detail: { value: this.value, segments: [...this.segments] },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private getSegmentInput(index: number): HTMLInputElement | null {
-    return this.shadowRoot?.querySelector(`input[data-index="${index}"]`) || null;
-  }
-
-  private focusSegment(index: number, cursorPosition?: 'start' | 'end') {
-    const input = this.getSegmentInput(index);
-    if (input) {
-      input.focus();
-      if (cursorPosition === 'start') {
-        input.setSelectionRange(0, 0);
-      } else if (cursorPosition === 'end') {
-        const len = input.value.length;
-        input.setSelectionRange(len, len);
-      }
+    if (this.value !== this.initialValue) {
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          detail: { value: this.value, segments: [...this.segments] },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
   render() {
-    return IpAddressInputTemplate({
-      value: this.value,
-      type: this.type,
-      variant: this.variant,
-      size: this.size,
-      autoFocusNext: this.autoFocusNext,
-      required: this.required,
-      readonly: this.readonly,
-      disabled: this.disabled,
-      error: this.error,
-      fullWidth: this.fullWidth,
-      segments: this.segments,
-      helperText: this.helperText,
-      label: this.label,
-      onSegmentInput: this.handleSegmentInput,
-      onSegmentKeyDown: this.handleSegmentKeyDown,
-      onSegmentPaste: this.handleSegmentPaste,
-      onSegmentFocus: this.handleSegmentFocus,
-      onSegmentBlur: this.handleSegmentBlur,
-    });
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'biz-ip-address-input': BizIpAddressInput;
+    return IpAddressInputTemplate(this);
   }
 }

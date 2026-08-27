@@ -1,1 +1,1 @@
-export { BizIpAddressInput as IpAddressInputWc } from './IpAddressInput.wc';
+export { BizIpAddressInput } from './IpAddressInput.wc.js';

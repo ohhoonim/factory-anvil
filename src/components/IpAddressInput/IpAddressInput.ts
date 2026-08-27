@@ -1,97 +1,92 @@
-import { html } from 'lit';
+import { html } from "lit";
+import { classMap } from "lit/directives/class-map.js";
 
-export interface IpAddressInputState {
-  value: string;
+export interface IpAddressInputHost {
   type: 'ipv4' | 'ipv6';
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium' | 'large';
+  value: string;
+  segments: string[];
   autoFocusNext: boolean;
   required: boolean;
   readonly: boolean;
   disabled: boolean;
   error: boolean;
   fullWidth: boolean;
-  segments: string[];
-  helperText?: string;
-  label?: string;
-  onSegmentInput: (index: number, event: InputEvent) => void;
-  onSegmentKeyDown: (index: number, event: KeyboardEvent) => void;
-  onSegmentPaste: (index: number, event: ClipboardEvent) => void;
-  onSegmentFocus: (index: number, event: FocusEvent) => void;
-  onSegmentBlur: (index: number, event: FocusEvent) => void;
+  activeSegmentIndex: number;
+  handleSegmentInput(event: InputEvent, index: number): void;
+  handleSegmentKeyDown(event: KeyboardEvent, index: number): void;
+  handleSegmentPaste(event: ClipboardEvent, index: number): void;
+  handleSegmentFocus(event: FocusEvent, index: number): void;
+  handleContainerBlur(event: FocusEvent): void;
 }
 
-export const IpAddressInputTemplate = (context: IpAddressInputState) => {
-  const segmentCount = context.type === 'ipv6' ? 8 : 4;
-  const separatorChar = context.type === 'ipv6' ? ':' : '.';
-  const maxLength = context.type === 'ipv6' ? 4 : 3;
-
-  const segmentElements = [];
-
-  for (let i = 0; i < segmentCount; i++) {
-    const segmentValue = context.segments[i] || '';
-    const ariaLabel = `${context.type === 'ipv6' ? 'IPv6' : 'IP'} 주소 세그먼트 ${i + 1}/${segmentCount}`;
-
-    segmentElements.push(html`
-      <input
-        type="text"
-        class="biz-ip-address-input__segment"
-        data-index="${i}"
-        .value="${segmentValue}"
-        maxlength="${maxLength}"
-        ?disabled="${context.disabled}"
-        ?readonly="${context.readonly}"
-        aria-invalid="${context.error }" 
-        aria-required="${context.required }"
-        aria-label="${ariaLabel}"
-        @input="${(e: InputEvent) => context.onSegmentInput(i, e)}"
-        @keydown="${(e: KeyboardEvent) => context.onSegmentKeyDown(i, e)}"
-        @paste="${(e: ClipboardEvent) => context.onSegmentPaste(i, e)}"
-        @focus="${(e: FocusEvent) => context.onSegmentFocus(i, e)}"
-        @blur="${(e: FocusEvent) => context.onSegmentBlur(i, e)}"
-      />
-    `);
-
-    if (i < segmentCount - 1) {
-      segmentElements.push(html`
-        <span class="biz-ip-address-input__separator" aria-hidden="true">
-          <slot name="separator-slot">${separatorChar}</slot>
-        </span>
-      `);
-    }
-  }
-
-  const containerClasses = [
-    'biz-ip-address-input',
-    `biz-ip-address-input--${context.variant || 'outlined'}`,
-    `biz-ip-address-input--${context.size || 'medium'}`,
-    `biz-ip-address-input--${context.type || 'ipv4'}`,
-    context.disabled ? 'biz-ip-address-input--disabled' : '',
-    context.readonly ? 'biz-ip-address-input--readonly' : '',
-    context.error ? 'biz-ip-address-input--error' : '',
-    context.fullWidth ? 'biz-ip-address-input--full-width' : ''
-  ].filter(Boolean).join(' ');
+export const IpAddressInputTemplate = (host: IpAddressInputHost) => {
+  const segmentCount = host.type === 'ipv6' ? 8 : 4;
+  const separator = host.type === 'ipv6' ? ':' : '.';
 
   return html`
-    <div class="${containerClasses}" role="group" aria-label="IP 주소 입력">
+    <div
+      class=${classMap({
+        'biz-ip-address-input': true,
+        [`biz-ip-address-input--${host.variant}`]: true,
+        [`biz-ip-address-input--${host.size}`]: true,
+        'biz-ip-address-input--disabled': host.disabled,
+        'biz-ip-address-input--readonly': host.readonly,
+        'biz-ip-address-input--error': host.error,
+        'biz-ip-address-input--full-width': host.fullWidth,
+      })}
+      @blur=${host.handleContainerBlur}
+    >
       <div class="biz-ip-address-input__label-area">
-        <slot name="label-slot">
-          ${context.label ? html`<label class="biz-ip-address-input__label">${context.label}</label>` : ''}
-        </slot>
+        <slot name="label-slot"></slot>
       </div>
 
-      <div class="biz-ip-address-input__field">
+      <div
+        class="biz-ip-address-input__field"
+        role="group"
+        aria-label="${host.type === 'ipv6' ? 'IPv6 주소 입력' : 'IP 주소 입력'}"
+        aria-invalid=${host.error ? 'true' : 'false'}
+        aria-required=${host.required ? 'true' : 'false'}
+      >
         <slot name="prefix-slot"></slot>
+
         <div class="biz-ip-address-input__segments">
-          ${segmentElements}
+          ${Array.from({ length: segmentCount }).map((_, index) => {
+            const segmentValue = host.segments[index] || '';
+            const segmentLabel = `${host.type === 'ipv6' ? 'IPv6' : 'IP'} 주소 세그먼트 ${index + 1}/${segmentCount}`;
+
+            return html`
+              <input
+                type="text"
+                class="biz-ip-address-input__segment"
+                .value=${segmentValue}
+                ?disabled=${host.disabled}
+                ?readonly=${host.readonly}
+                aria-label=${segmentLabel}
+                aria-invalid=${host.error ? 'true' : 'false'}
+                maxlength=${host.type === 'ipv6' ? 4 : 3}
+                @input=${(e: InputEvent) => host.handleSegmentInput(e, index)}
+                @keydown=${(e: KeyboardEvent) => host.handleSegmentKeyDown(e, index)}
+                @paste=${(e: ClipboardEvent) => host.handleSegmentPaste(e, index)}
+                @focus=${(e: FocusEvent) => host.handleSegmentFocus(e, index)}
+              />
+              ${index < segmentCount - 1
+                ? html`
+                    <span class="biz-ip-address-input__separator" aria-hidden="true">
+                      <slot name="separator-slot">${separator}</slot>
+                    </span>
+                  `
+                : ''}
+            `;
+          })}
         </div>
+
         <slot name="suffix-slot"></slot>
       </div>
 
-      <div class="biz-ip-address-input__helper-area" id="helper-text">
-        <slot name="helper-text-slot">
-          ${context.helperText ? html`<span class="biz-ip-address-input__helper-text">${context.helperText}</span>` : ''}
-        </slot>
+      <div class="biz-ip-address-input__helper-area">
+        <slot name="helper-text-slot"></slot>
       </div>
     </div>
   `;
