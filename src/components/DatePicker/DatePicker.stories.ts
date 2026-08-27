@@ -1,8 +1,23 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { fn } from 'storybook/test';
 import './DatePicker.wc.js';
+import type { DatePickerHost } from './DatePicker.js';
 
-const meta: Meta = {
+type DatePickerArgs = Required<DatePickerHost> & {
+  labelSlot?: string;
+  prefixSlot?: string;
+  suffixSlot?: string;
+  helperTextSlot?: string;
+  onChange?: (e: CustomEvent) => void;
+  onInput?: (e: CustomEvent) => void;
+  onOpen?: (e: CustomEvent) => void;
+  onClose?: (e: CustomEvent) => void;
+  onMonthChange?: (e: CustomEvent) => void;
+  onClear?: (e: CustomEvent) => void;
+};
+
+const meta: Meta<DatePickerArgs> = {
   title: 'Components/Forms/DatePicker',
   component: 'biz-date-picker',
   tags: ['autodocs'],
@@ -16,64 +31,96 @@ const meta: Meta = {
       options: ['small', 'medium', 'large'],
     },
     mode: {
-      control: { type: 'select' },
+      control: { type: 'radio' },
       options: ['single', 'range'],
     },
-    format: { control: 'text' },
-    placeholder: { control: 'text' },
     clearable: { control: 'boolean' },
-    disabled: { control: 'boolean' },
     readonly: { control: 'boolean' },
+    disabled: { control: 'boolean' },
     error: { control: 'boolean' },
     fullWidth: { control: 'boolean' },
+    placeholder: { control: 'text' },
+    format: { control: 'text' },
   },
   args: {
-    variant: 'outlined',
-    size: 'medium',
-    mode: 'single',
+    value: null,
     format: 'YYYY-MM-DD',
+    mode: 'single',
+    minDate: null,
+    maxDate: null,
+    disabledDates: [],
     placeholder: 'YYYY-MM-DD',
     clearable: true,
-    disabled: false,
     readonly: false,
+    disabled: false,
     error: false,
+    variant: 'outlined',
+    size: 'medium',
     fullWidth: false,
+    isOpen: false,
+    inputValue: '',
+    currentYear: 2026,
+    currentMonth: 7,
+    calendarGrid: [],
+    weekdays: ['일', '월', '화', '수', '목', '금', '토'],
+    liveAnnouncement: '',
+    labelSlot: '선택 일자',
+    prefixSlot: '',
+    suffixSlot: '',
+    helperTextSlot: '날짜를 입력하거나 달력에서 선택하세요.',
+    onChange: fn(),
+    onInput: fn(),
+    onOpen: fn(),
+    onClose: fn(),
+    onMonthChange: fn(),
+    onClear: fn(),
   },
-};
-
-export default meta;
-type Story = StoryObj;
-
-export const Default: Story = {
   render: (args) => html`
     <biz-date-picker
-      .variant="${args.variant}"
-      .size="${args.size}"
-      .mode="${args.mode}"
-      .format="${args.format}"
-      .placeholder="${args.placeholder}"
-      ?clearable="${args.clearable}"
-      ?disabled="${args.disabled}"
-      ?readonly="${args.readonly}"
-      ?error="${args.error}"
-      ?full-width="${args.fullWidth}"
+      .value=${args.value}
+      .format=${args.format}
+      .mode=${args.mode}
+      .minDate=${args.minDate}
+      .maxDate=${args.maxDate}
+      .disabledDates=${args.disabledDates}
+      .placeholder=${args.placeholder}
+      ?clearable=${args.clearable}
+      ?readonly=${args.readonly}
+      ?disabled=${args.disabled}
+      ?error=${args.error}
+      .variant=${args.variant}
+      .size=${args.size}
+      ?full-width=${args.fullWidth}
+      @change=${args.onChange}
+      @input=${args.onInput}
+      @open=${args.onOpen}
+      @close=${args.onClose}
+      @month-change=${args.onMonthChange}
+      @clear=${args.onClear}
     >
-      <span slot="label-slot">날짜 선택</span>
-      <span slot="helper-text-slot">원하는 날짜를 선택하거나 직접 입력하세요.</span>
+      ${args.labelSlot ? html`<span slot="label-slot">${args.labelSlot}</span>` : ''}
+      ${args.prefixSlot ? html`<span slot="prefix-slot">${args.prefixSlot}</span>` : ''}
+      ${args.suffixSlot ? html`<span slot="suffix-slot">${args.suffixSlot}</span>` : ''}
+      ${args.helperTextSlot ? html`<span slot="helper-text-slot">${args.helperTextSlot}</span>` : ''}
     </biz-date-picker>
   `,
 };
 
+export default meta;
+type Story = StoryObj<DatePickerArgs>;
+
+export const Default: Story = {};
+
 export const Variants: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 300px;">
-      <biz-date-picker variant="outlined" placeholder="Outlined">
+  render: (args) => html`
+    <div style="display: flex; gap: 16px; flex-direction: column;">
+      <biz-date-picker .variant=${'outlined'} .placeholder=${'Outlined'} .value=${args.value}>
         <span slot="label-slot">Outlined</span>
       </biz-date-picker>
-      <biz-date-picker variant="filled" placeholder="Filled">
+      <biz-date-picker .variant=${'filled'} .placeholder=${'Filled'} .value=${args.value}>
         <span slot="label-slot">Filled</span>
       </biz-date-picker>
-      <biz-date-picker variant="standard" placeholder="Standard">
+      <biz-date-picker .variant=${'standard'} .placeholder=${'Standard'} .value=${args.value}>
         <span slot="label-slot">Standard</span>
       </biz-date-picker>
     </div>
@@ -81,52 +128,54 @@ export const Variants: Story = {
 };
 
 export const Sizes: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 300px;">
-      <biz-date-picker size="small" placeholder="Small">
+  render: (args) => html`
+    <div style="display: flex; gap: 16px; flex-direction: column;">
+      <biz-date-picker .size=${'small'} .placeholder=${'Small'} .value=${args.value}>
         <span slot="label-slot">Small</span>
       </biz-date-picker>
-      <biz-date-picker size="medium" placeholder="Medium">
+      <biz-date-picker .size=${'medium'} .placeholder=${'Medium'} .value=${args.value}>
         <span slot="label-slot">Medium</span>
       </biz-date-picker>
-      <biz-date-picker size="large" placeholder="Large">
+      <biz-date-picker .size=${'large'} .placeholder=${'Large'} .value=${args.value}>
         <span slot="label-slot">Large</span>
       </biz-date-picker>
     </div>
   `,
 };
 
+export const RangeMode: Story = {
+  args: {
+    mode: 'range',
+    placeholder: 'YYYY-MM-DD ~ YYYY-MM-DD',
+    labelSlot: '기간 선택',
+    helperTextSlot: '시작일과 종료일을 선택하세요.',
+  },
+};
+
 export const States: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 300px;">
-      <biz-date-picker disabled value="2026-08-17">
-        <span slot="label-slot">Disabled</span>
+  render: (args) => html`
+    <div style="display: flex; gap: 16px; flex-direction: column;">
+      <biz-date-picker ?disabled=${true} .value=${'2026-08-01'}>
+        <span slot="label-slot">Disabled State</span>
       </biz-date-picker>
-      <biz-date-picker readonly value="2026-08-17">
-        <span slot="label-slot">Readonly</span>
+      <biz-date-picker ?readonly=${true} .value=${'2026-08-15'}>
+        <span slot="label-slot">Readonly State</span>
       </biz-date-picker>
-      <biz-date-picker error value="invalid-date">
-        <span slot="label-slot">Error</span>
-        <span slot="helper-text-slot" style="color: #dc2626;">올바른 날짜 형식이 아닙니다.</span>
+      <biz-date-picker ?error=${true} .value=${'2026-08-99'}>
+        <span slot="label-slot">Error State</span>
+        <span slot="helper-text-slot" style="color: var(--biz-date-picker-error-color);">올바르지 않은 날짜 포맷입니다.</span>
       </biz-date-picker>
     </div>
   `,
 };
 
-export const RangeMode: Story = {
-  render: () => html`
-    <biz-date-picker mode="range" clearable placeholder="YYYY-MM-DD ~ YYYY-MM-DD">
-      <span slot="label-slot">기간 선택 (Range Mode)</span>
-      <span slot="helper-text-slot">시작일과 종료일을 순서대로 선택하세요.</span>
-    </biz-date-picker>
-  `,
-};
-
-export const AccessibilityValidation: Story = {
-  render: () => html`
-    <biz-date-picker clearable>
-      <label slot="label-slot" id="datepicker-label">웹 접근성 검증 레이블</label>
-      <span slot="helper-text-slot" id="datepicker-helper">키보드로 달력을 조작할 수 있습니다 (Esc, 방향키, Enter).</span>
-    </biz-date-picker>
-  `,
+export const EventHandlers: Story = {
+  args: {
+    onChange: fn(),
+    onInput: fn(),
+    onOpen: fn(),
+    onClose: fn(),
+    onMonthChange: fn(),
+    onClear: fn(),
+  },
 };
