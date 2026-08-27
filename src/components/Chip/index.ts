@@ -1,1 +1,1 @@
-export { BizChip } from './Chip.wc';
+export { BizChip } from './Chip.wc.js';

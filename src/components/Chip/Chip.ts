@@ -1,131 +1,103 @@
-import { html } from 'lit';
-import { classMap } from "lit/directives/class-map.js";
-import { live } from "lit/directives/live.js";
-import { repeat } from "lit/directives/repeat.js";
+import { html, type TemplateResult, nothing } from 'lit';
 
-export interface ChipTemplateContext {
+export interface ChipHost {
   value: string[];
   placeholder: string;
-  variant: 'outlined' | 'filled' | 'standard';
-  size: 'small' | 'medium' | 'large';
-  disabled: boolean;
-  readonly: boolean;
+  delimiter: string | string[];
+  maxChips: number;
+  allowDuplicates: boolean;
   required: boolean;
+  readonly: boolean;
+  disabled: boolean;
   error: boolean;
   deletable: boolean;
-  focusedChipIndex: number;
-  isFocused: boolean;
+  variant: 'outlined' | 'filled' | 'standard';
+  size: 'small' | 'medium' | 'large';
+  fullWidth: boolean;
   inputValue: string;
+  focusedChipIndex: number;
   liveMessage: string;
   helperTextId: string;
-  onInput: (e: InputEvent) => void;
-  onKeyDown: (e: KeyboardEvent) => void;
-  onFocus: (e: FocusEvent) => void;
-  onBlur: (e: FocusEvent) => void;
-  onRemoveChip: (index: number) => void;
-  onContainerClick: () => void;
+  
+  handleInputKeydown(e: KeyboardEvent): void;
+  handleInputInput(e: HTMLInputElement): void;
+  handleInputFocus(e: FocusEvent): void;
+  handleInputBlur(e: FocusEvent): void;
+  handleChipKeydown(e: KeyboardEvent, index: number): void;
+  handleChipClick(index: number): void;
+  handleRemoveChip(e: Event, index: number): void;
+  handleContainerClick(): void;
 }
 
-export const ChipTemplate = (ctx: ChipTemplateContext) => {
-  const sizeClass = ctx.size === 'small' ? 'sm' : ctx.size === 'large' ? 'lg' : 'md';
-  const variantClass = ctx.variant || 'outlined';
+export const ChipTemplate = (host: ChipHost): TemplateResult => {
+  const isMaxReached = host.value.length >= host.maxChips;
 
   return html`
     <div
-      class=${classMap({
-        'biz-chip': true,
-        [`biz-chip--${variantClass}`]: true,
-        [`biz-chip--${sizeClass}`]: true,
-      })}
+      class="biz-chip ${host.variant} ${host.size} ${host.disabled ? 'disabled' : ''} ${host.readonly ? 'readonly' : ''} ${host.error ? 'error' : ''} ${host.fullWidth ? 'full-width' : ''}"
+      @click=${host.handleContainerClick}
     >
-      <slot name="label-slot">
-        <label class="biz-chip__label"></label>
-      </slot>
+      <div class="biz-chip__label-container">
+        <slot name="label-slot"></slot>
+      </div>
 
-      <div
-        class=${classMap({
-          'biz-chip__container': true,
-          'biz-chip__container--focused': ctx.isFocused,
-          'biz-chip__container--disabled': ctx.disabled,
-          'biz-chip__container--readonly': ctx.readonly,
-          'biz-chip__container--error': ctx.error,
-        })}
-        @click=${ctx.onContainerClick}
-      >
+      <div class="biz-chip__wrapper">
         <slot name="start-slot"></slot>
 
-        <ul class="biz-chip__item-list" role="list">
-          ${repeat(
-            ctx.value,
-            (item) => item,
-            (item, index) => html`
-              <li
-                class=${classMap({
-                  'biz-chip__item': true,
-                  'biz-chip__item--focused': ctx.focusedChipIndex === index,
-                })}
+        <div class="biz-chip__container" role="list" aria-label="Selected chips">
+          ${host.value.map((item, index) => html`
+            <slot name="chip-item-slot" data-index=${index}>
+              <div
+                class="biz-chip__item ${host.focusedChipIndex === index ? 'focused' : ''}"
                 role="listitem"
-                tabindex=${ctx.focusedChipIndex === index ? '0' : '-1'}
+                tabindex=${host.disabled ? '-1' : '0'}
+                @keydown=${(e: KeyboardEvent) => host.handleChipKeydown(e, index)}
+                @click=${() => host.handleChipClick(index)}
               >
-                <slot name="chip-item-slot" .item=${item} .index=${index}>
-                  <span>${item}</span>
-                  ${ctx.deletable && !ctx.disabled && !ctx.readonly
-                    ? html`
-                        <button
-                          type="button"
-                          class="biz-chip__delete-btn"
-                          aria-label=${`삭제: ${item}`}
-                          tabindex="-1"
-                          @click=${(e: Event) => {
-                            e.stopPropagation();
-                            ctx.onRemoveChip(index);
-                          }}
-                        >
-                          &times;
-                        </button>
-                      `
-                    : ''}
-                </slot>
-              </li>
-            `
-          )}
-        </ul>
+                <span class="biz-chip__item-text">${item}</span>
+                ${host.deletable && !host.readonly && !host.disabled
+                  ? html`
+                      <button
+                        type="button"
+                        class="biz-chip__item-delete"
+                        aria-label="삭제: ${item}"
+                        tabindex="-1"
+                        @click=${(e: Event) => host.handleRemoveChip(e, index)}
+                      >
+                        &times;
+                      </button>
+                    `
+                  : nothing}
+              </div>
+            </slot>
+          `)}
 
-        ${!ctx.readonly
-          ? html`
-              <input
-                type="text"
-                class="biz-chip__input"
-                .value=${live(ctx.inputValue)}
-                placeholder=${ctx.value.length === 0 ? ctx.placeholder : ''}
-                ?disabled=${ctx.disabled}
-                ?readonly=${ctx.readonly}
-                aria-invalid=${ctx.error ? 'true' : 'false'}
-                aria-required=${ctx.required ? 'true' : 'false'}
-                aria-describedby=${ctx.helperTextId}
-                @input=${ctx.onInput}
-                @keydown=${ctx.onKeyDown}
-                @focus=${ctx.onFocus}
-                @blur=${ctx.onBlur}
-              />
-            `
-          : ''}
+          <input
+            type="text"
+            class="biz-chip__input"
+            .value=${host.inputValue}
+            placeholder=${host.value.length === 0 ? host.placeholder : ''}
+            ?disabled=${host.disabled || isMaxReached}
+            ?readonly=${host.readonly}
+            aria-invalid=${host.error ? 'true' : 'false'}
+            aria-required=${host.required ? 'true' : 'false'}
+            aria-describedby=${host.helperTextId}
+            @keydown=${host.handleInputKeydown}
+            @input=${(e: Event) => host.handleInputInput(e.target as HTMLInputElement)}
+            @focus=${host.handleInputFocus}
+            @blur=${host.handleInputBlur}
+          />
+        </div>
 
         <slot name="end-slot"></slot>
       </div>
 
-      <div
-        id=${ctx.helperTextId}
-        class=${classMap({
-          'biz-chip__helper-text': true,
-          'biz-chip__helper-text--error': ctx.error,
-        })}
-      >
+      <div class="biz-chip__helper-container" id=${host.helperTextId}>
         <slot name="helper-text-slot"></slot>
       </div>
 
-      <div class="sr-only" aria-live="polite" aria-atomic="true">
-        ${ctx.liveMessage}
+      <div class="biz-chip__sr-only" aria-live="polite" aria-atomic="true">
+        ${host.liveMessage}
       </div>
     </div>
   `;

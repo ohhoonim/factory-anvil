@@ -1,6 +1,6 @@
-import { createComponent } from '@lit/react';
-import { BizChip } from "./Chip.wc";
 import React from 'react';
+import { createComponent } from '@lit/react';
+import { BizChip } from './Chip.wc.js';
 
 export const Chip = createComponent({
   tagName: 'biz-chip',
@@ -12,5 +12,6 @@ export const Chip = createComponent({
     onChipRemove: 'chip-remove',
     onFocus: 'focus',
     onBlur: 'blur',
+    onClear: 'clear',
   },
 });
