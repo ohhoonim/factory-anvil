@@ -8,7 +8,6 @@ export const Rating = createComponent({
   react: React,
   events: {
     onChange: 'change',
-    onInput: 'input',
     onHoverChange: 'hover-change',
     onClear: 'clear',
   },
