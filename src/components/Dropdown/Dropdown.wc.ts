@@ -1,27 +1,15 @@
-import { LitElement, type TemplateResult } from 'lit';
+import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { dropdownStyles } from './Dropdown.css.js';
-import { DropdownTemplate, type DropdownOption } from './Dropdown.js';
+import { dropdownStyles } from './Dropdown.css.ts';
+import { DropdownTemplate, type DropdownOption } from './Dropdown.ts';
+import type { DropdownHost } from './Dropdown.ts';
 
-/**
- * @element biz-dropdown
- * 
- * @slot tag-slot
- * @slot label-slot
- * @slot prefix-slot
- * @slot suffix-slot
- * @slot header-slot
- * @slot empty-slot
- * @slot option-slot
- * @slot footer-slot
- * @slot helper-text-wrapper
- */
 @customElement('biz-dropdown')
-export class BizDropdown extends LitElement {
+export class BizDropdown extends LitElement implements DropdownHost {
   static styles = dropdownStyles;
 
   @property({ type: Object })
-  value: string | number | (string | number)[] | null = null;
+  value: any = null;
 
   @property({ type: Array })
   options: DropdownOption[] = [];
@@ -34,6 +22,9 @@ export class BizDropdown extends LitElement {
 
   @property({ type: String })
   size: 'small' | 'medium' | 'large' = 'medium';
+
+  @property({ type: String, attribute: 'label-placement' })
+  labelPlacement: 'vertical' | 'horizontal' = 'vertical';
 
   @property({ type: Boolean })
   filterable = false;
@@ -62,73 +53,78 @@ export class BizDropdown extends LitElement {
   @property({ type: Boolean })
   error = false;
 
-  @property({ type: Boolean, attribute: 'full-width' })
-  fullWidth = false;
+  @state()
+  isOpen = false;
 
   @state()
-  private isOpen = false;
+  focusedOptionIndex = -1;
 
   @state()
-  private filterKeyword = '';
+  searchKeyword = '';
 
   @state()
-  private activeIndex = -1;
+  hasLabelSlot = false;
 
-  @state()
-  private focused = false;
-
-  private handleDocumentClick = (e: MouseEvent) => {
-    const path = e.composedPath();
-    if (!path.includes(this)) {
+  private _outsideClickListener = (e: MouseEvent) => {
+    if (!this.contains(e.target as Node)) {
       this.closePopover();
     }
   };
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('click', this.handleDocumentClick);
+    document.addEventListener('click', this._outsideClickListener);
   }
 
   disconnectedCallback() {
-    document.removeEventListener('click', this.handleDocumentClick);
     super.disconnectedCallback();
+    document.removeEventListener('click', this._outsideClickListener);
   }
 
-  private getFilteredOptions(): DropdownOption[] {
-    if (this.filterable && this.filterKeyword) {
-      return this.options.filter((opt) =>
-        opt.label.toLowerCase().includes(this.filterKeyword.toLowerCase())
-      );
+  getOptionId(index: number): string {
+    return `biz-dropdown-option-${index}`;
+  }
+
+  getFilteredOptions(): DropdownOption[] {
+    if (!this.filterable || !this.searchKeyword) {
+      return this.options;
     }
-    return this.options;
+    return this.options.filter((opt) =>
+      opt.label.toLowerCase().includes(this.searchKeyword.toLowerCase())
+    );
   }
 
-  private openPopover() {
+  handleLabelSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    const assignedNodes = slot.assignedNodes({ flatten: true });
+    this.hasLabelSlot = assignedNodes.some((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return Boolean(node.textContent?.trim());
+      }
+      return true;
+    });
+  }
+
+  openPopover() {
     if (this.disabled || this.readonly || this.isOpen) return;
     this.isOpen = true;
-    this.activeIndex = -1;
+    this.focusedOptionIndex = -1;
     this.dispatchEvent(
-      new CustomEvent('open', {
-        bubbles: true,
-        composed: true,
-      })
+      new CustomEvent('open', { bubbles: true, composed: true })
     );
   }
 
-  private closePopover() {
+  closePopover() {
     if (!this.isOpen) return;
     this.isOpen = false;
-    this.filterKeyword = '';
-    this.activeIndex = -1;
+    this.focusedOptionIndex = -1;
+    this.searchKeyword = '';
     this.dispatchEvent(
-      new CustomEvent('close', {
-        bubbles: true,
-        composed: true,
-      })
+      new CustomEvent('close', { bubbles: true, composed: true })
     );
   }
 
-  private toggleDropdownPopover() {
+  toggleDropdownPopover() {
     if (this.isOpen) {
       this.closePopover();
     } else {
@@ -136,90 +132,112 @@ export class BizDropdown extends LitElement {
     }
   }
 
-  private handleTriggerClick = (e: MouseEvent) => {
+  handleTriggerClick(e: MouseEvent) {
     e.stopPropagation();
     if (this.disabled || this.readonly) return;
     this.toggleDropdownPopover();
-  };
+  }
 
-  private handleTriggerKeyDown = (e: KeyboardEvent) => {
+  handleInputClick(e: MouseEvent) {
+    e.stopPropagation();
+    if (!this.isOpen) {
+      this.openPopover();
+    }
+  }
+
+  handleTriggerKeyDown(e: KeyboardEvent) {
     if (this.disabled || this.readonly) return;
 
-    const filtered = this.getFilteredOptions();
+    const filteredOptions = this.getFilteredOptions();
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         if (!this.isOpen) {
           this.openPopover();
-          this.activeIndex = 0;
+          this.focusedOptionIndex = filteredOptions.length > 0 ? 0 : -1;
         } else {
-          this.activeIndex = (this.activeIndex + 1) % filtered.length;
+          if (filteredOptions.length > 0) {
+            this.focusedOptionIndex =
+              (this.focusedOptionIndex + 1) % filteredOptions.length;
+          }
         }
         break;
+
       case 'ArrowUp':
         e.preventDefault();
         if (!this.isOpen) {
           this.openPopover();
-          this.activeIndex = filtered.length - 1;
+          this.focusedOptionIndex =
+            filteredOptions.length > 0 ? filteredOptions.length - 1 : -1;
         } else {
-          this.activeIndex = (this.activeIndex - 1 + filtered.length) % filtered.length;
+          if (filteredOptions.length > 0) {
+            this.focusedOptionIndex =
+              (this.focusedOptionIndex - 1 + filteredOptions.length) %
+              filteredOptions.length;
+          }
         }
         break;
+
       case 'Enter':
         e.preventDefault();
-        if (this.isOpen && this.activeIndex >= 0 && filtered[this.activeIndex]) {
-          const opt = filtered[this.activeIndex];
-          if (!opt.disabled) {
-            this.selectOption(opt);
+        if (this.isOpen) {
+          if (
+            this.focusedOptionIndex >= 0 &&
+            this.focusedOptionIndex < filteredOptions.length
+          ) {
+            const selectedOpt = filteredOptions[this.focusedOptionIndex];
+            if (!selectedOpt.disabled) {
+              this.selectOption(selectedOpt);
+            }
           }
         } else {
-          this.toggleDropdownPopover();
+          this.openPopover();
         }
         break;
+
       case 'Escape':
         e.preventDefault();
         this.closePopover();
         break;
+
       case 'Tab':
         this.closePopover();
         break;
+
       case 'Backspace':
         if (
-          this.mode === 'multi' &&
           this.filterable &&
-          this.filterKeyword === '' &&
+          this.mode === 'multi' &&
+          this.searchKeyword === '' &&
           Array.isArray(this.value) &&
           this.value.length > 0
         ) {
-          const lastVal = this.value[this.value.length - 1];
-          this.removeTag(lastVal);
+          const lastValue = this.value[this.value.length - 1];
+          this.handleTagRemove(lastValue, e as any);
         }
         break;
     }
-  };
+  }
 
-  private handleFilterInput = (e: InputEvent) => {
-    const input = e.target as HTMLInputElement;
-    this.filterKeyword = input.value;
-    this.activeIndex = -1;
-    this.dispatchEvent(
-      new CustomEvent('search', {
-        detail: { keyword: this.filterKeyword },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  };
-
-  private handleFilterKeyDown = (e: KeyboardEvent) => {
-    this.handleTriggerKeyDown(e);
-  };
-
-  private selectOption(option: DropdownOption) {
+  handleOptionClick(option: DropdownOption, e: MouseEvent) {
+    e.stopPropagation();
     if (option.disabled) return;
+    this.selectOption(option);
+  }
 
-    if (this.mode === 'multi') {
+  selectOption(option: DropdownOption) {
+    if (this.mode === 'single') {
+      this.value = option.value;
+      this.closePopover();
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          detail: { value: this.value, selectedOption: option },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    } else {
       const currentValues = Array.isArray(this.value) ? [...this.value] : [];
       const index = currentValues.indexOf(option.value);
       if (index > -1) {
@@ -228,115 +246,80 @@ export class BizDropdown extends LitElement {
         currentValues.push(option.value);
       }
       this.value = currentValues;
-    } else {
-      this.value = option.value;
-      this.closePopover();
+      const selectedOptions = this.options.filter((o) =>
+        currentValues.includes(o.value)
+      );
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          detail: { value: this.value, selectedOption: selectedOptions },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: this.value, selectedOption: option },
-        bubbles: true,
-        composed: true,
-      })
-    );
   }
 
-  private handleOptionClick = (option: DropdownOption, index: number) => {
-    this.activeIndex = index;
-    this.selectOption(option);
-  };
-
-  private handleClearClick = (e: MouseEvent) => {
+  handleClearClick(e: MouseEvent) {
     e.stopPropagation();
     if (this.disabled || this.readonly) return;
-
     this.value = this.mode === 'multi' ? [] : null;
-    this.filterKeyword = '';
-
+    this.searchKeyword = '';
     this.dispatchEvent(
-      new CustomEvent('clear', {
-        bubbles: true,
-        composed: true,
-      })
+      new CustomEvent('clear', { bubbles: true, composed: true })
     );
-
     this.dispatchEvent(
       new CustomEvent('change', {
-        detail: { value: this.value, selectedOption: null },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  };
-
-  private removeTag(val: string | number) {
-    if (this.disabled || this.readonly || !Array.isArray(this.value)) return;
-
-    const newValues = this.value.filter((v) => v !== val);
-    this.value = newValues;
-
-    this.dispatchEvent(
-      new CustomEvent('tag-remove', {
-        detail: { removedValue: val },
-        bubbles: true,
-        composed: true,
-      })
-    );
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: this.value, selectedOption: null },
+        detail: {
+          value: this.value,
+          selectedOption: this.mode === 'multi' ? [] : null,
+        },
         bubbles: true,
         composed: true,
       })
     );
   }
 
-  private handleTagRemove = (e: MouseEvent, val: string | number) => {
+  handleTagRemove(optionValue: any, e: MouseEvent) {
     e.stopPropagation();
-    this.removeTag(val);
-  };
+    if (this.disabled || this.readonly) return;
+    if (Array.isArray(this.value)) {
+      this.value = this.value.filter((v: any) => v !== optionValue);
+      const selectedOptions = this.options.filter((o) =>
+        this.value.includes(o.value)
+      );
+      this.dispatchEvent(
+        new CustomEvent('tag-remove', {
+          detail: { removedValue: optionValue },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          detail: { value: this.value, selectedOption: selectedOptions },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+  }
 
-  private handleFocus = () => {
-    this.focused = true;
-  };
+  handleFilterInput(e: InputEvent) {
+    e.stopPropagation();
+    const target = e.target as HTMLInputElement;
+    this.searchKeyword = target.value;
+    this.focusedOptionIndex = -1;
+    this.dispatchEvent(
+      new CustomEvent('search', {
+        detail: { keyword: this.searchKeyword },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
 
-  private handleBlur = () => {
-    this.focused = false;
-  };
-
-  render(): TemplateResult {
-    return DropdownTemplate({
-      value: this.value,
-      options: this.options,
-      mode: this.mode,
-      variant: this.variant,
-      size: this.size,
-      filterable: this.filterable,
-      placeholder: this.placeholder,
-      clearable: this.clearable,
-      maxTagCount: this.maxTagCount,
-      loading: this.loading,
-      required: this.required,
-      readonly: this.readonly,
-      disabled: this.disabled,
-      error: this.error,
-      fullWidth: this.fullWidth,
-      isOpen: this.isOpen,
-      filterKeyword: this.filterKeyword,
-      activeIndex: this.activeIndex,
-      focused: this.focused,
-      onTriggerClick: this.handleTriggerClick,
-      onTriggerKeyDown: this.handleTriggerKeyDown,
-      onFilterInput: this.handleFilterInput,
-      onFilterKeyDown: this.handleFilterKeyDown,
-      onOptionClick: this.handleOptionClick,
-      onClearClick: this.handleClearClick,
-      onTagRemove: this.handleTagRemove,
-      onFocus: this.handleFocus,
-      onBlur: this.handleBlur,
-    });
+  render() {
+    return DropdownTemplate(this);
   }
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { BizDropdown } from './Dropdown.wc.js';
+import { BizDropdown } from './Dropdown.wc.ts';
 
 export const Dropdown = createComponent({
   tagName: 'biz-dropdown',

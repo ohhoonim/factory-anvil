@@ -1,1 +1,1 @@
-export { BizDropdown } from './Dropdown.wc.js';
+export { BizDropdown } from './Dropdown.wc.ts';
