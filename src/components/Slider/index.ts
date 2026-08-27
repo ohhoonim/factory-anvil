@@ -1,1 +1,1 @@
-export { BizSlider } from './Slider.wc';
+export { BizSlider as BizSliderWc } from './Slider.wc';

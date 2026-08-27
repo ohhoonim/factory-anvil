@@ -45,6 +45,7 @@ const renderSearchInput = (args: SearchInputArgs): TemplateResult => html`
 const meta: Meta<SearchInputArgs> = {
   title: 'Components/Forms/SearchInput',
   component: 'biz-search-input',
+  tags: ["autodocs"],
   render: renderSearchInput,
   argTypes: {
     variant: {

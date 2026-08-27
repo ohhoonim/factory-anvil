@@ -1,42 +1,101 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
-import './Slider.wc';
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { fn } from 'storybook/test';
+import './Slider.wc.js';
+import type { SliderHost } from './Slider.js';
 
-interface SliderStoryArgs {
-  value: number | number[];
-  min: number;
-  max: number;
-  step: number;
-  mode: 'single' | 'range';
-  orientation: 'horizontal' | 'vertical';
-  showTicks: boolean;
-  showTooltip: 'always' | 'hover' | 'drag' | 'never';
-  readonly: boolean;
-  disabled: boolean;
-  error: boolean;
-  variant: 'standard' | 'outlined' | 'filled';
-  size: 'small' | 'medium' | 'large';
-  name: string;
-}
+type SliderArgs = Required<SliderHost> & {
+  labelSlot?: string;
+  prefixIconSlot?: string;
+  suffixIconSlot?: string;
+  tooltipSlot?: string;
+  tickLabelSlot?: string;
+  helperTextSlot?: string;
+  onInput?: (e: CustomEvent) => void;
+  onChange?: (e: CustomEvent) => void;
+  onClear?: (e: CustomEvent) => void;
+  onFocus?: (e: FocusEvent) => void;
+  onBlur?: (e: FocusEvent) => void;
+};
 
-const meta: Meta<SliderStoryArgs> = {
+const meta: Meta<SliderArgs> = {
   title: 'Components/Forms/Slider',
   component: 'biz-slider',
   tags: ['autodocs'],
   argTypes: {
-    value: { control: 'object' },
-    min: { control: 'number' },
-    max: { control: 'number' },
-    step: { control: 'number' },
-    mode: { control: { type: 'select' }, options: ['single', 'range'] },
-    orientation: { control: { type: 'select' }, options: ['horizontal', 'vertical'] },
-    showTicks: { control: 'boolean' },
-    showTooltip: { control: { type: 'select' }, options: ['always', 'hover', 'drag', 'never'] },
-    readonly: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-    error: { control: 'boolean' },
-    variant: { control: { type: 'select' }, options: ['standard', 'outlined', 'filled'] },
-    size: { control: { type: 'select' }, options: ['small', 'medium', 'large'] },
+    value: {
+      control: 'object',
+      description: '선택된 수치 값 (Single: 단일 숫자, Range: [start, end])',
+    },
+    min: {
+      control: 'number',
+      description: '최소 수치',
+    },
+    max: {
+      control: 'number',
+      description: '최대 수치',
+    },
+    step: {
+      control: 'number',
+      description: '이동 수치 간격',
+    },
+    mode: {
+      control: 'radio',
+      options: ['single', 'range'],
+      description: '동작 모드',
+    },
+    orientation: {
+      control: 'radio',
+      options: ['horizontal', 'vertical'],
+      description: '배치 방향',
+    },
+    showTicks: {
+      control: 'boolean',
+      description: '눈금 표시 여부',
+    },
+    showTooltip: {
+      control: 'select',
+      options: ['always', 'hover', 'drag', 'never'],
+      description: '툴팁 노출 조건',
+    },
+    size: {
+      control: 'radio',
+      options: ['small', 'medium', 'large'],
+      description: '컴포넌트 크기',
+    },
+    variant: {
+      control: 'radio',
+      options: ['standard', 'outlined', 'filled'],
+      description: '컴포넌트 형태',
+    },
+    disabled: {
+      control: 'boolean',
+      description: '비활성화 여부',
+    },
+    readonly: {
+      control: 'boolean',
+      description: '읽기 전용 여부',
+    },
+    error: {
+      control: 'boolean',
+      description: '에러 상태 여부',
+    },
+    labelSlot: {
+      control: 'text',
+      description: '상단 타이틀 레이블 슬롯',
+    },
+    prefixIconSlot: {
+      control: 'text',
+      description: '좌측/최소값 위치 아이콘 슬롯',
+    },
+    suffixIconSlot: {
+      control: 'text',
+      description: '우측/최대값 위치 아이콘 슬롯',
+    },
+    helperTextSlot: {
+      control: 'text',
+      description: '하단 안내 메시지 슬롯',
+    },
   },
   args: {
     value: 50,
@@ -47,18 +106,33 @@ const meta: Meta<SliderStoryArgs> = {
     orientation: 'horizontal',
     showTicks: false,
     showTooltip: 'hover',
+    formatTooltip: null,
     readonly: false,
     disabled: false,
     error: false,
-    variant: 'standard',
     size: 'medium',
+    variant: 'standard',
+    draggingIndex: null,
+    activeThumbIndex: null,
+    handleTrackClick: () => {},
+    handleThumbMouseDown: () => {},
+    handleThumbKeyDown: () => {},
+    handleThumbFocus: () => {},
+    handleThumbBlur: () => {},
+    handleThumbMouseEnter: () => {},
+    handleThumbMouseLeave: () => {},
+    labelSlot: '볼륨 조절',
+    prefixIconSlot: '🔈',
+    suffixIconSlot: '🔊',
+    tooltipSlot: '',
+    tickLabelSlot: '',
+    helperTextSlot: '적절한 음량을 선택하세요.',
+    onInput: fn(),
+    onChange: fn(),
+    onClear: fn(),
+    onFocus: fn(),
+    onBlur: fn(),
   },
-};
-
-export default meta;
-type Story = StoryObj<SliderStoryArgs>;
-
-export const Default: Story = {
   render: (args) => html`
     <biz-slider
       .value=${args.value}
@@ -68,36 +142,52 @@ export const Default: Story = {
       .mode=${args.mode}
       .orientation=${args.orientation}
       ?show-ticks=${args.showTicks}
-      show-tooltip=${args.showTooltip}
+      .show-tooltip=${args.showTooltip}
+      .formatTooltip=${args.formatTooltip}
       ?readonly=${args.readonly}
       ?disabled=${args.disabled}
       ?error=${args.error}
-      variant=${args.variant}
-      size=${args.size}
+      .size=${args.size}
+      .variant=${args.variant}
+      @input=${args.onInput}
+      @change=${args.onChange}
+      @clear=${args.onClear}
+      @focus=${args.onFocus}
+      @blur=${args.onBlur}
     >
-      <span slot="label-slot">Volume Control</span>
+      ${args.labelSlot ? html`<span slot="label-slot">${args.labelSlot}</span>` : ''}
+      ${args.prefixIconSlot ? html`<span slot="prefix-icon-slot">${args.prefixIconSlot}</span>` : ''}
+      ${args.suffixIconSlot ? html`<span slot="suffix-icon-slot">${args.suffixIconSlot}</span>` : ''}
+      ${args.tooltipSlot ? html`<span slot="tooltip-slot">${args.tooltipSlot}</span>` : ''}
+      ${args.tickLabelSlot ? html`<span slot="tick-label-slot">${args.tickLabelSlot}</span>` : ''}
+      ${args.helperTextSlot ? html`<span slot="helper-text-slot">${args.helperTextSlot}</span>` : ''}
     </biz-slider>
   `,
 };
 
+export default meta;
+type Story = StoryObj<SliderArgs>;
+
+export const Default: Story = {};
+
 export const Variants: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 24px; width: 400px;">
       <div>
-        <h4>Standard</h4>
-        <biz-slider variant="standard" .value=${30}>
+        <p style="margin-bottom: 8px; font-weight: bold;">Standard</p>
+        <biz-slider .value=${30} variant="standard">
           <span slot="label-slot">Standard Variant</span>
         </biz-slider>
       </div>
       <div>
-        <h4>Outlined</h4>
-        <biz-slider variant="outlined" .value=${50}>
+        <p style="margin-bottom: 8px; font-weight: bold;">Outlined</p>
+        <biz-slider .value=${50} variant="outlined">
           <span slot="label-slot">Outlined Variant</span>
         </biz-slider>
       </div>
       <div>
-        <h4>Filled</h4>
-        <biz-slider variant="filled" .value=${70}>
+        <p style="margin-bottom: 8px; font-weight: bold;">Filled</p>
+        <biz-slider .value=${70} variant="filled">
           <span slot="label-slot">Filled Variant</span>
         </biz-slider>
       </div>
@@ -106,15 +196,15 @@ export const Variants: Story = {
 };
 
 export const Sizes: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 24px; width: 400px;">
-      <biz-slider size="small" .value=${20}>
+      <biz-slider .value=${30} size="small">
         <span slot="label-slot">Small Size</span>
       </biz-slider>
-      <biz-slider size="medium" .value=${50}>
+      <biz-slider .value=${50} size="medium">
         <span slot="label-slot">Medium Size</span>
       </biz-slider>
-      <biz-slider size="large" .value=${80}>
+      <biz-slider .value=${70} size="large">
         <span slot="label-slot">Large Size</span>
       </biz-slider>
     </div>
@@ -122,28 +212,42 @@ export const Sizes: Story = {
 };
 
 export const RangeMode: Story = {
-  render: () => html`
-    <div style="width: 400px;">
-      <biz-slider mode="range" .value=${[20, 80]} .step=${5} show-ticks>
-        <span slot="label-slot">Price Range Select ($)</span>
-      </biz-slider>
-    </div>
-  `,
+  args: {
+    mode: 'range',
+    value: [20, 80],
+    labelSlot: '가격 범위 선택',
+    prefixIconSlot: '₩',
+    suffixIconSlot: '₩',
+    helperTextSlot: '최소 및 최대 가격 범위를 설정하세요.',
+  },
 };
 
 export const States: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 24px; width: 400px;">
-      <biz-slider disabled .value=${40}>
+      <biz-slider .value=${40} disabled>
         <span slot="label-slot">Disabled State</span>
+        <span slot="helper-text-slot">비활성화 상태입니다.</span>
       </biz-slider>
-      <biz-slider readonly .value=${60}>
+      <biz-slider .value=${60} readonly>
         <span slot="label-slot">Readonly State</span>
+        <span slot="helper-text-slot">읽기 전용 상태입니다.</span>
       </biz-slider>
-      <biz-slider error .value=${90}>
+      <biz-slider .value=${90} error>
         <span slot="label-slot">Error State</span>
-        <span slot="helper-text-slot" style="color: var(--biz-slider-error-color);">Value exceeds allowed range</span>
+        <span slot="helper-text-slot">허용 범위를 초과했습니다.</span>
       </biz-slider>
     </div>
   `,
+};
+
+export const EventHandlers: Story = {
+  args: {
+    labelSlot: '이벤트 핸들러 테스트',
+    onInput: fn(),
+    onChange: fn(),
+    onClear: fn(),
+    onFocus: fn(),
+    onBlur: fn(),
+  },
 };

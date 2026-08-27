@@ -1,38 +1,100 @@
-import { html } from 'lit';
+import { html } from "lit";
 
-export const SliderTemplate = (host: any) => {
-  const isRange = host.mode === 'range';
+export interface SliderHost {
+  value: number | number[];
+  min: number;
+  max: number;
+  step: number;
+  mode: 'single' | 'range';
+  orientation: 'horizontal' | 'vertical';
+  showTicks: boolean;
+  showTooltip: 'always' | 'hover' | 'drag' | 'never';
+  formatTooltip: ((value: number) => string) | null;
+  readonly: boolean;
+  disabled: boolean;
+  error: boolean;
+  size: 'small' | 'medium' | 'large';
+  variant: 'outlined' | 'filled' | 'standard';
+  draggingIndex: number | null;
+  activeThumbIndex: number | null;
+  handleTrackClick: (e: MouseEvent) => void;
+  handleThumbMouseDown: (index: number, e: MouseEvent) => void;
+  handleThumbKeyDown: (index: number, e: KeyboardEvent) => void;
+  handleThumbFocus: (index: number, e: FocusEvent) => void;
+  handleThumbBlur: (index: number, e: FocusEvent) => void;
+  handleThumbMouseEnter: (index: number) => void;
+  handleThumbMouseLeave: (index: number) => void;
+}
+
+export const SliderTemplate = (host: SliderHost) => {
+  const isRange = host.mode === 'range' && Array.isArray(host.value);
+  const values = isRange ? (host.value as number[]) : [typeof host.value === 'number' ? host.value : host.min];
+  const startVal = isRange ? Math.min(values[0], values[1]) : host.min;
+  const endVal = isRange ? Math.max(values[0], values[1]) : values[0];
+
+  const rangeSpan = Math.max(host.max - host.min, 1);
+  const fillStartPercent = Math.max(0, Math.min(100, ((startVal - host.min) / rangeSpan) * 100));
+  const fillEndPercent = Math.max(0, Math.min(100, ((endVal - host.min) / rangeSpan) * 100));
+
   const isVertical = host.orientation === 'vertical';
-  const min = host.min ?? 0;
-  const max = host.max ?? 100;
-  const step = host.step ?? 1;
+  const fillStyle = isVertical
+    ? `bottom: ${isRange ? fillStartPercent : 0}%; height: ${isRange ? fillEndPercent - fillStartPercent : fillEndPercent}%;`
+    : `left: ${isRange ? fillStartPercent : 0}%; width: ${isRange ? fillEndPercent - fillStartPercent : fillEndPercent}%;`;
 
-  let valStart = min;
-  let valEnd = max;
-
-  if (isRange) {
-    if (Array.isArray(host.value)) {
-      valStart = host.value[0] ?? min;
-      valEnd = host.value[1] ?? max;
+  const ticks = [];
+  if (host.showTicks && host.step > 0) {
+    const totalSteps = Math.floor(rangeSpan / host.step);
+    for (let i = 0; i <= totalSteps; i++) {
+      const tickVal = host.min + i * host.step;
+      if (tickVal <= host.max) {
+        const tickPercent = ((tickVal - host.min) / rangeSpan) * 100;
+        const tickStyle = isVertical ? `bottom: ${tickPercent}%;` : `left: ${tickPercent}%;`;
+        ticks.push({ value: tickVal, style: tickStyle });
+      }
     }
-  } else {
-    valEnd = typeof host.value === 'number' ? host.value : (Array.isArray(host.value) ? host.value[0] : min);
   }
 
-  const getPct = (v: number) => Math.max(0, Math.min(100, ((v - min) / (max - min || 1)) * 100));
-  const fillStart = isRange ? getPct(valStart) : 0;
-  const fillEnd = getPct(valEnd);
+  const renderThumb = (val: number, index: number) => {
+    const percent = Math.max(0, Math.min(100, ((val - host.min) / rangeSpan) * 100));
+    const thumbStyle = isVertical ? `bottom: ${percent}%;` : `left: ${percent}%;`;
+    const formattedValue = host.formatTooltip ? host.formatTooltip(val) : String(val);
+    const isDragging = host.draggingIndex === index;
+    const isFocused = host.activeThumbIndex === index;
 
-  const trackFillStyle = isVertical
-    ? `bottom: ${fillStart}%; height: ${fillEnd - fillStart}%;`
-    : `left: ${fillStart}%; width: ${fillEnd - fillStart}%;`;
-
-  const thumbStartStyle = isVertical ? `bottom: ${fillStart}%;` : `left: ${fillStart}%;`;
-  const thumbEndStyle = isVertical ? `bottom: ${fillEnd}%;` : `left: ${fillEnd}%;`;
+    return html`
+      <div
+        class="biz-slider__thumb ${isDragging ? 'biz-slider__thumb--dragging' : ''}"
+        style="${thumbStyle}"
+        role="slider"
+        tabindex="${host.disabled ? '-1' : '0'}"
+        aria-valuemin="${host.min}"
+        aria-valuemax="${host.max}"
+        aria-valuenow="${val}"
+        aria-valuetext="${formattedValue}"
+        aria-orientation="${host.orientation}"
+        aria-disabled="${host.disabled}"
+        aria-readonly="${host.readonly}"
+        @mousedown="${(e: MouseEvent) => host.handleThumbMouseDown(index, e)}"
+        @keydown="${(e: KeyboardEvent) => host.handleThumbKeyDown(index, e)}"
+        @focus="${(e: FocusEvent) => host.handleThumbFocus(index, e)}"
+        @blur="${(e: FocusEvent) => host.handleThumbBlur(index, e)}"
+        @mouseenter="${() => host.handleThumbMouseEnter(index)}"
+        @mouseleave="${() => host.handleThumbMouseLeave(index)}"
+      >
+        ${host.showTooltip !== 'never'
+          ? html`
+              <div class="biz-slider__tooltip ${isDragging || isFocused ? 'biz-slider__tooltip--visible' : ''}">
+                <slot name="tooltip-slot">${formattedValue}</slot>
+              </div>
+            `
+          : ''}
+      </div>
+    `;
+  };
 
   return html`
     <div
-      class="biz-slider ${host.variant ?? 'standard'} ${host.size ?? 'medium'} ${isVertical ? 'vertical' : 'horizontal'} ${host.disabled ? 'disabled' : ''} ${host.readonly ? 'readonly' : ''} ${host.error ? 'error' : ''} ${host.loading ? 'loading' : ''}"
+      class="biz-slider biz-slider--${host.orientation} biz-slider--${host.size} biz-slider--${host.variant} ${host.disabled ? 'biz-slider--disabled' : ''} ${host.readonly ? 'biz-slider--readonly' : ''} ${host.error ? 'biz-slider--error' : ''}"
     >
       <div class="biz-slider__label-container">
         <slot name="label-slot"></slot>
@@ -41,96 +103,39 @@ export const SliderTemplate = (host: any) => {
       <div class="biz-slider__body">
         <div class="biz-slider__prefix">
           <slot name="prefix-icon-slot"></slot>
+          <slot name="start-slot"></slot>
         </div>
 
-        <div
-          class="biz-slider__track-container"
-          @pointerdown=${host.handleTrackPointerDown}
-        >
+        <div class="biz-slider__track-container" @click="${host.handleTrackClick}">
           <div class="biz-slider__track"></div>
-          <div class="biz-slider__fill" style="${trackFillStyle}"></div>
+          <div class="biz-slider__range-fill" style="${fillStyle}"></div>
 
-          ${host.showTicks ? html`
-            <div class="biz-slider__ticks">
-              ${host.renderTicks ? host.renderTicks() : ''}
-            </div>
-          ` : ''}
-
-          ${isRange ? html`
-            <div
-              class="biz-slider__thumb biz-slider__thumb--start ${host.activeThumb === 'start' ? 'active' : ''}"
-              style="${thumbStartStyle}"
-              tabindex="${host.disabled ? -1 : 0}"
-              role="slider"
-              aria-valuemin="${min}"
-              aria-valuemax="${max}"
-              aria-valuenow="${valStart}"
-              aria-orientation="${host.orientation ?? 'horizontal'}"
-              aria-disabled="${host.disabled ? 'true' : 'false'}"
-              aria-readonly="${host.readonly ? 'true' : 'false'}"
-              @keydown=${(e: KeyboardEvent) => host.handleKeyDown(e, 'start')}
-              @focus=${(e: FocusEvent) => host.handleFocus(e, 'start')}
-              @blur=${(e: FocusEvent) => host.handleBlur(e, 'start')}
-              @pointerdown=${(e: PointerEvent) => host.handleThumbPointerDown(e, 'start')}
-            >
-              ${host.showTooltip !== 'never' ? html`
-                <div class="biz-slider__tooltip">
-                  <slot name="tooltip-slot">
-                    ${host.formatTooltip ? host.formatTooltip(valStart) : valStart}
-                  </slot>
+          ${host.showTicks
+            ? html`
+                <div class="biz-slider__ticks">
+                  ${ticks.map(
+                    (tick) => html`
+                      <div class="biz-slider__tick" style="${tick.style}">
+                        <slot name="tick-label-slot">${tick.value}</slot>
+                      </div>
+                    `
+                  )}
                 </div>
-              ` : ''}
-            </div>
-          ` : ''}
+              `
+            : ''}
 
-          <div
-            class="biz-slider__thumb biz-slider__thumb--end ${host.activeThumb === 'end' ? 'active' : ''}"
-            style="${thumbEndStyle}"
-            tabindex="${host.disabled ? -1 : 0}"
-            role="slider"
-            aria-valuemin="${min}"
-            aria-valuemax="${max}"
-            aria-valuenow="${valEnd}"
-            aria-orientation="${host.orientation ?? 'horizontal'}"
-            aria-disabled="${host.disabled ? 'true' : 'false'}"
-            aria-readonly="${host.readonly ? 'true' : 'false'}"
-            @keydown=${(e: KeyboardEvent) => host.handleKeyDown(e, 'end')}
-            @focus=${(e: FocusEvent) => host.handleFocus(e, 'end')}
-            @blur=${(e: FocusEvent) => host.handleBlur(e, 'end')}
-            @pointerdown=${(e: PointerEvent) => host.handleThumbPointerDown(e, 'end')}
-          >
-            ${host.showTooltip !== 'never' ? html`
-              <div class="biz-slider__tooltip">
-                <slot name="tooltip-slot">
-                  ${host.formatTooltip ? host.formatTooltip(valEnd) : valEnd}
-                </slot>
-              </div>
-            ` : ''}
-          </div>
-
-          <slot name="tick-label-slot"></slot>
+          ${values.map((v, i) => renderThumb(v, i))}
         </div>
 
         <div class="biz-slider__suffix">
           <slot name="suffix-icon-slot"></slot>
+          <slot name="end-slot"></slot>
         </div>
       </div>
 
       <div class="biz-slider__helper-container">
         <slot name="helper-text-slot"></slot>
       </div>
-
-      <input
-        type="range"
-        class="biz-slider__native-input"
-        .name=${host.name || ''}
-        .min=${String(min)}
-        .max=${String(max)}
-        .step=${String(step)}
-        .value=${String(isRange ? `${valStart},${valEnd}` : valEnd)}
-        ?disabled=${host.disabled}
-        hidden
-      />
     </div>
   `;
 };
