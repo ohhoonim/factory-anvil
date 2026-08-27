@@ -1,110 +1,105 @@
-import { html, nothing } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { html } from "lit";
+import { classMap } from "lit/directives/class-map.js";
 
-export interface CheckboxTemplateOptions {
+export interface CheckboxHost {
   checked: boolean;
-  indeterminate: boolean;
-  disabled: boolean;
-  readonly: boolean;
-  required: boolean;
-  error: boolean;
   value: string | number;
-  labelPosition: 'left' | 'right';
-  variant: 'standard' | 'outlined' | 'filled';
+  indeterminate: boolean;
+  labelPosition: 'right' | 'left';
+  required: boolean;
+  readonly: boolean;
+  disabled: boolean;
+  error: boolean;
   size: 'small' | 'medium' | 'large';
-  descriptionId?: string;
-  onInput: (event: Event) => void;
-  onChange: (event: Event) => void;
-  onFocus: (event: FocusEvent) => void;
-  onBlur: (event: FocusEvent) => void;
+  variant: 'standard' | 'button' | 'card';
+  descriptionId: string;
+  handleInputChange: (event: Event) => void;
+  handleFocus: (event: FocusEvent) => void;
+  handleBlur: (event: FocusEvent) => void;
 }
 
-export const CheckboxTemplate = (options: CheckboxTemplateOptions) => {
-  const {
-    checked,
-    indeterminate,
-    disabled,
-    readonly,
-    required,
-    error,
-    value,
-    labelPosition,
-    variant,
-    size,
-    descriptionId,
-    onInput,
-    onChange,
-    onFocus,
-    onBlur,
-  } = options;
+export const CheckboxTemplate = (host: CheckboxHost) => html`
+  <div
+    class=${classMap({
+      'biz-checkbox': true,
+      'biz-checkbox--checked': host.checked,
+      'biz-checkbox--indeterminate': host.indeterminate,
+      'biz-checkbox--disabled': host.disabled,
+      'biz-checkbox--readonly': host.readonly,
+      'biz-checkbox--error': host.error,
+      [`biz-checkbox--${host.size}`]: true,
+      [`biz-checkbox--${host.variant}`]: true,
+      [`biz-checkbox--label-${host.labelPosition}`]: true,
+    })}
+  >
+    <label class="biz-checkbox__wrapper">
+      ${host.labelPosition === 'left'
+        ? html`
+            <span class="biz-checkbox__label">
+              <slot></slot>
+            </span>
+          `
+        : ''}
 
-  const ariaCheckedValue = indeterminate ? 'mixed' : checked ? 'true' : 'false';
-
-  return html`
-    <div
-      class="biz-checkbox biz-checkbox--${size} biz-checkbox--${variant} biz-checkbox--label-${labelPosition}"
-      ?data-checked=${checked}
-      ?data-indeterminate=${indeterminate}
-      ?data-disabled=${disabled}
-      ?data-readonly=${readonly}
-      ?data-error=${error}
-    >
-      <label class="biz-checkbox__wrapper">
-        <slot name="start-slot"></slot>
-        <div class="biz-checkbox__control-container">
-          <input
-            type="checkbox"
-            class="biz-checkbox__native"
-            .checked=${checked}
-            .value=${String(value)}
-            ?disabled=${disabled}
-            ?readonly=${readonly}
-            ?required=${required}
-            aria-checked=${ariaCheckedValue}
-            aria-invalid=${error ? 'true' : 'false'}
-            aria-required=${required ? 'true' : 'false'}
-            aria-describedby=${ifDefined(descriptionId)}
-            @input=${onInput}
-            @change=${onChange}
-            @focus=${onFocus}
-            @blur=${onBlur}
-          />
-          <div class="biz-checkbox__control" aria-hidden="true">
-            <slot name="icon-slot">
-              ${indeterminate
-                ? html`
-                    <svg class="biz-checkbox__icon" viewBox="0 0 16 16" fill="none">
-                      <rect x="3" y="7" width="10" height="2" rx="1" fill="currentColor" />
-                    </svg>
-                  `
-                : checked
-                ? html`
-                    <svg class="biz-checkbox__icon" viewBox="0 0 16 16" fill="none">
-                      <path
-                        d="M13.5 4.5L6.5 11.5L3 8"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  `
-                : nothing}
-            </slot>
-          </div>
-        </div>
-        <span class="biz-checkbox__label">
-          <slot name="label-slot">
-            <slot></slot>
+      <span class="biz-checkbox__control">
+        <input
+          type="checkbox"
+          class="biz-checkbox__input"
+          .checked=${host.checked}
+          .value=${String(host.value)}
+          .disabled=${host.disabled}
+          .readOnly=${host.readonly}
+          .required=${host.required}
+          role="checkbox"
+          aria-checked=${host.indeterminate ? 'mixed' : host.checked ? 'true' : 'false'}
+          aria-invalid=${host.error ? 'true' : 'false'}
+          aria-required=${host.required ? 'true' : 'false'}
+          aria-describedby=${host.descriptionId}
+          @change=${host.handleInputChange}
+          @focus=${host.handleFocus}
+          @blur=${host.handleBlur}
+        />
+        <span class="biz-checkbox__box">
+          <slot name="icon-slot">
+            ${host.indeterminate
+              ? html`
+                  <svg class="biz-checkbox__icon" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M4 8H12"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                `
+              : host.checked
+              ? html`
+                  <svg class="biz-checkbox__icon" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M3.5 8L6.5 11L12.5 5"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                `
+              : ''}
           </slot>
         </span>
-        <slot name="end-slot"></slot>
-      </label>
-      <div id=${ifDefined(descriptionId)} class="biz-checkbox__description">
-        <slot name="description-slot">
-          <slot name="helper-text-slot"></slot>
-        </slot>
-      </div>
+      </span>
+
+      ${host.labelPosition === 'right'
+        ? html`
+            <span class="biz-checkbox__label">
+              <slot></slot>
+            </span>
+          `
+        : ''}
+    </label>
+
+    <div id=${host.descriptionId} class="biz-checkbox__description">
+      <slot name="description-slot"></slot>
     </div>
-  `;
-};
+  </div>
+`;

@@ -159,12 +159,12 @@ const promptTemplate = `# {ComponentName} Biz-UI 웹 컴포넌트 개발 프롬�
 
 [출력 형식]
 - 각 파일별 경로(\`src/components/{ComponentName}/{ComponentName}.react.ts\`, \`src/components/{ComponentName}/index.ts\`, \`src/react.ts\`)를 명시하고 해당 코드 블록만 출력하세요.
-- 코드를 작성한 후 5단계(Storybook 및 테스트 코드 생성) 진행 준비가 되었음을 알려주고 대기하세요.
+- 코드를 작성한 후 5단계(Storybook 생성 프롬프트) 진행 준비가 되었음을 알려주고 대기하세요.
 \`\`\`\`
 
 ---
 
-## [Prompt 5] 5단계: Storybook 코드 생성 프롬프트
+## [Prompt 5] 5단계: Storybook 생성 프롬프트
 
 \`\`\`\`text
 [요청 사항]
@@ -177,6 +177,7 @@ const promptTemplate = `# {ComponentName} Biz-UI 웹 컴포넌트 개발 프롬�
 4. 요구사항 정의서 1.2절의 Variants(\`Outlined\`, \`Filled\`, \`Standard\`) 및 1.3절의 Sizes(\`Small\`, \`Medium\`, \`Large\`)를 시연하는 Story를 작성하세요.
 5. 요구사항 정의서 3.2절의 주요 States(\`Disabled\`, \`Readonly\`, \`Error\`, \`Loading\` 등)를 시연하는 Story를 작성하세요.
 6. \`@storybook/addon-a11y\` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
+7. 3단계에서 작성한 {ComponentName}.ws.ts에서 dispatchEvent 를 분석하여 각 이벤트에 대한 story를 작성하세요.. action()말고 fn() 을 사용하세요.
 
 [출력 형식]
 - 파일 경로(\`src/components/{ComponentName}/{ComponentName}.stories.ts\`)를 명시하고 해당 코드 블록만 출력하세요.

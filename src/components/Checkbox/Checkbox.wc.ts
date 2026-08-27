@@ -1,74 +1,54 @@
-import { LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { CheckboxTemplate } from './Checkbox.ts';
-import { checkboxStyles } from './Checkbox.css.ts';
+import { CheckboxTemplate, type CheckboxHost } from './Checkbox.js';
+import { checkboxStyles } from './Checkbox.css.js';
 
-/**
- * @element biz-checkbox
- * @slot start-slot
- * @slot icon-slot
- * @slot label-slot
- * @slot end-slot
- * @slot description-slot
- * @slot helper-text-slot description-slot 내부
- * @slot (default) label-slot 내부 
- */
 @customElement('biz-checkbox')
-export class BizCheckbox extends LitElement {
-  static styles = checkboxStyles;
+export class BizCheckbox extends LitElement implements CheckboxHost {
+  static override styles = checkboxStyles;
 
   @property({ type: Boolean, reflect: true })
   checked = false;
-
-  @property({ type: Boolean, reflect: true })
-  indeterminate = false;
 
   @property({ type: String })
   value: string | number = '';
 
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  indeterminate = false;
 
-  @property({ type: Boolean, reflect: true })
-  readonly = false;
+  @property({ type: String, attribute: 'label-position' })
+  labelPosition: 'right' | 'left' = 'right';
 
   @property({ type: Boolean, reflect: true })
   required = false;
 
   @property({ type: Boolean, reflect: true })
+  readonly = false;
+
+  @property({ type: Boolean, reflect: true })
+  disabled = false;
+
+  @property({ type: Boolean, reflect: true })
   error = false;
 
-  @property({ type: String, attribute: 'label-position' })
-  labelPosition: 'left' | 'right' = 'right';
-
-  @property({ type: String })
-  variant: 'standard' | 'outlined' | 'filled' = 'standard';
-
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   size: 'small' | 'medium' | 'large' = 'medium';
 
+  @property({ type: String, reflect: true })
+  variant: 'standard' | 'button' | 'card' = 'standard';
+
   @state()
-  private isFocused = false;
+  descriptionId = `biz-checkbox-desc-${Math.random().toString(36).substring(2, 9)}`;
 
-  private uniqueDescriptionId = `biz-checkbox-desc-${Math.random().toString(36).substring(2, 9)}`;
-
-  private handleInput(event: Event): void {
+  handleInputChange(event: Event): void {
     if (this.disabled || this.readonly) {
       event.preventDefault();
       return;
     }
 
-    const target = event.target as HTMLInputElement;
-    this.checked = target.checked;
+    const input = event.target as HTMLInputElement;
+    this.checked = input.checked;
     this.indeterminate = false;
-  }
-
-  private handleChange(event: Event): void {
-    if (this.disabled || this.readonly) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
 
     this.dispatchEvent(
       new CustomEvent('change', {
@@ -82,80 +62,28 @@ export class BizCheckbox extends LitElement {
     );
   }
 
-  private handleFocus(event: FocusEvent): void {
-    if (this.disabled) return;
-    this.isFocused = true;
-
+  handleFocus(event: FocusEvent): void {
     this.dispatchEvent(
-      new CustomEvent('focus', {
+      new FocusEvent('focus', {
         bubbles: true,
         composed: true,
-        detail: event,
+        relatedTarget: event.relatedTarget,
       })
     );
   }
 
-  private handleBlur(event: FocusEvent): void {
-    if (this.disabled) return;
-    this.isFocused = false;
-
+  handleBlur(event: FocusEvent): void {
     this.dispatchEvent(
-      new CustomEvent('blur', {
+      new FocusEvent('blur', {
         bubbles: true,
         composed: true,
-        detail: event,
+        relatedTarget: event.relatedTarget,
       })
     );
   }
 
-  private handleKeyDown(event: KeyboardEvent): void {
-    if (this.disabled || this.readonly) return;
-
-    if (event.code === 'Space') {
-      event.preventDefault();
-      this.checked = !this.checked;
-      this.indeterminate = false;
-
-      this.dispatchEvent(
-        new CustomEvent('change', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            checked: this.checked,
-            value: this.value,
-          },
-        })
-      );
-    }
-  }
-
-  protected firstUpdated(): void {
-    this.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this.removeEventListener('keydown', this.handleKeyDown);
-  }
-
-  render() {
-    return CheckboxTemplate({
-      checked: this.checked,
-      indeterminate: this.indeterminate,
-      disabled: this.disabled,
-      readonly: this.readonly,
-      required: this.required,
-      error: this.error,
-      value: this.value,
-      labelPosition: this.labelPosition,
-      variant: this.variant,
-      size: this.size,
-      descriptionId: this.uniqueDescriptionId,
-      onInput: this.handleInput.bind(this),
-      onChange: this.handleChange.bind(this),
-      onFocus: this.handleFocus.bind(this),
-      onBlur: this.handleBlur.bind(this),
-    });
+  override render() {
+    return CheckboxTemplate(this);
   }
 }
 

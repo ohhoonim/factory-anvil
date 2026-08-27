@@ -1,6 +1,6 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { BizCheckbox } from './Checkbox.wc.ts';
+import { BizCheckbox } from './Checkbox.wc.js';
 
 export const Checkbox = createComponent({
   tagName: 'biz-checkbox',
