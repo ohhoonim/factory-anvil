@@ -1,8 +1,8 @@
-import { css } from 'lit';
+import { css } from "lit";
 
 export const ipAddressInputStyles = css`
   :host {
-    /* Layout & Sizing Tokens */
+    /* Layout & Sizing */
     --biz-ip-address-input-height-sm: 32px;
     --biz-ip-address-input-height-md: 40px;
     --biz-ip-address-input-height-lg: 48px;
@@ -29,7 +29,6 @@ export const ipAddressInputStyles = css`
     --biz-ip-address-input-disabled-text-color: #9ca3af;
 
     display: inline-block;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     box-sizing: border-box;
   }
 
@@ -43,22 +42,17 @@ export const ipAddressInputStyles = css`
     display: flex;
     flex-direction: column;
     gap: 4px;
-    width: fit-content;
+    font-family: sans-serif;
   }
 
-  .biz-ip-address-input--full-width {
-    width: 100%;
-  }
-
-  /* Field Container */
   .biz-ip-address-input__field {
     display: inline-flex;
     align-items: center;
-    background-color: var(--biz-ip-address-input-bg-color);
-    border-radius: var(--biz-ip-address-input-border-radius);
-    padding: var(--biz-ip-address-input-padding-y) var(--biz-ip-address-input-padding-x);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     box-sizing: border-box;
+    padding: var(--biz-ip-address-input-padding-y) var(--biz-ip-address-input-padding-x);
+    border-radius: var(--biz-ip-address-input-border-radius);
+    background-color: var(--biz-ip-address-input-bg-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   }
 
   /* Variants */
@@ -67,9 +61,9 @@ export const ipAddressInputStyles = css`
   }
 
   .biz-ip-address-input--filled .biz-ip-address-input__field {
-    background-color: var(--biz-ip-address-input-disabled-bg-color);
     border: 1px solid transparent;
     border-bottom: 1px solid var(--biz-ip-address-input-border-color);
+    background-color: var(--biz-ip-address-input-disabled-bg-color);
   }
 
   .biz-ip-address-input--standard .biz-ip-address-input__field {
@@ -83,88 +77,69 @@ export const ipAddressInputStyles = css`
 
   /* Sizes */
   .biz-ip-address-input--small .biz-ip-address-input__field {
-    height: var(--biz-ip-address-input-height-sm);
+    min-height: var(--biz-ip-address-input-height-sm);
     font-size: 12px;
   }
 
   .biz-ip-address-input--medium .biz-ip-address-input__field {
-    height: var(--biz-ip-address-input-height-md);
+    min-height: var(--biz-ip-address-input-height-md);
     font-size: 14px;
   }
 
   .biz-ip-address-input--large .biz-ip-address-input__field {
-    height: var(--biz-ip-address-input-height-lg);
+    min-height: var(--biz-ip-address-input-height-lg);
     font-size: 16px;
   }
 
-  /* Segments Layout */
+  /* Segments Container & Elements */
   .biz-ip-address-input__segments {
     display: flex;
     align-items: center;
   }
 
-  /* Inputs & Separator */
   .biz-ip-address-input__segment {
     border: none;
     outline: none;
     background: transparent;
     text-align: center;
     color: var(--biz-ip-address-input-text-color);
-    font-family: inherit;
     font-size: inherit;
+    font-family: inherit;
     padding: 0;
-    margin: 0;
-  }
-
-  .biz-ip-address-input--ipv4 .biz-ip-address-input__segment {
     width: var(--biz-ip-address-input-segment-width-ipv4);
-  }
-
-  .biz-ip-address-input--ipv6 .biz-ip-address-input__segment {
-    width: var(--biz-ip-address-input-segment-width-ipv6);
   }
 
   .biz-ip-address-input__separator {
     color: var(--biz-ip-address-input-separator-color);
     user-select: none;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
+    padding: 0 2px;
   }
 
-  /* Hover State */
-  .biz-ip-address-input:hover:not(.biz-ip-address-input--disabled):not(.biz-ip-address-input--error) .biz-ip-address-input__field {
+  /* Interactive States */
+  .biz-ip-address-input__field:hover {
     border-color: var(--biz-ip-address-input-hover-border-color);
   }
 
-  /* Focus States */
   .biz-ip-address-input__field:focus-within {
     border-color: var(--biz-ip-address-input-focus-border-color);
     box-shadow: 0 0 0 3px var(--biz-ip-address-input-focus-ring-color);
   }
 
-  /* Error State */
+  /* States: Error */
   .biz-ip-address-input--error .biz-ip-address-input__field {
-    border-color: var(--biz-ip-address-input-error-color);
+    border-color: var(--biz-ip-address-input-error-color) !important;
   }
 
   .biz-ip-address-input--error .biz-ip-address-input__field:focus-within {
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
   }
 
-  .biz-ip-address-input--error .biz-ip-address-input__helper-text {
-    color: var(--biz-ip-address-input-error-color);
-  }
-
-  /* Disabled State */
-  .biz-ip-address-input--disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-
+  /* States: Disabled */
   .biz-ip-address-input--disabled .biz-ip-address-input__field {
     background-color: var(--biz-ip-address-input-disabled-bg-color);
     border-color: var(--biz-ip-address-input-border-color);
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   .biz-ip-address-input--disabled .biz-ip-address-input__segment {
@@ -172,20 +147,12 @@ export const ipAddressInputStyles = css`
     cursor: not-allowed;
   }
 
-  /* Readonly State */
+  /* States: Readonly */
   .biz-ip-address-input--readonly .biz-ip-address-input__field {
     background-color: var(--biz-ip-address-input-disabled-bg-color);
   }
 
-  /* Labels & Helper Text */
-  .biz-ip-address-input__label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--biz-ip-address-input-text-color);
-  }
-
-  .biz-ip-address-input__helper-text {
-    font-size: 12px;
-    color: var(--biz-ip-address-input-separator-color);
+  .biz-ip-address-input--readonly .biz-ip-address-input__segment {
+    cursor: default;
   }
 `;

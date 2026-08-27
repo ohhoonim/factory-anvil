@@ -1,10 +1,10 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { BizIpAddressInput as IpAddressInputWc } from './IpAddressInput.wc';
+import { BizIpAddressInput } from './IpAddressInput.wc.js';
 
 export const IpAddressInput = createComponent({
   tagName: 'biz-ip-address-input',
-  elementClass: IpAddressInputWc,
+  elementClass: BizIpAddressInput,
   react: React,
   events: {
     onInput: 'input',
