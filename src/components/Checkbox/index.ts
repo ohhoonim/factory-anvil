@@ -1,1 +1,1 @@
-export { BizCheckbox } from './Checkbox.wc.ts';
+export { BizCheckbox } from './Checkbox.wc.js';
