@@ -1,1 +1,1 @@
-export * from './MultilineTextInput.wc';
+export { BizMultilineTextInput } from './MultilineTextInput.wc.js';
