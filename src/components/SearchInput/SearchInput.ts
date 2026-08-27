@@ -1,8 +1,6 @@
-import { html } from 'lit';
-import { classMap } from "lit/directives/class-map.js";
-import { live } from "lit/directives/live.js";
+import { html, type TemplateResult } from 'lit';
 
-export interface SearchInputContext {
+export interface SearchInputHost {
   value: string;
   placeholder: string;
   clearable: boolean;
@@ -15,120 +13,123 @@ export interface SearchInputContext {
   variant: 'outlined' | 'filled' | 'standard';
   size: 'small' | 'medium' | 'large';
   fullWidth: boolean;
-  label?: string;
-  helperText?: string;
-  srAnnounceText: string;
+  helperText: string;
   handleInput: (e: InputEvent) => void;
   handleChange: (e: Event) => void;
   handleKeyDown: (e: KeyboardEvent) => void;
-  handleClear: (e: MouseEvent) => void;
-  handleSearchAction: (e: MouseEvent) => void;
+  handleClear: () => void;
+  handleSearch: () => void;
   handleFocus: (e: FocusEvent) => void;
   handleBlur: (e: FocusEvent) => void;
 }
 
-export const SearchInputTemplate = (context: SearchInputContext) => {
-  const isClearVisible = context.clearable && !context.disabled && !context.readonly && Boolean(context.value);
-  const isSearchBtnVisible = context.showSearchButton;
+export const SearchInputTemplate = (host: SearchInputHost): TemplateResult => {
+  const isClearVisible = host.clearable && !host.disabled && !host.readonly && host.value.length > 0;
+  const isSearchBtnVisible = host.showSearchButton && !host.disabled;
 
   return html`
     <div
-      class=${classMap({
-        'biz-search-input': true,
-        [`biz-search-input--${context.variant}`]: true,
-        [`biz-search-input--${context.size}`]: true,
-        'biz-search-input--disabled': context.disabled,
-        'biz-search-input--readonly': context.readonly,
-        'biz-search-input--error': context.error,
-        'biz-search-input--loading': context.loading,
-        'biz-search-input--full-width': context.fullWidth,
-      })}
+      class="biz-search-input"
+      ?data-disabled="${host.disabled}"
+      ?data-readonly="${host.readonly}"
+      ?data-error="${host.error}"
+      ?data-loading="${host.loading}"
+      ?data-full-width="${host.fullWidth}"
+      data-variant="${host.variant || 'outlined'}"
+      data-size="${host.size || 'medium'}"
     >
       <div class="biz-search-input__label-container">
-        <slot name="label-slot">
-          ${context.label ? html`<label for="search-control" class="biz-search-input__label">${context.label}</label>` : ''}
-        </slot>
+        <slot name="label-slot"></slot>
       </div>
 
-      <div class="biz-search-input__control-wrapper">
-        <span class="biz-search-input__start-slot">
+      <div class="biz-search-input__field-container">
+        <div class="biz-search-input__start-slot">
           <slot name="start-slot">
-            ${context.loading
-              ? html`<span class="biz-search-input__spinner" aria-hidden="true"></span>`
+            ${host.loading
+              ? html`
+                  <span class="biz-search-input__spinner" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10" stroke-opacity="0.25" />
+                      <path d="M12 2 a10 10 0 0 1 10 10" />
+                    </svg>
+                  </span>
+                `
               : html`
-                  <svg class="biz-search-input__search-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                    <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                  </svg>
+                  <span class="biz-search-input__default-search-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </span>
                 `}
           </slot>
-        </span>
+        </div>
 
         <input
-          id="search-control"
-          type="text"
-          role="searchbox"
+          id="search-input-control"
           class="biz-search-input__control"
-          .value=${live(context.value)}
-          placeholder=${context.placeholder}
-          ?disabled=${context.disabled}
-          ?readonly=${context.readonly}
-          ?required=${context.required}
-          aria-invalid=${context.error ? 'true' : 'false'}
-          aria-required=${context.required ? 'true' : 'false'}
-          aria-busy=${context.loading ? 'true' : 'false'}
-          aria-describedby="helper-text"
-          @input=${context.handleInput}
-          @change=${context.handleChange}
-          @keydown=${context.handleKeyDown}
-          @focus=${context.handleFocus}
-          @blur=${context.handleBlur}
+          type="search"
+          role="searchbox"
+          .value="${host.value}"
+          placeholder="${host.placeholder}"
+          ?disabled="${host.disabled}"
+          ?readonly="${host.readonly}"
+          ?required="${host.required}"
+          aria-invalid="${host.error ? 'true' : 'false'}"
+          aria-required="${host.required ? 'true' : 'false'}"
+          aria-busy="${host.loading ? 'true' : 'false'}"
+          aria-describedby="helper-text-area"
+          @input="${host.handleInput}"
+          @change="${host.handleChange}"
+          @keydown="${host.handleKeyDown}"
+          @focus="${host.handleFocus}"
+          @blur="${host.handleBlur}"
         />
 
-        <span class="biz-search-input__end-slot">
-          <slot name="end-slot">
-            ${isClearVisible
-              ? html`
+        <div class="biz-search-input__end-slot">
+          ${isClearVisible
+            ? html`
+                <button
+                  type="button"
+                  class="biz-search-input__clear-btn"
+                  aria-label="검색어 삭제"
+                  @click="${host.handleClear}"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              `
+            : ''}
+          <slot name="end-slot"></slot>
+          ${isSearchBtnVisible
+            ? html`
+                <slot name="search-button-slot">
                   <button
                     type="button"
-                    class="biz-search-input__clear-btn"
-                    aria-label="검색어 삭제"
-                    @click=${context.handleClear}
+                    class="biz-search-input__search-action-btn"
+                    aria-label="검색 실행"
+                    ?disabled="${host.disabled || host.readonly}"
+                    @click="${host.handleSearch}"
                   >
-                    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                      <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
                   </button>
-                `
-              : ''}
-            ${isSearchBtnVisible
-              ? html`
-                  <slot name="search-button-slot">
-                    <button
-                      type="button"
-                      class="biz-search-input__action-btn"
-                      aria-label="검색 실행"
-                      ?disabled=${context.disabled || context.readonly}
-                      @click=${context.handleSearchAction}
-                    >
-                      검색
-                    </button>
-                  </slot>
-                `
-              : ''}
-          </slot>
-        </span>
+                </slot>
+              `
+            : ''}
+        </div>
       </div>
 
-      <div id="helper-text" class="biz-search-input__helper-container">
+      <div id="helper-text-area" class="biz-search-input__helper-area">
         <slot name="helper-text-slot">
-          ${context.helperText
-            ? html`<span class="biz-search-input__helper-text">${context.helperText}</span>`
+          ${host.helperText
+            ? html`<span class="biz-search-input__helper-text">${host.helperText}</span>`
             : ''}
         </slot>
-      </div>
-
-      <div class="biz-search-input__sr-only" aria-live="polite">
-        ${context.srAnnounceText}
       </div>
     </div>
   `;

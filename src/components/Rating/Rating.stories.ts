@@ -14,6 +14,7 @@ type RatingStoryArgs = Required<RatingHost> & {
 const meta: Meta<RatingStoryArgs> = {
   title: 'Components/Forms/Rating',
   component: 'biz-rating',
+  tags: ["autodocs"],
   argTypes: {
     value: {
       control: { type: 'number', min: 0, max: 10, step: 0.1 },

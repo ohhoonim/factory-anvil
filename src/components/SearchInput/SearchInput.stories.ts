@@ -1,27 +1,73 @@
-import { html } from 'lit';
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import "./SearchInput.wc";
+import { html, type TemplateResult } from 'lit';
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { fn } from 'storybook/test';
+import { type SearchInputHost } from './SearchInput';
+import './SearchInput.wc.js';
 
-const meta: Meta = {
+type SearchInputArgs = Required<SearchInputHost> & {
+  labelSlot?: string;
+  startSlot?: string;
+  endSlot?: string;
+  searchButtonSlot?: string;
+  helperTextSlot?: string;
+};
+
+const renderSearchInput = (args: SearchInputArgs): TemplateResult => html`
+  <biz-search-input
+    .value="${args.value}"
+    .placeholder="${args.placeholder}"
+    ?clearable="${args.clearable}"
+    ?show-search-button="${args.showSearchButton}"
+    ?loading="${args.loading}"
+    ?required="${args.required}"
+    ?readonly="${args.readonly}"
+    ?disabled="${args.disabled}"
+    ?error="${args.error}"
+    .variant="${args.variant}"
+    .size="${args.size}"
+    ?full-width="${args.fullWidth}"
+    .helperText="${args.helperText}"
+    @input="${args.handleInput}"
+    @change="${args.handleChange}"
+    @search="${args.handleSearch}"
+    @clear="${args.handleClear}"
+    @focus="${args.handleFocus}"
+    @blur="${args.handleBlur}"
+  >
+    ${args.labelSlot ? html`<label slot="label-slot" for="search-input-control">${args.labelSlot}</label>` : ''}
+    ${args.startSlot ? html`<span slot="start-slot">${args.startSlot}</span>` : ''}
+    ${args.endSlot ? html`<span slot="end-slot">${args.endSlot}</span>` : ''}
+    ${args.searchButtonSlot ? html`<button slot="search-button-slot">${args.searchButtonSlot}</button>` : ''}
+    ${args.helperTextSlot ? html`<span slot="helper-text-slot">${args.helperTextSlot}</span>` : ''}
+  </biz-search-input>
+`;
+
+const meta: Meta<SearchInputArgs> = {
   title: 'Components/Forms/SearchInput',
   component: 'biz-search-input',
-  tags: ['autodocs'],
+  render: renderSearchInput,
   argTypes: {
     variant: {
       control: { type: 'select' },
       options: ['outlined', 'filled', 'standard'],
+      description: '검색 필드 스타일 유형',
     },
     size: {
       control: { type: 'select' },
       options: ['small', 'medium', 'large'],
+      description: '검색 필드 크기',
     },
+    value: { control: 'text' },
+    placeholder: { control: 'text' },
     clearable: { control: 'boolean' },
     showSearchButton: { control: 'boolean' },
     loading: { control: 'boolean' },
-    disabled: { control: 'boolean' },
+    required: { control: 'boolean' },
     readonly: { control: 'boolean' },
+    disabled: { control: 'boolean' },
     error: { control: 'boolean' },
     fullWidth: { control: 'boolean' },
+    helperText: { control: 'text' },
   },
   args: {
     value: '',
@@ -29,65 +75,100 @@ const meta: Meta = {
     clearable: true,
     showSearchButton: false,
     loading: false,
-    disabled: false,
+    required: false,
     readonly: false,
+    disabled: false,
     error: false,
     variant: 'outlined',
     size: 'medium',
     fullWidth: false,
-    label: '검색',
-    helperText: '원하는 키워드를 입력 후 Enter를 누르세요.',
+    helperText: '',
+    handleInput: fn(),
+    handleChange: fn(),
+    handleKeyDown: fn(),
+    handleSearch: fn(),
+    handleClear: fn(),
+    handleFocus: fn(),
+    handleBlur: fn(),
   },
 };
 
 export default meta;
-type Story = StoryObj;
 
-export const Default: Story = {};
+type Story = StoryObj<SearchInputArgs>;
+
+export const Default: Story = {
+  args: {
+    labelSlot: '통합 검색',
+    helperText: '원하시는 검색어를 입력 후 엔터를 누르세요.',
+  },
+};
 
 export const Variants: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 16px; width: 320px;">
-      <biz-search-input variant="outlined" label="Outlined (기본)" value="Outlined 스타일"></biz-search-input>
-      <biz-search-input variant="filled" label="Filled" value="Filled 스타일"></biz-search-input>
-      <biz-search-input variant="standard" label="Standard" value="Standard 스타일"></biz-search-input>
+      <biz-search-input .variant="${'outlined'}" .value="${args.value}" placeholder="Outlined Variant"></biz-search-input>
+      <biz-search-input .variant="${'filled'}" .value="${args.value}" placeholder="Filled Variant"></biz-search-input>
+      <biz-search-input .variant="${'standard'}" .value="${args.value}" placeholder="Standard Variant"></biz-search-input>
     </div>
   `,
 };
 
 export const Sizes: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 16px; width: 320px;">
-      <biz-search-input size="small" label="Small" value="Small 크기"></biz-search-input>
-      <biz-search-input size="medium" label="Medium" value="Medium 크기"></biz-search-input>
-      <biz-search-input size="large" label="Large" value="Large 크기"></biz-search-input>
+      <biz-search-input .size="${'small'}" .value="${args.value}" placeholder="Small Size (32px)"></biz-search-input>
+      <biz-search-input .size="${'medium'}" .value="${args.value}" placeholder="Medium Size (40px)"></biz-search-input>
+      <biz-search-input .size="${'large'}" .value="${args.value}" placeholder="Large Size (48px)"></biz-search-input>
     </div>
   `,
 };
 
 export const States: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 16px; width: 320px;">
-      <biz-search-input label="Disabled" value="비활성화 상태" disabled></biz-search-input>
-      <biz-search-input label="Readonly" value="읽기 전용 상태" readonly></biz-search-input>
-      <biz-search-input label="Error" value="잘못된 입력값" error helper-text="유효하지 않은 검색어입니다."></biz-search-input>
-      <biz-search-input label="Loading" value="검색 중..." loading></biz-search-input>
+      <biz-search-input value="검색어 입력됨" ?clearable="${true}" placeholder="Active / Clearable State"></biz-search-input>
+      <biz-search-input ?loading="${true}" placeholder="Loading State"></biz-search-input>
+      <biz-search-input ?error="${true}" helper-text="올바른 검색어를 입력해주세요." placeholder="Error State"></biz-search-input>
+      <biz-search-input ?readonly="${true}" value="읽기 전용 값" placeholder="Readonly State"></biz-search-input>
+      <biz-search-input ?disabled="${true}" value="비활성화 값" placeholder="Disabled State"></biz-search-input>
     </div>
   `,
 };
 
-export const WithActionButton: Story = {
+export const WithSearchButton: Story = {
   args: {
     showSearchButton: true,
-    label: '버튼 포함 검색',
+    value: '스프링 프레임워크',
+    labelSlot: '기술 스택 검색',
   },
 };
 
-export const InteractiveA11y: Story = {
+export const AccessibilityValidation: Story = {
   args: {
-    label: '접근성 검증 검색 필드',
-    helperText: 'Tab 및 Enter/Escape 키보드 네비게이션을 테스트해보세요.',
-    clearable: true,
+    required: true,
+    error: true,
+    labelSlot: '필수 검색 항목 (a11y 검증)',
+    helperText: '스크린 리더에서 aria-describedby 및 aria-invalid를 식별합니다.',
+  },
+  parameters: {
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: true }],
+      },
+    },
+  },
+};
+
+export const EventTesting: Story = {
+  args: {
+    value: '이벤트 테스트 중',
     showSearchButton: true,
+    handleInput: fn(),
+    handleChange: fn(),
+    handleSearch: fn(),
+    handleClear: fn(),
+    handleFocus: fn(),
+    handleBlur: fn(),
   },
 };
