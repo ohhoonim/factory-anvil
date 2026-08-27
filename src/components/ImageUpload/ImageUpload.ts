@@ -1,143 +1,213 @@
-import { html, type TemplateResult } from 'lit';
+import { html } from "lit";
 
-export interface ImageUploadTemplateProps {
-  rootClasses: string;
-  value: any;
-  accept: string;
-  maxSize: number | null;
-  aspectRatio: number | null;
-  shape: string;
-  enableCrop: boolean;
-  outputType: string;
-  outputQuality: number;
-  disabled: boolean;
-  readonly: boolean;
-  error: boolean;
-  isDragOver: boolean;
-  isCropping: boolean;
-  isProcessing: boolean;
-  previewUrl: string | null;
-  liveMessage: string;
-  onTriggerFileInput: () => void;
-  onFileChange: (e: Event) => void;
-  onDragOver: (e: DragEvent) => void;
-  onDragLeave: (e: DragEvent) => void;
-  onDrop: (e: DragEvent) => void;
-  onRemove: (e: Event) => void;
-  onCropConfirm: () => void;
-  onCropCancel: () => void;
-  onKeyDown: (e: KeyboardEvent) => void;
+export interface ImageUploadHost {
+value: string | File | Blob | null;
+accept: string;
+maxSize: number | null;
+aspectRatio: number | null;
+shape: 'square' | 'circle';
+enableCrop: boolean;
+outputType: 'blob' | 'file' | 'base64';
+outputQuality: number;
+disabled: boolean;
+readonly: boolean;
+error: boolean;
+isDragOver: boolean;
+isCropping: boolean;
+isProcessing: boolean;
+previewUrl: string | null;
+statusMessage: string;
+
+cropScale: number;
+cropOffsetX: number;
+cropOffsetY: number;
+
+handleFileSelect: (e: Event) => void;
+handleDragOver: (e: DragEvent) => void;
+handleDragLeave: (e: DragEvent) => void;
+handleDrop: (e: DragEvent) => void;
+handleTriggerFileSelect: () => void;
+handleOpenCrop: () => void;
+handleConfirmCrop: () => void;
+handleCancelCrop: () => void;
+handleRemove: () => void;
+handleKeydown: (e: KeyboardEvent) => void;
+handleCropMouseDown: (e: MouseEvent) => void;
+handleCropZoom: (e: InputEvent) => void;
+handleCropReset: () => void;
 }
 
-export const ImageUploadTemplate = (props: ImageUploadTemplateProps): TemplateResult => {
+export const ImageUploadTemplate = (host: ImageUploadHost) => {
   return html`
-    <div class="${props.rootClasses}">
-      <!-- Label Slot -->
-      <div class="biz-image-upload__label">
-        <slot name="label-slot"></slot>
-      </div>
+    <div
+    class="biz-image-upload__container ${host.isDragOver ? 'biz-image-upload__container--dragover' : ''}"
+  >
+    <input
+      type="file"
+      class="biz-image-upload__input"
+      accept="${host.accept}"
+      ?disabled="${host.disabled || host.readonly}"
+      @change="${host.handleFileSelect}"
+    />
 
-      <!-- Main Container (Drop Zone / Preview) -->
+    ${host.previewUrl
+      ? html`
+          <div class="biz-image-upload__preview-wrapper">
+            <img
+              src="${host.previewUrl}"
+              alt="업로드된 이미지 미리보기"
+              class="biz-image-upload__preview-img"
+            />
+            ${!host.readonly
+              ? html`
+                  <div class="biz-image-upload__overlay">
+                    <slot name="preview-mask-slot">
+                      ${host.enableCrop
+                        ? html`
+                            <button
+                              type="button"
+                              class="biz-image-upload__action-btn"
+                              role="button"
+                              aria-label="이미지 편집"
+                              ?disabled="${host.disabled}"
+                              @click="${host.handleOpenCrop}"
+                            >
+                              편집
+                            </button>
+                          `
+                        : ''}
+                      <button
+                        type="button"
+                        class="biz-image-upload__action-btn"
+                        role="button"
+                        aria-label="이미지 삭제"
+                        ?disabled="${host.disabled}"
+                        @click="${host.handleRemove}"
+                      >
+                        삭제
+                      </button>
+                    </slot>
+                  </div>
+                `
+              : ''}
+          </div>
+        `
+      : html`
+          <div
+            class="biz-image-upload__dropzone"
+            role="button"
+            tabindex="${host.disabled ? -1 : 0}"
+            aria-label="이미지 업로드 영역"
+            aria-describedby="biz-image-upload-helper"
+            @click="${host.handleTriggerFileSelect}"
+            @keydown="${host.handleKeydown}"
+            @dragover="${host.handleDragOver}"
+            @dragleave="${host.handleDragLeave}"
+            @drop="${host.handleDrop}"
+          >
+            <slot name="drop-zone-slot">
+              <div class="biz-image-upload__drop-content">
+                <span>이미지 업로드</span>
+              </div>
+            </slot>
+          </div>
+        `}
+
+    ${host.isProcessing
+      ? html`
+          <div class="biz-image-upload__spinner-overlay">
+            <div class="biz-image-upload__spinner"></div>
+          </div>
+        `
+      : ''}
+  </div>
+
+  <div class="biz-image-upload__helper-text" id="biz-image-upload-helper">
+    <slot name="helper-text-slot"></slot>
+  </div>
+
+  <dialog
+    class="biz-image-upload__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-label="이미지 크롭 및 편집"
+    ?open="${host.isCropping}"
+  >
+    <div class="biz-image-upload__crop-container">
       <div
-        class="biz-image-upload__container"
-        role="button"
-        tabindex="${props.disabled ? -1 : 0}"
-        aria-disabled="${props.disabled}"
-        aria-invalid="${props.error}"
-        @click=${props.onTriggerFileInput}
-        @dragover=${props.onDragOver}
-        @dragleave=${props.onDragLeave}
-        @drop=${props.onDrop}
-        @keydown=${props.onKeyDown}
+        class="biz-image-upload__crop-canvas"
+        @mousedown="${host.handleCropMouseDown}"
       >
-        <input
-          type="file"
-          class="biz-image-upload__input"
-          accept="${props.accept}"
-          ?disabled=${props.disabled || props.readonly}
-          @change=${props.onFileChange}
-        />
-
-        ${props.previewUrl
+        ${host.previewUrl
           ? html`
               <img
-                src="${props.previewUrl}"
-                alt="업로드된 이미지 미리보기"
-                class="biz-image-upload__preview-img"
+                src="${host.previewUrl}"
+                alt="크롭 대상 이미지"
+                class="biz-image-upload__crop-target"
+                style="transform: translate(${host.cropOffsetX}px, ${host.cropOffsetY}px) scale(${host.cropScale});"
               />
-              <div class="biz-image-upload__overlay">
-                <slot name="preview-mask-slot">
-                  ${!props.readonly
-                    ? html`
-                        <button
-                          type="button"
-                          class="biz-image-upload__overlay-btn"
-                          aria-label="이미지 삭제"
-                          @click=${props.onRemove}
-                        >
-                          삭제
-                        </button>
-                      `
-                    : ''}
-                </slot>
-              </div>
             `
-          : html`
-              <div class="biz-image-upload__drop-zone">
-                <slot name="drop-zone-slot">
-                  <span>이미지를 드래그하거나 클릭하여 업로드</span>
-                </slot>
-              </div>
-            `}
+          : ''}
+        <div
+          class="biz-image-upload__crop-mask ${host.shape === 'circle' ? 'biz-image-upload__crop-mask--circle' : ''}"
+          style="${host.aspectRatio ? `aspect-ratio: ${host.aspectRatio};` : ''}"
+        >
+          <div class="biz-image-upload__crop-grid"></div>
+        </div>
       </div>
 
-      <!-- Helper Text Slot -->
-      <div class="biz-image-upload__helper-text">
-        <slot name="helper-text-slot"></slot>
+      <div class="biz-image-upload__crop-toolbar">
+        <slot name="crop-toolbar-slot">
+          <div class="biz-image-upload__crop-controls">
+            <label for="biz-crop-zoom" class="biz-image-upload__crop-label">확대/축소</label>
+            <input
+              id="biz-crop-zoom"
+              type="range"
+              min="1"
+              max="3"
+              step="0.05"
+              .value="${String(host.cropScale)}"
+              @input="${host.handleCropZoom}"
+            />
+            <button
+              type="button"
+              class="biz-image-upload__action-btn"
+              @click="${host.handleCropReset}"
+            >
+              초기화
+            </button>
+          </div>
+        </slot>
       </div>
 
-      <!-- Screen Reader Live Region -->
-      <div class="sr-only" aria-live="polite">${props.liveMessage}</div>
-
-      <!-- Crop Modal -->
-      ${props.isCropping
-        ? html`
-            <div class="biz-image-upload__modal-backdrop">
-              <div
-                class="biz-image-upload__modal"
-                role="dialog"
-                aria-modal="true"
-                aria-label="이미지 자르기 편집"
-              >
-                <div class="biz-image-upload__crop-canvas">
-                  <span>Crop Area</span>
-                </div>
-                <div class="biz-image-upload__crop-toolbar">
-                  <slot name="crop-toolbar-slot"></slot>
-                </div>
-                <div class="biz-image-upload__crop-footer">
-                  <slot name="crop-footer-slot">
-                    <button
-                      type="button"
-                      class="biz-image-upload__btn"
-                      @click=${props.onCropCancel}
-                    >
-                      취소
-                    </button>
-                    <button
-                      type="button"
-                      class="biz-image-upload__btn biz-image-upload__btn--primary"
-                      ?disabled=${props.isProcessing}
-                      @click=${props.onCropConfirm}
-                    >
-                      확인
-                    </button>
-                  </slot>
-                </div>
-              </div>
-            </div>
-          `
-        : ''}
+      <div class="biz-image-upload__crop-footer">
+        <slot name="crop-footer-slot">
+          <button
+            type="button"
+            class="biz-image-upload__action-btn"
+            @click="${host.handleCancelCrop}"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            class="biz-image-upload__action-btn biz-image-upload__action-btn--primary"
+            @click="${host.handleConfirmCrop}"
+          >
+            확인
+          </button>
+        </slot>
+      </div>
     </div>
+  </dialog>
+
+  <div
+    class="biz-image-upload__sr-only"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    ${host.statusMessage}
+  </div>
+</div>
   `;
 };

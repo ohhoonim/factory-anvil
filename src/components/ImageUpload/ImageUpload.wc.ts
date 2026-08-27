@@ -1,40 +1,26 @@
-import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
+import { LitElement, type PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import { imageUploadStyles } from './ImageUpload.css';
-import { ImageUploadTemplate } from './ImageUpload';
-
+import { imageUploadStyles } from './ImageUpload.css.js';
+import { ImageUploadTemplate, type ImageUploadHost } from './ImageUpload';
 
 export interface CropResult {
-  file?: File | Blob;
+  file: File | Blob | string;
   url: string;
-  cropData?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rotation: number;
+  cropData: {
+    scale: number;
+    offsetX: number;
+    offsetY: number;
+    aspectRatio: number | null;
+    quality: number;
   };
 }
 
-export type ImageUploadOutputType = 'blob' | 'file' | 'base64';
-export type ImageUploadShape = 'square' | 'circle';
-
-/**
- * @element biz-image-upload
- * 
- * @slot label-slot
- * @slot preview-mask-slot
- * @slot drop-zone-slot
- * @slot helper-text-slot
- * @slot crop-toolbar-slot
- * @slot crop-footer-slot
- */
 @customElement('biz-image-upload')
-export class ImageUpload extends LitElement {
-  static styles = [imageUploadStyles];
+export class BizImageUpload extends LitElement implements ImageUploadHost {
+  static styles = imageUploadStyles;
 
-  @property({ type: Object })
-  value: string | File | CropResult | null = null;
+  @property({ type: Object, attribute: false })
+  value: string | File | Blob | null = null;
 
   @property({ type: String })
   accept = 'image/jpeg,image/png,image/webp';
@@ -46,13 +32,13 @@ export class ImageUpload extends LitElement {
   aspectRatio: number | null = null;
 
   @property({ type: String })
-  shape: ImageUploadShape = 'square';
+  shape: 'square' | 'circle' = 'square';
 
   @property({ type: Boolean, attribute: 'enable-crop' })
   enableCrop = true;
 
   @property({ type: String, attribute: 'output-type' })
-  outputType: ImageUploadOutputType = 'blob';
+  outputType: 'blob' | 'file' | 'base64' = 'blob';
 
   @property({ type: Number, attribute: 'output-quality' })
   outputQuality = 0.92;
@@ -67,157 +53,397 @@ export class ImageUpload extends LitElement {
   error = false;
 
   @state()
-  private isDragOver = false;
+  isDragOver = false;
 
   @state()
-  private isCropping = false;
+  isCropping = false;
 
   @state()
-  private isProcessing = false;
+  isProcessing = false;
 
   @state()
-  private previewUrl: string | null = null;
+  previewUrl: string | null = null;
 
   @state()
-  private rawFile: File | null = null;
+  statusMessage = '';
 
   @state()
-  private liveMessage = '';
+  cropScale = 1;
 
-  @query('input[type="file"]')
+  @state()
+  cropOffsetX = 0;
+
+  @state()
+  cropOffsetY = 0;
+
+  @query('.biz-image-upload__input')
   private fileInput!: HTMLInputElement;
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    this.syncPreviewUrl();
-  }
+  @query('.biz-image-upload__dialog')
+  private cropDialog!: HTMLDialogElement;
 
-  willUpdate(changedProperties: PropertyValues<this>): void {
+  private rawFile: File | null = null;
+  private isDragging = false;
+  private startX = 0;
+  private startY = 0;
+
+  protected updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
+
     if (changedProperties.has('value')) {
-      this.syncPreviewUrl();
+      this.syncPreviewFromValue();
     }
   }
 
-  private syncPreviewUrl(): void {
+  private syncPreviewFromValue(): void {
     if (!this.value) {
       this.previewUrl = null;
       return;
     }
+
     if (typeof this.value === 'string') {
       this.previewUrl = this.value;
     } else if (this.value instanceof File || this.value instanceof Blob) {
-      this.previewUrl = URL.createObjectURL(this.value);
-    } else if (typeof this.value === 'object' && 'url' in this.value) {
-      this.previewUrl = this.value.url;
-    }
-  }
-
-  private triggerFileInput(): void {
-    if (this.disabled || this.readonly) return;
-    this.fileInput?.click();
-  }
-
-  private handleFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.processSelectedFile(input.files[0]);
-    }
-    input.value = '';
-  }
-
-  private processSelectedFile(file: File): void {
-    if (this.maxSize && file.size > this.maxSize) {
-      this.error = true;
-      this.liveMessage = '파일 용량이 초과되었습니다.';
-      this.dispatchEvent(
-        new CustomEvent('error', {
-          detail: { type: 'size', message: 'File size exceeds maximum allowed limit.' },
-          bubbles: true,
-          composed: true,
-        })
-      );
-      return;
-    }
-
-    const acceptedTypes = this.accept.split(',').map((type) => type.trim());
-    const isAccepted = acceptedTypes.some((type) => {
-      if (type.endsWith('/*')) {
-        return file.type.startsWith(type.replace('/*', ''));
+      if (this.previewUrl && this.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(this.previewUrl);
       }
-      return file.type === type;
-    });
+      this.previewUrl = URL.createObjectURL(this.value);
+    }
+  }
 
-    if (!isAccepted) {
+  private validateFile(file: File): boolean {
+    if (this.accept) {
+      const acceptedTypes = this.accept.split(',').map((t) => t.trim().toLowerCase());
+      const fileType = file.type.toLowerCase();
+      const fileExt = `.${file.name.split('.').pop()?.toLowerCase()}`;
+
+      const isValidType = acceptedTypes.some((type) => {
+        if (type.startsWith('.')) {
+          return fileExt === type;
+        }
+        if (type.endsWith('/*')) {
+          return fileType.startsWith(type.replace('/*', ''));
+        }
+        return fileType === type;
+      });
+
+      if (!isValidType) {
+        this.error = true;
+        this.statusMessage = '허용되지 않은 파일 형식입니다.';
+        this.dispatchEvent(
+          new CustomEvent('error', {
+            bubbles: true,
+            composed: true,
+            detail: { type: 'extension', message: this.statusMessage },
+          })
+        );
+        return false;
+      }
+    }
+
+    if (this.maxSize !== null && file.size > this.maxSize) {
       this.error = true;
-      this.liveMessage = '지원하지 않는 파일 형식입니다.';
+      this.statusMessage = '허용 용량을 초과한 파일입니다.';
       this.dispatchEvent(
         new CustomEvent('error', {
-          detail: { type: 'extension', message: 'File format is not supported.' },
           bubbles: true,
           composed: true,
+          detail: { type: 'size', message: this.statusMessage },
         })
       );
-      return;
+      return false;
     }
 
     this.error = false;
+    return true;
+  }
+
+  private processFile(file: File): void {
+    if (!this.validateFile(file)) return;
+
     this.rawFile = file;
+    if (this.previewUrl && this.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.previewUrl);
+    }
+    this.previewUrl = URL.createObjectURL(file);
 
     if (this.enableCrop) {
+      this.handleCropReset();
       this.isCropping = true;
-      this.liveMessage = '크롭 모달이 열렸습니다.';
+      this.statusMessage = '이미지 크롭 모달이 열렸습니다.';
       this.dispatchEvent(
         new CustomEvent('crop-start', {
-          detail: { rawFile: file },
           bubbles: true,
           composed: true,
+          detail: { rawFile: file },
         })
       );
+      if (this.cropDialog && !this.cropDialog.open) {
+        this.cropDialog.showModal();
+      }
     } else {
-      const url = URL.createObjectURL(file);
-      this.previewUrl = url;
       this.value = file;
-      this.liveMessage = '이미지가 성공적으로 첨부되었습니다.';
+      this.statusMessage = '이미지가 성공적으로 첨부되었습니다.';
       this.dispatchEvent(
         new CustomEvent('change', {
-          detail: { file, url, cropData: null },
           bubbles: true,
           composed: true,
+          detail: { file, url: this.previewUrl, cropData: {} },
         })
       );
     }
   }
 
-  private handleDragOver(event: DragEvent): void {
-    event.preventDefault();
+  handleTriggerFileSelect = (): void => {
+    if (this.disabled || this.readonly) return;
+    this.fileInput?.click();
+  };
+
+  handleFileSelect = (e: Event): void => {
+    const input = e.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.processFile(input.files[0]);
+    }
+  };
+
+  handleDragOver = (e: DragEvent): void => {
+    e.preventDefault();
+    e.stopPropagation();
     if (this.disabled || this.readonly) return;
     this.isDragOver = true;
-  }
+  };
 
-  private handleDragLeave(event: DragEvent): void {
-    event.preventDefault();
+  handleDragLeave = (e: DragEvent): void => {
+    e.preventDefault();
+    e.stopPropagation();
     this.isDragOver = false;
-  }
+  };
 
-  private handleDrop(event: DragEvent): void {
-    event.preventDefault();
+  handleDrop = (e: DragEvent): void => {
+    e.preventDefault();
+    e.stopPropagation();
     this.isDragOver = false;
     if (this.disabled || this.readonly) return;
 
-    if (event.dataTransfer?.files && event.dataTransfer.files[0]) {
-      this.processSelectedFile(event.dataTransfer.files[0]);
+    if (e.dataTransfer?.files && e.dataTransfer.files[0]) {
+      this.processFile(e.dataTransfer.files[0]);
     }
+  };
+
+  handleOpenCrop = (): void => {
+    if (this.disabled || this.readonly) return;
+    this.handleCropReset();
+    this.isCropping = true;
+    this.statusMessage = '이미지 크롭 모달이 열렸습니다.';
+    if (this.rawFile) {
+      this.dispatchEvent(
+        new CustomEvent('crop-start', {
+          bubbles: true,
+          composed: true,
+          detail: { rawFile: this.rawFile },
+        })
+      );
+    }
+    if (this.cropDialog && !this.cropDialog.open) {
+      this.cropDialog.showModal();
+    }
+  };
+
+  handleCropMouseDown = (e: MouseEvent): void => {
+    e.preventDefault();
+    this.isDragging = true;
+    this.startX = e.clientX - this.cropOffsetX;
+    this.startY = e.clientY - this.cropOffsetY;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!this.isDragging) return;
+      this.cropOffsetX = moveEvent.clientX - this.startX;
+      this.cropOffsetY = moveEvent.clientY - this.startY;
+    };
+
+    const handleMouseUp = () => {
+      this.isDragging = false;
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+
+  handleCropZoom = (e: InputEvent): void => {
+    const input = e.target as HTMLInputElement;
+    this.cropScale = parseFloat(input.value);
+  };
+
+  handleCropReset = (): void => {
+    this.cropScale = 1;
+    this.cropOffsetX = 0;
+    this.cropOffsetY = 0;
+  };
+
+  private async generateCroppedResult(): Promise<{ blob: Blob; url: string }> {
+    return new Promise((resolve, reject) => {
+      if (!this.previewUrl) {
+        reject(new Error('미리보기 이미지가 존재하지 않습니다.'));
+        return;
+      }
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          reject(new Error('Canvas 2D context 생성 실패'));
+          return;
+        }
+
+        const cropWidth = 300;
+        const cropHeight = this.aspectRatio ? cropWidth / this.aspectRatio : 300;
+
+        canvas.width = cropWidth;
+        canvas.height = cropHeight;
+
+        ctx.clearRect(0, 0, cropWidth, cropHeight);
+
+        const imgCenterX = cropWidth / 2 + this.cropOffsetX;
+        const imgCenterY = cropHeight / 2 + this.cropOffsetY;
+
+        const scaledWidth = img.width * (cropWidth / img.width) * this.cropScale;
+        const scaledHeight = img.height * (cropHeight / img.height) * this.cropScale;
+
+        ctx.save();
+        ctx.translate(imgCenterX, imgCenterY);
+        ctx.drawImage(
+          img,
+          -scaledWidth / 2,
+          -scaledHeight / 2,
+          scaledWidth,
+          scaledHeight
+        );
+        ctx.restore();
+
+        const mimeType = this.rawFile ? this.rawFile.type : 'image/png';
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              resolve({ blob, url });
+            } else {
+              reject(new Error('Canvas Blob 생성 실패'));
+            }
+          },
+          mimeType,
+          this.outputQuality
+        );
+      };
+      img.onerror = (err) => reject(err);
+      img.src = this.previewUrl;
+    });
   }
 
-  private handleRemove(event?: Event): void {
-    event?.stopPropagation();
+  handleConfirmCrop = async (): Promise<void> => {
+    this.isProcessing = true;
+    try {
+      const { blob, url } = await this.generateCroppedResult();
+
+      let finalResult: File | Blob | string = blob;
+      if (this.outputType === 'file' && this.rawFile) {
+        finalResult = new File([blob], this.rawFile.name, { type: blob.type });
+      } else if (this.outputType === 'base64') {
+        finalResult = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      const cropResult: CropResult = {
+        file: finalResult,
+        url,
+        cropData: {
+          scale: this.cropScale,
+          offsetX: this.cropOffsetX,
+          offsetY: this.cropOffsetY,
+          aspectRatio: this.aspectRatio,
+          quality: this.outputQuality,
+        },
+      };
+
+      if (this.previewUrl && this.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(this.previewUrl);
+      }
+
+      this.previewUrl = url;
+      this.value = finalResult;
+      this.isCropping = false;
+
+      if (this.cropDialog?.open) {
+        this.cropDialog.close();
+      }
+
+      this.statusMessage = '이미지 편집이 완료되었습니다.';
+
+      this.dispatchEvent(
+        new CustomEvent('crop-complete', {
+          bubbles: true,
+          composed: true,
+          detail: { croppedResult: cropResult },
+        })
+      );
+
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          bubbles: true,
+          composed: true,
+          detail: cropResult,
+        })
+      );
+    } catch (err) {
+      this.error = true;
+      this.statusMessage = '이미지 크롭 처리 중 오류가 발생했습니다.';
+      this.dispatchEvent(
+        new CustomEvent('error', {
+          bubbles: true,
+          composed: true,
+          detail: { type: 'crop', message: this.statusMessage, originalError: err },
+        })
+      );
+    } finally {
+      this.isProcessing = false;
+    }
+  };
+
+  handleCancelCrop = (): void => {
+    this.isCropping = false;
+    if (this.cropDialog?.open) {
+      this.cropDialog.close();
+    }
+    this.statusMessage = '크롭 작업이 취소되었습니다.';
+    this.dispatchEvent(
+      new CustomEvent('crop-cancel', {
+        bubbles: true,
+        composed: true,
+      })
+    );
+  };
+
+  handleRemove = (): void => {
     if (this.disabled || this.readonly) return;
+
+    if (this.previewUrl && this.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.previewUrl);
+    }
 
     this.value = null;
-    this.previewUrl = null;
     this.rawFile = null;
-    this.error = false;
-    this.liveMessage = '이미지가 삭제되었습니다.';
+    this.previewUrl = null;
+    if (this.fileInput) {
+      this.fileInput.value = '';
+    }
+    this.statusMessage = '이미지가 삭제되었습니다.';
 
     this.dispatchEvent(
       new CustomEvent('remove', {
@@ -225,118 +451,34 @@ export class ImageUpload extends LitElement {
         composed: true,
       })
     );
+
     this.dispatchEvent(
       new CustomEvent('clear', {
         bubbles: true,
         composed: true,
       })
     );
-  }
+  };
 
-  private handleCropConfirm(): void {
-    this.isProcessing = true;
-    const cropResult: CropResult = {
-      file: this.rawFile ?? undefined,
-      url: this.rawFile ? URL.createObjectURL(this.rawFile) : '',
-      cropData: { x: 0, y: 0, width: 100, height: 100, rotation: 0 },
-    };
+  handleKeydown = (e: KeyboardEvent): void => {
+    if (this.disabled || this.readonly) return;
 
-    this.isProcessing = false;
-    this.isCropping = false;
-    this.value = cropResult;
-    this.previewUrl = cropResult.url;
-    this.liveMessage = '이미지가 성공적으로 편집되어 저장되었습니다.';
-
-    this.dispatchEvent(
-      new CustomEvent('crop-complete', {
-        detail: { croppedResult: cropResult },
-        bubbles: true,
-        composed: true,
-      })
-    );
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { file: cropResult.file, url: cropResult.url, cropData: cropResult.cropData },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private handleCropCancel(): void {
-    this.isCropping = false;
-    this.liveMessage = '크롭 편집이 취소되었습니다.';
-    this.dispatchEvent(
-      new CustomEvent('crop-cancel', {
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private handleKeyDown(event: KeyboardEvent): void {
-    if (this.disabled) return;
-
-    if (this.isCropping) {
-      if (event.key === 'Escape') {
-        this.handleCropCancel();
-      }
-      return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.handleTriggerFileSelect();
+    } else if (e.key === 'Escape' && this.isCropping) {
+      e.preventDefault();
+      this.handleCancelCrop();
     }
+  };
 
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      if (!this.previewUrl) {
-        this.triggerFileInput();
-      }
-    }
-  }
-
-  render(): TemplateResult {
-    const rootClasses = [
-      'biz-image-upload',
-      this.shape === 'circle' ? 'biz-image-upload--circle' : '',
-      this.isDragOver ? 'biz-image-upload--dragover' : '',
-      this.disabled ? 'biz-image-upload--disabled' : '',
-      this.readonly ? 'biz-image-upload--readonly' : '',
-      this.error ? 'biz-image-upload--error' : '',
-    ]
-      .filter(Boolean)
-      .join(' ');
-
-    return ImageUploadTemplate({
-      rootClasses,
-      value: this.value,
-      accept: this.accept,
-      maxSize: this.maxSize,
-      aspectRatio: this.aspectRatio,
-      shape: this.shape,
-      enableCrop: this.enableCrop,
-      outputType: this.outputType,
-      outputQuality: this.outputQuality,
-      disabled: this.disabled,
-      readonly: this.readonly,
-      error: this.error,
-      isDragOver: this.isDragOver,
-      isCropping: this.isCropping,
-      isProcessing: this.isProcessing,
-      previewUrl: this.previewUrl,
-      liveMessage: this.liveMessage,
-      onTriggerFileInput: () => this.triggerFileInput(),
-      onFileChange: (e: Event) => this.handleFileChange(e),
-      onDragOver: (e: DragEvent) => this.handleDragOver(e),
-      onDragLeave: (e: DragEvent) => this.handleDragLeave(e),
-      onDrop: (e: DragEvent) => this.handleDrop(e),
-      onRemove: (e: Event) => this.handleRemove(e),
-      onCropConfirm: () => this.handleCropConfirm(),
-      onCropCancel: () => this.handleCropCancel(),
-      onKeyDown: (e: KeyboardEvent) => this.handleKeyDown(e),
-    });
+  render() {
+    return ImageUploadTemplate(this);
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'biz-image-upload': ImageUpload;
+    'biz-image-upload': BizImageUpload;
   }
 }

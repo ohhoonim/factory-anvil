@@ -2,6 +2,21 @@
   "version": 1.1,
   "tags": [
     {
+      "name": "shop-cart",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [{ "name": "items", "values": [{ "name": "CartItem[]" }] }],
+      "references": []
+    },
+    {
+      "name": "biz-breadcrumb",
+      "description": "\n\n\n---\n\n\n\n\n### **Slots:**\n - **(no)** - undefined",
+      "attributes": [
+        { "name": "items", "values": [{ "name": "BreadcrumbItem[]" }] },
+        { "name": "separator", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-application-shell",
       "description": "\n\n\n---\n\n\n",
       "attributes": [
@@ -16,15 +31,6 @@
         { "name": "sidebar-collapsed", "values": [] },
         { "name": "sticky-header", "values": [] },
         { "name": "fixed-sidebar", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-breadcrumb",
-      "description": "\n\n\n---\n\n\n\n\n### **Slots:**\n - **(no)** - undefined",
-      "attributes": [
-        { "name": "items", "values": [{ "name": "BreadcrumbItem[]" }] },
-        { "name": "separator", "values": [] }
       ],
       "references": []
     },
@@ -132,64 +138,6 @@
       "references": []
     },
     {
-      "name": "biz-content-container",
-      "description": "\n\n\n---\n\n\n",
-      "attributes": [
-        {
-          "name": "variant",
-          "values": [
-            { "name": "standard" },
-            { "name": "fluid" },
-            { "name": "card" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" },
-            { "name": "full" }
-          ]
-        },
-        { "name": "centered", "values": [] },
-        { "name": "scrollable", "values": [] },
-        { "name": "padding", "values": [] },
-        { "name": "loading", "values": [] },
-        { "name": "empty", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-card-container",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **card-click** - undefined",
-      "attributes": [
-        {
-          "name": "variant",
-          "values": [
-            { "name": "outlined" },
-            { "name": "filled" },
-            { "name": "elevated" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "full-width", "values": [] },
-        { "name": "bordered-divider", "values": [] },
-        { "name": "hoverable", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "loading", "values": [] },
-        { "name": "aria-labelledby", "values": [] }
-      ],
-      "references": []
-    },
-    {
       "name": "biz-button",
       "description": "\n\n\n---\n\n\n",
       "attributes": [
@@ -224,8 +172,37 @@
       "references": []
     },
     {
+      "name": "biz-card-container",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **card-click** - undefined",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "elevated" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "full-width", "values": [] },
+        { "name": "bordered-divider", "values": [] },
+        { "name": "hoverable", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "loading", "values": [] },
+        { "name": "aria-labelledby", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-date-picker",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **month-change** - undefined\n\n### **Slots:**\n - **date-cell-slot** - undefined\n- **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined\n- **header-slot** - undefined\n- **footer-slot** - undefined",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **input** - undefined\n- **change** - undefined\n- **open** - undefined\n- **close** - undefined\n- **clear** - undefined\n- **month-change** - undefined",
       "attributes": [
         {
           "name": "value",
@@ -276,8 +253,37 @@
       "references": []
     },
     {
+      "name": "biz-content-container",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [
+            { "name": "standard" },
+            { "name": "fluid" },
+            { "name": "card" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" },
+            { "name": "full" }
+          ]
+        },
+        { "name": "centered", "values": [] },
+        { "name": "scrollable", "values": [] },
+        { "name": "padding", "values": [] },
+        { "name": "loading", "values": [] },
+        { "name": "empty", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-date-range-picker",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **input** - undefined\n- **clear** - undefined\n- **change** - undefined\n- **range-start-select** - undefined\n- **range-end-select** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **prefix-slot** - undefined\n- **start-slot** - undefined\n- **separator-slot** - undefined\n- **end-slot** - undefined\n- **suffix-slot** - undefined\n- **header-slot** - undefined\n- **presets-slot** - undefined\n- **footer-slot** - undefined\n- **helper-text-slot** - undefined",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined",
       "attributes": [
         {
           "name": "value",
@@ -296,22 +302,6 @@
           "name": "input-mode",
           "values": [{ "name": "single" }, { "name": "double" }]
         },
-        {
-          "name": "variant",
-          "values": [
-            { "name": "outlined" },
-            { "name": "filled" },
-            { "name": "standard" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
         { "name": "min-date", "values": [{ "name": "Date" }] },
         { "name": "max-date", "values": [{ "name": "Date" }] },
         { "name": "min-range", "values": [] },
@@ -319,43 +309,13 @@
         {
           "name": "disabled-dates",
           "values": [
-            { "name": "Array<Date" },
-            { "name": "string>" },
+            { "name": "Array<string" },
+            { "name": "Date>" },
             { "name": "((date: Date) => boolean)" }
           ]
         },
         { "name": "presets", "values": [{ "name": "PresetObject[]" }] },
         { "name": "placeholder", "values": [{ "name": "[string, string]" }] },
-        { "name": "clearable", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "error", "values": [] },
-        { "name": "loading", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-date-time-picker",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **input** - undefined\n- **clear** - undefined\n- **change** - undefined\n- **date-change** - undefined\n- **time-change** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined\n- **header-slot** - undefined\n- **date-cell-slot** - undefined\n- **time-option-slot** - undefined\n- **footer-slot** - undefined",
-      "attributes": [
-        { "name": "value", "values": [{ "name": "Date" }] },
-        { "name": "format", "values": [] },
-        {
-          "name": "layout-mode",
-          "values": [{ "name": "side-by-side" }, { "name": "tabbed" }]
-        },
-        { "name": "use12-hours", "values": [] },
-        { "name": "show-seconds", "values": [] },
-        { "name": "min-datetime", "values": [{ "name": "Date" }] },
-        { "name": "max-datetime", "values": [{ "name": "Date" }] },
-        {
-          "name": "disabledDates",
-          "values": [
-            { "name": "any[]" },
-            { "name": "((date: Date) => boolean)" }
-          ]
-        },
-        { "name": "placeholder", "values": [] },
         { "name": "clearable", "values": [] },
         { "name": "readonly", "values": [] },
         { "name": "disabled", "values": [] },
@@ -381,6 +341,64 @@
       "references": []
     },
     {
+      "name": "biz-date-time-picker",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **clear** - undefined\n- **change** - undefined\n- **date-change** - undefined\n- **time-change** - undefined",
+      "attributes": [
+        { "name": "value", "values": [{ "name": "Date" }] },
+        { "name": "format", "values": [] },
+        {
+          "name": "layout-mode",
+          "values": [{ "name": "side-by-side" }, { "name": "tabbed" }]
+        },
+        { "name": "use12-hours", "values": [] },
+        { "name": "show-seconds", "values": [] },
+        { "name": "minDatetime", "values": [{ "name": "Date" }] },
+        { "name": "maxDatetime", "values": [{ "name": "Date" }] },
+        {
+          "name": "disabledDates",
+          "values": [
+            { "name": "Date[]" },
+            { "name": "((date: Date) => boolean)" }
+          ]
+        },
+        {
+          "name": "disabledHours",
+          "values": [{ "name": "((hour: number) => boolean)" }]
+        },
+        {
+          "name": "disabledMinutes",
+          "values": [{ "name": "((minute: number) => boolean)" }]
+        },
+        { "name": "placeholder", "values": [] },
+        { "name": "clearable", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "error", "values": [] },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "standard" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "full-width", "values": [] },
+        {
+          "name": "label-layout",
+          "values": [{ "name": "vertical" }, { "name": "horizontal" }]
+        }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-dialog",
       "description": "\n\n\n---\n\n\n",
       "attributes": [
@@ -391,12 +409,9 @@
     },
     {
       "name": "biz-dropdown",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **change** - undefined\n- **tag-remove** - undefined\n\n### **Slots:**\n - **tag-slot** - undefined\n- **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **header-slot** - undefined\n- **empty-slot** - undefined\n- **option-slot** - undefined\n- **footer-slot** - undefined\n- **helper-text-wrapper** - undefined",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **open** - undefined\n- **close** - undefined\n- **change** - undefined\n- **clear** - undefined\n- **tag-remove** - undefined\n- **search** - undefined",
       "attributes": [
-        {
-          "name": "value",
-          "values": [{ "name": "(string" }, { "name": "number)[]" }]
-        },
+        { "name": "value", "values": [{ "name": "any" }] },
         { "name": "options", "values": [{ "name": "DropdownOption[]" }] },
         {
           "name": "mode",
@@ -418,6 +433,10 @@
             { "name": "large" }
           ]
         },
+        {
+          "name": "label-placement",
+          "values": [{ "name": "vertical" }, { "name": "horizontal" }]
+        },
         { "name": "filterable", "values": [] },
         { "name": "placeholder", "values": [] },
         { "name": "clearable", "values": [] },
@@ -426,18 +445,17 @@
         { "name": "required", "values": [] },
         { "name": "readonly", "values": [] },
         { "name": "disabled", "values": [] },
-        { "name": "error", "values": [] },
-        { "name": "full-width", "values": [] }
+        { "name": "error", "values": [] }
       ],
       "references": []
     },
     {
       "name": "biz-file-uploader",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **error** - undefined\n- **file-add** - undefined\n- **change** - undefined\n- **clear** - undefined\n- **file-remove** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **upload-button-slot** - undefined\n- **drop-zone-content-slot** - undefined\n- **upload-button-slot** - undefined\n- **file-item-slot** - undefined\n- **helper-text-slot** - undefined",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **error** - undefined\n- **file-add** - undefined\n- **change** - undefined",
       "attributes": [
         {
           "name": "value",
-          "values": [{ "name": "Array<File" }, { "name": "any>" }]
+          "values": [{ "name": "(File" }, { "name": "FileUploadedFile)[]" }]
         },
         { "name": "accept", "values": [] },
         { "name": "multiple", "values": [] },
@@ -450,8 +468,8 @@
         {
           "name": "variant",
           "values": [
-            { "name": "dropzone" },
             { "name": "button" },
+            { "name": "dropzone" },
             { "name": "compact" }
           ]
         },
@@ -463,8 +481,7 @@
             { "name": "large" }
           ]
         },
-        { "name": "full-width", "values": [] },
-        { "name": "helper-text", "values": [] }
+        { "name": "full-width", "values": [] }
       ],
       "references": []
     },
@@ -501,25 +518,61 @@
     },
     {
       "name": "biz-image-upload",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **error** - undefined\n- **crop-start** - undefined\n- **change** - undefined\n- **remove** - undefined\n- **clear** - undefined\n- **crop-complete** - undefined\n- **crop-cancel** - undefined\n\n### **Slots:**\n - **label-slot** - undefined\n- **preview-mask-slot** - undefined\n- **drop-zone-slot** - undefined\n- **helper-text-slot** - undefined\n- **crop-toolbar-slot** - undefined\n- **crop-footer-slot** - undefined",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **error** - undefined\n- **crop-start** - undefined\n- **change** - undefined",
       "attributes": [
-        {
-          "name": "value",
-          "values": [{ "name": "File" }, { "name": "CropResult" }]
-        },
         { "name": "accept", "values": [] },
         { "name": "max-size", "values": [] },
         { "name": "aspect-ratio", "values": [] },
-        { "name": "shape", "values": [{ "name": "ImageUploadShape" }] },
+        {
+          "name": "shape",
+          "values": [{ "name": "square" }, { "name": "circle" }]
+        },
         { "name": "enable-crop", "values": [] },
         {
           "name": "output-type",
-          "values": [{ "name": "ImageUploadOutputType" }]
+          "values": [
+            { "name": "blob" },
+            { "name": "file" },
+            { "name": "base64" }
+          ]
         },
         { "name": "output-quality", "values": [] },
         { "name": "disabled", "values": [] },
         { "name": "readonly", "values": [] },
         { "name": "error", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-ip-address-input",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **clear** - undefined\n- **input** - undefined\n\n### **Slots:**\n - **separator-slot** - undefined\n- **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined",
+      "attributes": [
+        { "name": "value", "values": [] },
+        { "name": "type", "values": [{ "name": "ipv4" }, { "name": "ipv6" }] },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "standard" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "auto-focus-next", "values": [] },
+        { "name": "required", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "error", "values": [] },
+        { "name": "full-width", "values": [] },
+        { "name": "label", "values": [] },
+        { "name": "helper-text", "values": [] }
       ],
       "references": []
     },
@@ -559,63 +612,6 @@
         { "name": "error", "values": [] },
         { "name": "loading", "values": [] },
         { "name": "full-width", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-ip-address-input",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **clear** - undefined\n- **input** - undefined\n\n### **Slots:**\n - **separator-slot** - undefined\n- **label-slot** - undefined\n- **prefix-slot** - undefined\n- **suffix-slot** - undefined\n- **helper-text-slot** - undefined",
-      "attributes": [
-        { "name": "value", "values": [] },
-        { "name": "type", "values": [{ "name": "ipv4" }, { "name": "ipv6" }] },
-        {
-          "name": "variant",
-          "values": [
-            { "name": "outlined" },
-            { "name": "filled" },
-            { "name": "standard" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "auto-focus-next", "values": [] },
-        { "name": "required", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "error", "values": [] },
-        { "name": "full-width", "values": [] },
-        { "name": "label", "values": [] },
-        { "name": "helper-text", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-markdown-editor",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **change** - undefined\n- **mode-change** - undefined\n- **focus** - undefined\n- **blur** - undefined\n- **upload-image** - undefined\n- **clear** - undefined\n\n### **Slots:**\n - **toolbar-left-slot** - undefined\n- **toolbar-right-slot** - undefined\n- **editor-header-slot** - undefined\n- **preview-header-slot** - undefined\n- **custom-preview-slot** - undefined\n- **statusbar-slot** - undefined",
-      "attributes": [
-        { "name": "value", "values": [] },
-        {
-          "name": "mode",
-          "values": [
-            { "name": "split" },
-            { "name": "edit" },
-            { "name": "preview" }
-          ]
-        },
-        { "name": "placeholder", "values": [] },
-        { "name": "sync-scroll", "values": [] },
-        { "name": "height", "values": [] },
-        { "name": "max-height", "values": [] },
-        { "name": "autofocus", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "sanitize", "values": [] }
       ],
       "references": []
     },
@@ -776,6 +772,30 @@
         { "name": "readonly", "values": [] },
         { "name": "disabled", "values": [] },
         { "name": "error", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-markdown-editor",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **change** - undefined\n- **mode-change** - undefined\n- **focus** - undefined\n- **blur** - undefined\n- **upload-image** - undefined\n- **clear** - undefined\n\n### **Slots:**\n - **toolbar-left-slot** - undefined\n- **toolbar-right-slot** - undefined\n- **editor-header-slot** - undefined\n- **preview-header-slot** - undefined\n- **custom-preview-slot** - undefined\n- **statusbar-slot** - undefined",
+      "attributes": [
+        { "name": "value", "values": [] },
+        {
+          "name": "mode",
+          "values": [
+            { "name": "split" },
+            { "name": "edit" },
+            { "name": "preview" }
+          ]
+        },
+        { "name": "placeholder", "values": [] },
+        { "name": "sync-scroll", "values": [] },
+        { "name": "height", "values": [] },
+        { "name": "max-height", "values": [] },
+        { "name": "autofocus", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "sanitize", "values": [] }
       ],
       "references": []
     },
@@ -1124,12 +1144,6 @@
           ]
         }
       ],
-      "references": []
-    },
-    {
-      "name": "shop-cart",
-      "description": "\n\n\n---\n\n\n",
-      "attributes": [{ "name": "items", "values": [{ "name": "CartItem[]" }] }],
       "references": []
     }
   ]

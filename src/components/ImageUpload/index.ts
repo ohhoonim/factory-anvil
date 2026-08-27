@@ -1,1 +1,1 @@
-export { ImageUpload as ImageUploadWc } from './ImageUpload.wc';
+export type { CropResult } from './ImageUpload.wc.js';
