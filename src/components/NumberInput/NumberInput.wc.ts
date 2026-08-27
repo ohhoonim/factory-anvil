@@ -1,75 +1,90 @@
-import { LitElement, type PropertyValues } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { NumberInputTemplate } from "./NumberInput";
-import { numberInputStyles } from "./NumberInput.css";
+import { LitElement, type TemplateResult } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { numberInputStyles } from './NumberInput.css.js';
+import { NumberInputTemplate, type NumberInputHost } from './NumberInput.js';
 
-/**
- * @element biz-number-input
- * 
- * @slot decrement-icon-slot
- * @slot increment-icon-slot
- * @slot label-slot
- * @slot prefix-slot
- * @slot suffix-slot
- * @slot helper-text-slot
- */
 @customElement('biz-number-input')
-export class BizNumberInput extends LitElement {
+export class BizNumberInput extends LitElement implements NumberInputHost {
   static styles = numberInputStyles;
 
-  @property({ type: Number }) value: number | null = null;
-  @property({ type: Number }) min = -Infinity;
-  @property({ type: Number }) max = Infinity;
-  @property({ type: Number }) step = 1;
-  @property({ type: Number }) precision?: number;
-  @property({ type: Boolean }) controls = true;
+  @property({ type: Number })
+  value: number | null = null;
+
+  @property({ type: Number })
+  min: number = -Infinity;
+
+  @property({ type: Number })
+  max: number = Infinity;
+
+  @property({ type: Number })
+  step: number = 1;
+
+  @property({ type: Number })
+  precision?: number;
+
+  @property({ type: Boolean })
+  controls: boolean = true;
+
   @property({ type: String, attribute: 'controls-position' })
   controlsPosition: 'end' | 'stacked' | 'split' = 'end';
+
   @property({ type: Boolean, attribute: 'use-grouping' })
-  useGrouping = false;
-  @property({ type: Boolean, reflect: true }) required = false;
-  @property({ type: Boolean, reflect: true }) readonly = false;
-  @property({ type: Boolean, reflect: true }) disabled = false;
-  @property({ type: Boolean, reflect: true }) error = false;
-  @property({ type: String, reflect: true })
+  useGrouping: boolean = false;
+
+  @property({ type: Boolean, reflect: true })
+  required: boolean = false;
+
+  @property({ type: Boolean, reflect: true })
+  readonly: boolean = false;
+
+  @property({ type: Boolean, reflect: true })
+  disabled: boolean = false;
+
+  @property({ type: Boolean, reflect: true })
+  error: boolean = false;
+
+  @property({ type: String })
   variant: 'outlined' | 'filled' | 'standard' = 'outlined';
-  @property({ type: String, reflect: true })
+
+  @property({ type: String })
   size: 'small' | 'medium' | 'large' = 'medium';
+
   @property({ type: Boolean, attribute: 'full-width', reflect: true })
-  fullWidth = false;
+  fullWidth: boolean = false;
 
-  @state() private inputValue = '';
+  @property({ type: String })
+  placeholder?: string;
 
-  willUpdate(changedProperties: PropertyValues) {
-    if (
-      changedProperties.has('value') ||
-      changedProperties.has('precision') ||
-      changedProperties.has('useGrouping')
-    ) {
-      this.inputValue = this.formatValue(this.value);
-    }
+  @state()
+  private rawInputValue: string = '';
+
+  get isMinReached(): boolean {
+    return this.value !== null && this.value <= this.min;
   }
 
-  private formatValue(val: number | null): string {
-    if (val === null || isNaN(val)) return '';
+  get isMaxReached(): boolean {
+    return this.value !== null && this.value >= this.max;
+  }
 
-    let formattedNumber = val;
-    if (this.precision !== undefined) {
-      formattedNumber = Number(val.toFixed(this.precision));
+  get formattedValue(): string {
+    if (this.rawInputValue !== '') {
+      return this.rawInputValue;
     }
+    if (this.value === null || Number.isNaN(this.value)) {
+      return '';
+    }
+
+    let valStr = this.precision !== undefined 
+      ? this.value.toFixed(this.precision) 
+      : this.value.toString();
 
     if (this.useGrouping) {
-      return formattedNumber.toLocaleString();
+      const parts = valStr.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      valStr = parts.join('.');
     }
 
-    return String(formattedNumber);
-  }
-
-  private parseInputValue(str: string): number | null {
-    if (!str.trim()) return null;
-    const cleanStr = str.replace(/,/g, '');
-    const parsed = Number(cleanStr);
-    return isNaN(parsed) ? null : parsed;
+    return valStr;
   }
 
   private clampValue(val: number): number {
@@ -80,41 +95,55 @@ export class BizNumberInput extends LitElement {
     return clamped;
   }
 
-  private dispatchCustomEvent(eventName: string, detail: object = {}) {
+  private emitCustomEvent(eventName: string, detail: Record<string, unknown> = {}): void {
     this.dispatchEvent(
       new CustomEvent(eventName, {
-        detail,
         bubbles: true,
         composed: true,
+        detail,
       })
     );
   }
 
-  private updateValue(newValue: number | null, isInputEvent = true) {
-    let finalValue = newValue;
-    if (finalValue !== null) {
-      finalValue = this.clampValue(finalValue);
+  handleInput(e: InputEvent): void {
+    const inputEl = e.target as HTMLInputElement;
+    const rawVal = inputEl.value.replace(/,/g, '');
+    this.rawInputValue = inputEl.value;
+
+    if (rawVal === '' || rawVal === '-') {
+      this.value = null;
+      this.emitCustomEvent('input', { value: null });
+      return;
     }
 
-    this.value = finalValue;
-    this.inputValue = this.formatValue(finalValue);
+    const parsed = Number(rawVal);
+    if (!Number.isNaN(parsed)) {
+      this.value = parsed;
+      this.emitCustomEvent('input', { value: this.value });
+    }
+  }
 
-    if (isInputEvent) {
-      this.dispatchCustomEvent('input', { value: this.value });
+  handleChange(e: Event): void {
+    const inputEl = e.target as HTMLInputElement;
+    const rawVal = inputEl.value.replace(/,/g, '');
+    this.rawInputValue = '';
+
+    if (rawVal === '' || rawVal === '-') {
+      this.value = null;
     } else {
-      this.dispatchCustomEvent('change', { value: this.value });
+      const parsed = Number(rawVal);
+      if (Number.isNaN(parsed)) {
+        this.value = null;
+      } else {
+        this.value = this.clampValue(parsed);
+      }
     }
+
+    this.requestUpdate();
+    this.emitCustomEvent('change', { value: this.value });
   }
 
-  private handleInput(e: Event) {
-    const target = e.target as HTMLInputElement;
-    const parsed = this.parseInputValue(target.value);
-    this.value = parsed;
-    this.inputValue = target.value;
-    this.dispatchCustomEvent('input', { value: this.value });
-  }
-
-  private handleFocus(e: FocusEvent) {
+  handleFocus(e: FocusEvent): void {
     this.dispatchEvent(
       new FocusEvent('focus', {
         bubbles: true,
@@ -124,12 +153,8 @@ export class BizNumberInput extends LitElement {
     );
   }
 
-  private handleBlur(e: FocusEvent) {
-    if (this.value !== null) {
-      this.updateValue(this.value, false);
-    } else {
-      this.dispatchCustomEvent('change', { value: null });
-    }
+  handleBlur(e: FocusEvent): void {
+    this.rawInputValue = '';
     this.dispatchEvent(
       new FocusEvent('blur', {
         bubbles: true,
@@ -139,90 +164,79 @@ export class BizNumberInput extends LitElement {
     );
   }
 
-  private stepUp(amount = this.step) {
+  handleKeyDown(e: KeyboardEvent): void {
     if (this.disabled || this.readonly) return;
-    const current = this.value ?? 0;
-    const nextValue = this.clampValue(current + amount);
-    this.updateValue(nextValue, true);
-    this.dispatchCustomEvent('step-up', { value: nextValue });
-  }
 
-  private stepDown(amount = this.step) {
-    if (this.disabled || this.readonly) return;
-    const current = this.value ?? 0;
-    const nextValue = this.clampValue(current - amount);
-    this.updateValue(nextValue, true);
-    this.dispatchCustomEvent('step-down', { value: nextValue });
-  }
-
-  private handleKeyDown(e: KeyboardEvent) {
-    if (this.disabled || this.readonly) return;
+    const currentVal = this.value ?? 0;
 
     switch (e.key) {
       case 'ArrowUp':
         e.preventDefault();
-        this.stepUp();
+        this.handleStepUp();
         break;
       case 'ArrowDown':
         e.preventDefault();
-        this.stepDown();
+        this.handleStepDown();
         break;
       case 'Home':
         if (this.min !== -Infinity) {
           e.preventDefault();
-          this.updateValue(this.min, true);
+          this.updateValueAndEmit(this.min);
         }
         break;
       case 'End':
         if (this.max !== Infinity) {
           e.preventDefault();
-          this.updateValue(this.max, true);
+          this.updateValueAndEmit(this.max);
         }
         break;
       case 'PageUp':
         e.preventDefault();
-        this.stepUp(this.step * 10);
+        this.updateValueAndEmit(currentVal + this.step * 10);
         break;
       case 'PageDown':
         e.preventDefault();
-        this.stepDown(this.step * 10);
-        break;
-      case 'Enter':
-        if (this.value !== null) {
-          this.updateValue(this.value, false);
-        }
+        this.updateValueAndEmit(currentVal - this.step * 10);
         break;
       case 'Escape':
-        this.inputValue = this.formatValue(this.value);
+        this.rawInputValue = '';
+        this.requestUpdate();
         break;
     }
   }
 
-  render() {
-    return NumberInputTemplate({
-      value: this.value,
-      min: this.min,
-      max: this.max,
-      step: this.step,
-      precision: this.precision,
-      controls: this.controls,
-      controlsPosition: this.controlsPosition,
-      useGrouping: this.useGrouping,
-      required: this.required,
-      readonly: this.readonly,
-      disabled: this.disabled,
-      error: this.error,
-      variant: this.variant,
-      size: this.size,
-      fullWidth: this.fullWidth,
-      inputValue: this.inputValue,
-      onInputChange: this.handleInput.bind(this),
-      onInputBlur: this.handleBlur.bind(this),
-      onInputFocus: this.handleFocus.bind(this),
-      onKeyDown: this.handleKeyDown.bind(this),
-      onDecrement: () => this.stepDown(),
-      onIncrement: () => this.stepUp(),
-    });
+  handleStepUp(): void {
+    if (this.disabled || this.readonly || this.isMaxReached) return;
+    const currentVal = this.value ?? 0;
+    const nextVal = this.clampValue(currentVal + this.step);
+    this.value = nextVal;
+    this.rawInputValue = '';
+    this.emitCustomEvent('step-up', { value: this.value });
+    this.emitCustomEvent('input', { value: this.value });
+    this.emitCustomEvent('change', { value: this.value });
+  }
+
+  handleStepDown(): void {
+    if (this.disabled || this.readonly || this.isMinReached) return;
+    const currentVal = this.value ?? 0;
+    const nextVal = this.clampValue(currentVal - this.step);
+    this.value = nextVal;
+    this.rawInputValue = '';
+    this.emitCustomEvent('step-down', { value: this.value });
+    this.emitCustomEvent('input', { value: this.value });
+    this.emitCustomEvent('change', { value: this.value });
+  }
+
+  private updateValueAndEmit(newValue: number): void {
+    const clamped = this.clampValue(newValue);
+    this.value = clamped;
+    this.rawInputValue = '';
+    this.emitCustomEvent('input', { value: this.value });
+    this.emitCustomEvent('change', { value: this.value });
+  }
+
+  override render(): TemplateResult {
+    return NumberInputTemplate(this);
   }
 }
 

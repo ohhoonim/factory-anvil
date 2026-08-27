@@ -1,1 +1,1 @@
-export { BizNumberInput } from './NumberInput.wc';
+export { BizNumberInput } from './NumberInput.wc.js';
