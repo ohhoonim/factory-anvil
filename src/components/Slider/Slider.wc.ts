@@ -1,24 +1,28 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { SliderTemplate } from './Slider';
-import { sliderStyles } from './Slider.css';
+import { SliderTemplate, type SliderHost } from './Slider.js';
+import { sliderStyles } from './Slider.css.js';
 
-/**
- * @element biz-slider
- * 
- * @slot label-slot
- * @slot prefix-icon-slot
- * @slot tooltip-slot
- * @slot tooltip-slot
- * @slot tick-label-slot
- * @slot suffix-icon-slot
- * @slot helper-text-slot
- */
 @customElement('biz-slider')
-export class BizSlider extends LitElement {
-  static styles = sliderStyles;
+export class BizSlider extends LitElement implements SliderHost {
+  static override styles = sliderStyles;
 
-  @property({ type: Object })
+  @property({
+    type: Object,
+    converter: {
+      fromAttribute: (value: string | null) => {
+        if (!value) return 0;
+        try {
+          return JSON.parse(value);
+        } catch {
+          return Number(value) || 0;
+        }
+      },
+      toAttribute: (value: unknown) => {
+        return typeof value === 'object' ? JSON.stringify(value) : String(value);
+      },
+    },
+  })
   value: number | number[] = 0;
 
   @property({ type: Number })
@@ -55,263 +59,275 @@ export class BizSlider extends LitElement {
   error = false;
 
   @property({ type: String })
-  variant: 'standard' | 'outlined' | 'filled' = 'standard';
-
-  @property({ type: String })
   size: 'small' | 'medium' | 'large' = 'medium';
 
   @property({ type: String })
-  name = '';
+  variant: 'outlined' | 'filled' | 'standard' = 'standard';
 
   @state()
-  activeThumb: 'start' | 'end' | null = null;
+  draggingIndex: number | null = null;
 
-  private isDragging = false;
+  @state()
+  activeThumbIndex: number | null = null;
 
-  private handleDocumentPointerMove = (e: PointerEvent) => {
-    if (!this.isDragging || !this.activeThumb || this.disabled || this.readonly) return;
-    this.updateValueFromPointer(e, this.activeThumb, true);
-  };
+  private _boundMouseMove?: (e: MouseEvent) => void;
+  private _boundMouseUp?: (e: MouseEvent) => void;
 
-  private handleDocumentPointerUp = (e: PointerEvent) => {
-    if (!this.isDragging) return;
-    this.isDragging = false;
-    const currentActive = this.activeThumb;
-    this.activeThumb = null;
-
-    window.removeEventListener('pointermove', this.handleDocumentPointerMove);
-    window.removeEventListener('pointerup', this.handleDocumentPointerUp);
-
-    if (currentActive) {
-      this.updateValueFromPointer(e, currentActive, false);
-      this.dispatchChangeEvent();
-    }
-  };
-
-  disconnectedCallback() {
+  override disconnectedCallback(): void {
     super.disconnectedCallback();
-    window.removeEventListener('pointermove', this.handleDocumentPointerMove);
-    window.removeEventListener('pointerup', this.handleDocumentPointerUp);
+    this._removeDragListeners();
   }
 
-  private getValueArray(): [number, number] {
-    if (Array.isArray(this.value)) {
-      return [this.value[0] ?? this.min, this.value[1] ?? this.max];
+  private _clamp(val: number): number {
+    const stepped = Math.round((val - this.min) / this.step) * this.step + this.min;
+    const precision = (this.step.toString().split('.')[1] || '').length;
+    const fixedVal = Number(stepped.toFixed(precision));
+    return Math.max(this.min, Math.min(this.max, fixedVal));
+  }
+
+  private _getValueArray(): number[] {
+    if (this.mode === 'range') {
+      if (Array.isArray(this.value)) {
+        return [this._clamp(this.value[0] ?? this.min), this._clamp(this.value[1] ?? this.max)];
+      }
+      return [this.min, this._clamp(typeof this.value === 'number' ? this.value : this.max)];
     }
-    return [this.min, typeof this.value === 'number' ? this.value : this.min];
+    return [this._clamp(typeof this.value === 'number' ? this.value : this.min)];
   }
 
-  private clampAndSnap(val: number): number {
-    let clamped = Math.max(this.min, Math.min(this.max, val));
-    if (this.step > 0) {
-      const steps = Math.round((clamped - this.min) / this.step);
-      clamped = this.min + steps * this.step;
-    }
-    return Math.max(this.min, Math.min(this.max, Number(clamped.toFixed(10))));
+  private _updateValue(newValue: number | number[], isFinal = false): void {
+    if (this.disabled || this.readonly) return;
+
+    this.value = newValue;
+    const eventName = isFinal ? 'change' : 'input';
+
+    this.dispatchEvent(
+      new CustomEvent(eventName, {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
-  private updateValueFromPointer(e: PointerEvent, targetThumb: 'start' | 'end', isInput: boolean) {
-    const track = this.shadowRoot?.querySelector('.biz-slider__track-container');
-    if (!track) return;
+  private _calculateValueFromClientPos(clientX: number, clientY: number): number {
+    const trackEl = this.shadowRoot?.querySelector('.biz-slider__track-container');
+    if (!trackEl) return this.min;
 
-    const rect = track.getBoundingClientRect();
+    const rect = trackEl.getBoundingClientRect();
     let ratio = 0;
 
     if (this.orientation === 'vertical') {
-      ratio = (rect.bottom - e.clientY) / rect.height;
+      ratio = (rect.bottom - clientY) / rect.height;
     } else {
-      ratio = (e.clientX - rect.left) / rect.width;
+      ratio = (clientX - rect.left) / rect.width;
     }
 
     ratio = Math.max(0, Math.min(1, ratio));
     const rawVal = this.min + ratio * (this.max - this.min);
-    const newValue = this.clampAndSnap(rawVal);
-
-    if (this.mode === 'range') {
-      const [startVal, endVal] = this.getValueArray();
-      let updatedStart = startVal;
-      let updatedEnd = endVal;
-
-      if (targetThumb === 'start') {
-        updatedStart = Math.min(newValue, endVal);
-      } else {
-        updatedEnd = Math.max(newValue, startVal);
-      }
-
-      const nextVal: [number, number] = [updatedStart, updatedEnd];
-      if (startVal !== updatedStart || endVal !== updatedEnd) {
-        this.value = nextVal;
-        if (isInput) this.dispatchInputEvent();
-      }
-    } else {
-      if (this.value !== newValue) {
-        this.value = newValue;
-        if (isInput) this.dispatchInputEvent();
-      }
-    }
+    return this._clamp(rawVal);
   }
 
-  public handleTrackPointerDown(e: PointerEvent) {
+  handleTrackClick = (e: MouseEvent): void => {
     if (this.disabled || this.readonly) return;
-    const target = e.target as HTMLElement;
-    if (target.classList.contains('biz-slider__thumb')) return;
 
-    const track = this.shadowRoot?.querySelector('.biz-slider__track-container');
-    if (!track) return;
+    const clickVal = this._calculateValueFromClientPos(e.clientX, e.clientY);
+    const currentValues = this._getValueArray();
 
-    const rect = track.getBoundingClientRect();
-    let ratio = 0;
-
-    if (this.orientation === 'vertical') {
-      ratio = (rect.bottom - e.clientY) / rect.height;
-    } else {
-      ratio = (e.clientX - rect.left) / rect.width;
-    }
-
-    ratio = Math.max(0, Math.min(1, ratio));
-    const clickVal = this.clampAndSnap(this.min + ratio * (this.max - this.min));
-
-    let chosenThumb: 'start' | 'end' = 'end';
     if (this.mode === 'range') {
-      const [sVal, eVal] = this.getValueArray();
-      const distStart = Math.abs(clickVal - sVal);
-      const distEnd = Math.abs(clickVal - eVal);
-      chosenThumb = distStart < distEnd ? 'start' : 'end';
+      const dist0 = Math.abs(currentValues[0] - clickVal);
+      const dist1 = Math.abs(currentValues[1] - clickVal);
+      const targetIndex = dist0 <= dist1 ? 0 : 1;
+
+      const nextValues = [...currentValues];
+      nextValues[targetIndex] = clickVal;
+
+      if (targetIndex === 0 && nextValues[0] > nextValues[1]) {
+        nextValues[1] = nextValues[0];
+      } else if (targetIndex === 1 && nextValues[1] < nextValues[0]) {
+        nextValues[0] = nextValues[1];
+      }
+
+      this._updateValue(nextValues, true);
+    } else {
+      this._updateValue(clickVal, true);
     }
+  };
 
-    this.activeThumb = chosenThumb;
-    this.isDragging = true;
-    this.updateValueFromPointer(e, chosenThumb, true);
-    this.dispatchChangeEvent();
-
-    window.addEventListener('pointermove', this.handleDocumentPointerMove);
-    window.addEventListener('pointerup', this.handleDocumentPointerUp);
-  }
-
-  public handleThumbPointerDown(e: PointerEvent, thumb: 'start' | 'end') {
+  handleThumbMouseDown = (index: number, e: MouseEvent): void => {
     if (this.disabled || this.readonly) return;
     e.stopPropagation();
-    this.activeThumb = thumb;
-    this.isDragging = true;
 
-    window.addEventListener('pointermove', this.handleDocumentPointerMove);
-    window.addEventListener('pointerup', this.handleDocumentPointerUp);
+    this.draggingIndex = index;
+    this.activeThumbIndex = index;
+
+    this._boundMouseMove = (event: MouseEvent) => this._handleDragMove(event);
+    this._boundMouseUp = () => this._handleDragEnd();
+
+    window.addEventListener('mousemove', this._boundMouseMove);
+    window.addEventListener('mouseup', this._boundMouseUp);
+  };
+
+  private _handleDragMove(e: MouseEvent): void {
+    if (this.draggingIndex === null) return;
+
+    const newVal = this._calculateValueFromClientPos(e.clientX, e.clientY);
+    const currentValues = this._getValueArray();
+
+    if (this.mode === 'range') {
+      const nextValues = [...currentValues];
+      nextValues[this.draggingIndex] = newVal;
+
+      if (this.draggingIndex === 0 && nextValues[0] > nextValues[1]) {
+        nextValues[0] = nextValues[1];
+      } else if (this.draggingIndex === 1 && nextValues[1] < nextValues[0]) {
+        nextValues[1] = nextValues[0];
+      }
+
+      this._updateValue(nextValues, false);
+    } else {
+      this._updateValue(newVal, false);
+    }
   }
 
-  public handleFocus(_e: FocusEvent, thumb: 'start' | 'end') {
-    this.dispatchEvent(new CustomEvent('focus', { bubbles: true, composed: true }));
+  private _handleDragEnd(): void {
+    if (this.draggingIndex !== null) {
+      this.draggingIndex = null;
+      this._updateValue(this.value, true);
+    }
+    this._removeDragListeners();
   }
 
-  public handleBlur(_e: FocusEvent, thumb: 'start' | 'end') {
-    this.dispatchEvent(new CustomEvent('blur', { bubbles: true, composed: true }));
+  private _removeDragListeners(): void {
+    if (this._boundMouseMove) {
+      window.removeEventListener('mousemove', this._boundMouseMove);
+      this._boundMouseMove = undefined;
+    }
+    if (this._boundMouseUp) {
+      window.removeEventListener('mouseup', this._boundMouseUp);
+      this._boundMouseUp = undefined;
+    }
   }
 
-  public handleKeyDown(e: KeyboardEvent, thumb: 'start' | 'end') {
+  handleThumbKeyDown = (index: number, e: KeyboardEvent): void => {
     if (this.disabled || this.readonly) return;
 
-    const isRange = this.mode === 'range';
-    const [startVal, endVal] = this.getValueArray();
-    let current = isRange ? (thumb === 'start' ? startVal : endVal) : (typeof this.value === 'number' ? this.value : startVal);
-    let handled = true;
-
-    const pageStep = this.step * 10;
+    let delta = 0;
+    const largeStep = this.step * 10 || 10;
 
     switch (e.key) {
       case 'ArrowRight':
       case 'ArrowUp':
-        current += this.step;
+        delta = this.step;
         break;
       case 'ArrowLeft':
       case 'ArrowDown':
-        current -= this.step;
+        delta = -this.step;
         break;
       case 'PageUp':
-        current += pageStep;
+        delta = largeStep;
         break;
       case 'PageDown':
-        current -= pageStep;
+        delta = -largeStep;
         break;
-      case 'Home':
-        current = this.min;
-        break;
-      case 'End':
-        current = this.max;
-        break;
-      default:
-        handled = false;
-        break;
-    }
-
-    if (handled) {
-      e.preventDefault();
-      const nextVal = this.clampAndSnap(current);
-
-      if (isRange) {
-        let nextStart = startVal;
-        let nextEnd = endVal;
-        if (thumb === 'start') {
-          nextStart = Math.min(nextVal, endVal);
+      case 'Home': {
+        const currentValues = this._getValueArray();
+        if (this.mode === 'range') {
+          const nextValues = [...currentValues];
+          nextValues[index] = this.min;
+          if (index === 1 && nextValues[1] < nextValues[0]) {
+            nextValues[0] = this.min;
+          }
+          this._updateValue(nextValues, true);
         } else {
-          nextEnd = Math.max(nextVal, startVal);
+          this._updateValue(this.min, true);
         }
-        this.value = [nextStart, nextEnd];
-      } else {
-        this.value = nextVal;
+        e.preventDefault();
+        return;
       }
-
-      this.dispatchInputEvent();
-      this.dispatchChangeEvent();
+      case 'End': {
+        const currentValues = this._getValueArray();
+        if (this.mode === 'range') {
+          const nextValues = [...currentValues];
+          nextValues[index] = this.max;
+          if (index === 0 && nextValues[0] > nextValues[1]) {
+            nextValues[1] = this.max;
+          }
+          this._updateValue(nextValues, true);
+        } else {
+          this._updateValue(this.max, true);
+        }
+        e.preventDefault();
+        return;
+      }
+      case 'Escape':
+        this.blur();
+        return;
+      default:
+        return;
     }
-  }
 
-  public clear() {
+    if (delta !== 0) {
+      e.preventDefault();
+      const currentValues = this._getValueArray();
+      const currentVal = currentValues[index] ?? this.min;
+      const targetVal = this._clamp(currentVal + delta);
+
+      if (this.mode === 'range') {
+        const nextValues = [...currentValues];
+        nextValues[index] = targetVal;
+
+        if (index === 0 && nextValues[0] > nextValues[1]) {
+          nextValues[0] = nextValues[1];
+        } else if (index === 1 && nextValues[1] < nextValues[0]) {
+          nextValues[1] = nextValues[0];
+        }
+
+        this._updateValue(nextValues, true);
+      } else {
+        this._updateValue(targetVal, true);
+      }
+    }
+  };
+
+  handleThumbFocus = (index: number, e: FocusEvent): void => {
+    this.activeThumbIndex = index;
+    this.dispatchEvent(new FocusEvent('focus', e));
+  };
+
+  handleThumbBlur = (index: number, e: FocusEvent): void => {
+    if (this.activeThumbIndex === index) {
+      this.activeThumbIndex = null;
+    }
+    this.dispatchEvent(new FocusEvent('blur', e));
+  };
+
+  handleThumbMouseEnter = (index: number): void => {
+    if (this.showTooltip === 'hover') {
+      this.activeThumbIndex = index;
+    }
+  };
+
+  handleThumbMouseLeave = (_index: number): void => {
+    if (this.showTooltip === 'hover' && this.shadowRoot?.activeElement === null) {
+      this.activeThumbIndex = null;
+    }
+  };
+
+  public clear(): void {
     if (this.disabled || this.readonly) return;
-    if (this.mode === 'range') {
-      this.value = [this.min, this.min];
-    } else {
-      this.value = this.min;
-    }
-    this.dispatchInputEvent();
-    this.dispatchChangeEvent();
-    this.dispatchEvent(new CustomEvent('clear', { bubbles: true, composed: true }));
-  }
-
-  private dispatchInputEvent() {
+    const clearedValue = this.mode === 'range' ? [this.min, this.min] : this.min;
+    this._updateValue(clearedValue, true);
     this.dispatchEvent(
-      new CustomEvent('input', {
+      new CustomEvent('clear', {
         bubbles: true,
         composed: true,
-        detail: { value: this.value }
       })
     );
   }
 
-  private dispatchChangeEvent() {
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { value: this.value }
-      })
-    );
-  }
-
-  renderTicks() {
-    if (!this.showTicks) return null;
-    const ticksCount = Math.floor((this.max - this.min) / this.step);
-    if (ticksCount <= 0 || ticksCount > 100) return null;
-
-    const ticks = [];
-    for (let i = 0; i <= ticksCount; i++) {
-      const pct = (i / ticksCount) * 100;
-      const tickStyle = this.orientation === 'vertical' ? `bottom: ${pct}%` : `left: ${pct}%`;
-      ticks.push(html`<span class="biz-slider__tick" style="${tickStyle}"></span>`);
-    }
-    return ticks;
-  }
-
-  render() {
-    return SliderTemplate(this);
+  override render() {
+    return html`${SliderTemplate(this)}`;
   }
 }
 

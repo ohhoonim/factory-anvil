@@ -1,16 +1,16 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { BizSlider } from './Slider.wc';
+import { BizSlider as BizSliderWc } from './Slider.wc.js';
 
-export const Slider = createComponent({
+export const BizSlider = createComponent({
   tagName: 'biz-slider',
-  elementClass: BizSlider,
+  elementClass: BizSliderWc,
   react: React,
   events: {
     onInput: 'input',
     onChange: 'change',
+    onClear: 'clear',
     onFocus: 'focus',
     onBlur: 'blur',
-    onClear: 'clear',
   },
 });
