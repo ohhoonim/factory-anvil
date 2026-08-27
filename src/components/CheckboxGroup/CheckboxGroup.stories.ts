@@ -1,141 +1,196 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import { html } from 'lit';
-import './CheckboxGroup.wc.js';
+import type { Meta, StoryObj } from "@storybook/web-components-vite";
+import { html } from "lit";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { fn, within, userEvent, expect } from "storybook/test";
+import type { CheckboxGroupHost } from "./CheckboxGroup";
+import './CheckboxGroup.wc';
 
-const meta: Meta = {
+type CheckboxGroupArgs = Required<CheckboxGroupHost> & {
+  labelSlot?: string;
+  defaultSlot?: string;
+  helperTextSlot?: string;
+  onChange?: (e: Event) => void;
+  onClear?: (e: Event) => void;
+};
+
+const meta: Meta<CheckboxGroupArgs> = {
   title: 'Components/Forms/CheckboxGroup',
   component: 'biz-checkbox-group',
   tags: ['autodocs'],
   argTypes: {
-    orientation: {
-      control: { type: 'select' },
-      options: ['vertical', 'horizontal']
-    },
     variant: {
-      control: { type: 'select' },
-      options: ['standard', 'card', 'button']
+      control: 'select',
+      options: ['standard', 'card', 'button'],
     },
     size: {
-      control: { type: 'select' },
-      options: ['small', 'medium', 'large']
+      control: 'select',
+      options: ['small', 'medium', 'large'],
     },
-    required: { control: 'boolean' },
+    orientation: {
+      control: 'radio',
+      options: ['vertical', 'horizontal'],
+    },
+    value: { control: 'object' },
+    name: { control: 'text' },
+    required: { control: 'boolean', description: '체크 해제를 못하게 막는 인터랙션 잠금이 아니라, "제출 시점에 최소 1개는 선택되어 있어야 한다"'},
     disabled: { control: 'boolean' },
     readonly: { control: 'boolean' },
     error: { control: 'boolean' },
+    min: { control: 'number', description: '최소 선택 개수' },
+    max: { control: 'number' , descript: '최대 선택 개수'},
     fullWidth: { control: 'boolean' },
-    min: { control: 'number' },
-    max: { control: 'number' }
+    labelSlot: { control: 'text' },
+    defaultSlot: { control: 'text' },
+    helperTextSlot: { control: 'text' },
   },
   args: {
+    value: ['opt1'],
+    name: 'frameworks',
     orientation: 'vertical',
-    variant: 'standard',
-    size: 'medium',
     required: false,
     disabled: false,
     readonly: false,
     error: false,
-    fullWidth: false,
     min: 0,
-    max: Number.POSITIVE_INFINITY
-  }
+    max: Infinity,
+    variant: 'standard',
+    size: 'medium',
+    fullWidth: false,
+    labelSlot: '좋아하는 프레임워크 선택',
+    defaultSlot: `
+      <label><input type="checkbox" value="opt1"> Lit</label>
+      <label><input type="checkbox" value="opt2"> React</label>
+      <label><input type="checkbox" value="opt3"> Vue</label>
+    `,
+    helperTextSlot: '하나 이상 선택할 수 있습니다.',
+    onChange: fn(),
+    onClear: fn(),
+  },
+  render: (args) => html`
+    <biz-checkbox-group
+      .value=${args.value}
+      .name=${args.name}
+      .orientation=${args.orientation}
+      ?required=${args.required}
+      ?disabled=${args.disabled}
+      ?readonly=${args.readonly}
+      ?error=${args.error}
+      .min=${args.min}
+      .max=${args.max}
+      .variant=${args.variant}
+      .size=${args.size}
+      ?full-width=${args.fullWidth}
+      @change=${args.onChange}
+      @clear=${args.onClear}
+    >
+      <span slot="label-slot">${args.labelSlot}</span>
+      ${unsafeHTML(args.defaultSlot)}
+      <span slot="helper-text-slot">${unsafeHTML(args.helperTextSlot)}</span>
+    </biz-checkbox-group>
+  `,
 };
 
 export default meta;
-type Story = StoryObj;
+type Story = StoryObj<CheckboxGroupArgs>;
 
-export const Default: Story = {
-  render: (args) => html`
-    <biz-checkbox-group
-      .orientation="${args.orientation}"
-      .variant="${args.variant}"
-      .size="${args.size}"
-      ?required="${args.required}"
-      ?disabled="${args.disabled}"
-      ?readonly="${args.readonly}"
-      ?error="${args.error}"
-      ?full-width="${args.fullWidth}"
-      .min="${args.min}"
-      .max="${args.max}"
-    >
-      <span slot="label-slot">알림 설정</span>
-      <label><input type="checkbox" value="email" /> 이메일 알림</label>
-      <label><input type="checkbox" value="sms" /> SMS 알림</label>
-      <label><input type="checkbox" value="push" /> 앱 푸시 알림</label>
-      <span slot="helper-text-slot">수신하고자 하는 알림 채널을 선택하세요.</span>
-    </biz-checkbox-group>
-  `
+export const Default: Story = {};
+
+export const VariantStandard: Story = {
+  args: {
+    variant: 'standard',
+  },
 };
 
-export const Variants: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 24px;">
-      <biz-checkbox-group variant="standard">
-        <span slot="label-slot">Standard Variant</span>
-        <label><input type="checkbox" value="1" /> 옵션 1</label>
-        <label><input type="checkbox" value="2" /> 옵션 2</label>
-      </biz-checkbox-group>
-
-      <biz-checkbox-group variant="card">
-        <span slot="label-slot">Card Variant</span>
-        <label><input type="checkbox" value="1" /> 카드 옵션 1</label>
-        <label><input type="checkbox" value="2" /> 카드 옵션 2</label>
-      </biz-checkbox-group>
-
-      <biz-checkbox-group variant="button" orientation="horizontal">
-        <span slot="label-slot">Button Variant</span>
-        <label><input type="checkbox" value="1" /> 버튼 1</label>
-        <label><input type="checkbox" value="2" /> 버튼 2</label>
-      </biz-checkbox-group>
-    </div>
-  `
+export const VariantCard: Story = {
+  args: {
+    variant: 'card',
+  },
 };
 
-export const Sizes: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 24px;">
-      <biz-checkbox-group size="small">
-        <span slot="label-slot">Small Size</span>
-        <label><input type="checkbox" value="1" /> 소형 옵션 1</label>
-        <label><input type="checkbox" value="2" /> 소형 옵션 2</label>
-      </biz-checkbox-group>
-
-      <biz-checkbox-group size="medium">
-        <span slot="label-slot">Medium Size</span>
-        <label><input type="checkbox" value="1" /> 중형 옵션 1</label>
-        <label><input type="checkbox" value="2" /> 중형 옵션 2</label>
-      </biz-checkbox-group>
-
-      <biz-checkbox-group size="large">
-        <span slot="label-slot">Large Size</span>
-        <label><input type="checkbox" value="1" /> 대형 옵션 1</label>
-        <label><input type="checkbox" value="2" /> 대형 옵션 2</label>
-      </biz-checkbox-group>
-    </div>
-  `
+export const VariantButton: Story = {
+  args: {
+    variant: 'button',
+  },
 };
 
-export const States: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 24px;">
-      <biz-checkbox-group disabled>
-        <span slot="label-slot">Disabled State</span>
-        <label><input type="checkbox" value="1" /> 비활성화 1</label>
-        <label><input type="checkbox" value="2" /> 비활성화 2</label>
-      </biz-checkbox-group>
+export const SizeSmall: Story = {
+  args: {
+    size: 'small',
+  },
+};
 
-      <biz-checkbox-group readonly .value="${['1']}">
-        <span slot="label-slot">Readonly State</span>
-        <label><input type="checkbox" value="1" /> 읽기 전용 1</label>
-        <label><input type="checkbox" value="2" /> 읽기 전용 2</label>
-      </biz-checkbox-group>
+export const SizeMedium: Story = {
+  args: {
+    size: 'medium',
+  },
+};
 
-      <biz-checkbox-group error>
-        <span slot="label-slot">Error State</span>
-        <label><input type="checkbox" value="1" /> 에러 옵션 1</label>
-        <label><input type="checkbox" value="2" /> 에러 옵션 2</label>
-        <span slot="helper-text-slot">필수 항목을 선택해 주세요.</span>
-      </biz-checkbox-group>
-    </div>
-  `
+export const SizeLarge: Story = {
+  args: {
+    size: 'large',
+  },
+};
+
+export const HorizontalLayout: Story = {
+  args: {
+    orientation: 'horizontal',
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
+};
+
+export const Readonly: Story = {
+  args: {
+    readonly: true,
+  },
+};
+
+export const ErrorState: Story = {
+  args: {
+    error: true,
+    helperTextSlot: '최소 1개 이상의 항목을 선택해야 합니다.',
+  },
+};
+
+export const EventChange: Story = {
+  args: {
+    onChange: fn( e => {
+        alert(JSON.stringify(e.detail));
+    }),
+    labelSlot: '체크사항이 변경되면 그룹내 체크 목록을 리턴합니다. ',
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const checkboxes = canvasElement.querySelectorAll('input[type="checkbox"]');
+    if (checkboxes.length > 1) {
+      await userEvent.click(checkboxes[1]);
+      await expect(args.onChange).toHaveBeenCalled();
+    }
+  },
+};
+
+export const EventClear: Story = {
+  args: {
+    onClear: fn(),
+    labelSlot: `
+        biz-checkbox-group의 clear() 함수를 호출하면 전부 체크 해제되면서 change 이벤트가 발생합니다.
+    `,
+    helperTextSlot: `
+         <pre>
+            const group = document.querySelector('biz-checkbox-group')
+            group.clear()
+         </pre>
+    `,
+  },
+  play: async ({ canvasElement, args }) => {
+    const group = canvasElement.querySelector('biz-checkbox-group') as any;
+    if (group && typeof group.clear === 'function') {
+      group.clear();
+      await expect(args.onClear).toHaveBeenCalled();
+    }
+  },
 };

@@ -1,67 +1,54 @@
-import { html, type TemplateResult } from 'lit';
+import { html } from "lit";
+import { classMap } from "lit/directives/class-map.js";
 
-export interface CheckboxGroupTemplateProps {
-  labelId: string;
-  helperId: string;
-  orientation?: 'vertical' | 'horizontal';
-  size?: 'small' | 'medium' | 'large';
-  variant?: 'standard' | 'card' | 'button';
-  fullWidth?: boolean;
-  required?: boolean;
-  disabled?: boolean;
-  readonly?: boolean;
-  error?: boolean;
-  onSlotChange?: (e: Event) => void;
+export interface CheckboxGroupHost {
+  value: string[];
+  name: string;
+  orientation: 'vertical' | 'horizontal';
+  required: boolean;
+  disabled: boolean;
+  readonly: boolean;
+  error: boolean;
+  min: number;
+  max: number;
+  variant: 'standard' | 'card' | 'button';
+  size: 'small' | 'medium' | 'large';
+  fullWidth: boolean;
+  handleSlotChange: (e: Event) => void;
+  handleCheckboxChange: (e: Event) => void;
 }
 
-export const CheckboxGroupTemplate = (props: CheckboxGroupTemplateProps): TemplateResult => {
-  const {
-    labelId,
-    helperId,
-    orientation = 'vertical',
-    size = 'medium',
-    variant = 'standard',
-    fullWidth = false,
-    required = false,
-    disabled = false,
-    readonly = false,
-    error = false,
-    onSlotChange
-  } = props;
+export const CheckboxGroupTemplate = (host: CheckboxGroupHost) => html`
+  <fieldset
+    class=${classMap({
+      'biz-checkbox-group': true,
+      [`biz-checkbox-group--${host.variant}`]: true,
+      [`biz-checkbox-group--${host.size}`]: true,
+      'biz-checkbox-group--horizontal': host.orientation === 'horizontal',
+      'biz-checkbox-group--vertical': host.orientation === 'vertical',
+      'biz-checkbox-group--disabled': host.disabled,
+      'biz-checkbox-group--readonly': host.readonly,
+      'biz-checkbox-group--error': host.error,
+      'biz-checkbox-group--full-width': host.fullWidth,
+    })}
+    role="group"
+    aria-invalid=${host.error ? 'true' : 'false'}
+    aria-required=${host.required ? 'true' : 'false'}
+    ?disabled=${host.disabled}
+  >
+    <legend class="biz-checkbox-group__label">
+      <slot name="label-slot"></slot>
+    </legend>
 
-  const groupClasses = [
-    'biz-checkbox-group',
-    `biz-checkbox-group--${orientation}`,
-    `biz-checkbox-group--${size}`,
-    `biz-checkbox-group--${variant}`,
-    fullWidth ? 'biz-checkbox-group--full-width' : '',
-    disabled ? 'biz-checkbox-group--disabled' : '',
-    readonly ? 'biz-checkbox-group--readonly' : '',
-    error ? 'biz-checkbox-group--error' : ''
-  ].filter(Boolean).join(' ');
-
-  return html`
     <div
-      class="${groupClasses}"
-      role="group"
-      aria-labelledby="${labelId}"
-      aria-describedby="${helperId}"
-      aria-invalid="${error ? 'true' : 'false'}"
-      aria-required="${required ? 'true' : 'false'}"
-      ?data-disabled="${disabled}"
-      ?data-readonly="${readonly}"
+      class="biz-checkbox-group__container"
+      @change=${host.handleCheckboxChange}
     >
-      <div id="${labelId}" class="biz-checkbox-group__label">
-        <slot name="label-slot"></slot>
-      </div>
-
-      <div class="biz-checkbox-group__container">
-        <slot @slotchange="${onSlotChange}"></slot>
-      </div>
-
-      <div id="${helperId}" class="biz-checkbox-group__helper-text">
-        <slot name="helper-text-slot"></slot>
-      </div>
+      <slot @slotchange=${host.handleSlotChange}></slot>
     </div>
-  `;
-};
+
+    <div class="biz-checkbox-group__helper-text" id="helper-text">
+      <slot name="helper-text-slot"></slot>
+    </div>
+  </fieldset>
+`;

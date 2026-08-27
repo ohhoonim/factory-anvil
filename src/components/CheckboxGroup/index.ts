@@ -1,1 +1,1 @@
-export { CheckboxGroup as CheckboxGroupWc } from './CheckboxGroup.wc';
+export { BizCheckboxGroup } from './CheckboxGroup.wc';
