@@ -1,87 +1,74 @@
-import { html, type TemplateResult } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { html } from "lit";
+import { classMap } from "lit/directives/class-map.js";
 
-export interface RadioButtonProps {
-  checked?: boolean;
-  value?: string | number | boolean;
-  name?: string;
-  size?: 'small' | 'medium' | 'large';
-  variant?: 'standard' | 'button' | 'card';
-  labelPosition?: 'right' | 'left';
-  readonly?: boolean;
-  disabled?: boolean;
-  error?: boolean;
-  descriptionId?: string;
-  onInput?: (e: Event) => void;
-  onChange?: (e: Event) => void;
-  onFocus?: (e: FocusEvent) => void;
-  onBlur?: (e: FocusEvent) => void;
+export interface RadioButtonHost {
+  checked: boolean;
+  value: string | number | boolean;
+  name: string;
+  size: 'small' | 'medium' | 'large';
+  variant: 'standard' | 'button' | 'card' | 'outlined' | 'filled';
+  labelPosition: 'right' | 'left';
+  readonly: boolean;
+  disabled: boolean;
+  error: boolean;
+  helperTextId: string;
+  handleInputChange: (e: Event) => void;
+  handleFocus: (e: FocusEvent) => void;
+  handleBlur: (e: FocusEvent) => void;
 }
 
-export const RadioButtonTemplate = (props: RadioButtonProps): TemplateResult => {
-  const {
-    checked = false,
-    value = '',
-    name = '',
-    size = 'medium',
-    variant = 'standard',
-    labelPosition = 'right',
-    readonly = false,
-    disabled = false,
-    error = false,
-    descriptionId,
-    onInput,
-    onChange,
-    onFocus,
-    onBlur,
-  } = props;
+export const RadioButtonTemplate = (host: RadioButtonHost) => html`
+  <div
+    class=${classMap({
+      'biz-radio-button': true,
+      'biz-radio-button--checked': host.checked,
+      'biz-radio-button--disabled': host.disabled,
+      'biz-radio-button--readonly': host.readonly,
+      'biz-radio-button--error': host.error,
+      [`biz-radio-button--${host.size}`]: Boolean(host.size),
+      [`biz-radio-button--${host.variant}`]: Boolean(host.variant),
+      [`biz-radio-button--label-${host.labelPosition}`]: Boolean(host.labelPosition),
+    })}
+  >
+    <label class="biz-radio-button__container">
+      <slot name="start-slot"></slot>
 
-  const isInteractive = !disabled && !readonly;
-
-  return html`
-    <div
-      class=${[
-        'biz-radio-button',
-        `biz-radio-button--${size}`,
-        `biz-radio-button--${variant}`,
-        `biz-radio-button--label-${labelPosition}`,
-        checked ? 'biz-radio-button--checked' : '',
-        disabled ? 'biz-radio-button--disabled' : '',
-        readonly ? 'biz-radio-button--readonly' : '',
-        error ? 'biz-radio-button--error' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-    >
-      <label class="biz-radio-button__label-container">
+      <div class="biz-radio-button__wrapper">
         <input
           type="radio"
           class="biz-radio-button__input"
-          .checked=${checked}
-          .value=${String(value)}
-          name=${name}
-          ?disabled=${disabled}
-          ?readonly=${readonly}
-          aria-checked=${checked ? 'true' : 'false'}
-          aria-invalid=${error ? 'true' : 'false'}
-          aria-describedby=${ifDefined(descriptionId || undefined)}
-          @input=${isInteractive ? onInput : (e: Event) => e.preventDefault()}
-          @change=${isInteractive ? onChange : (e: Event) => e.preventDefault()}
-          @focus=${onFocus}
-          @blur=${onBlur}
+          .name=${host.name}
+          .value=${String(host.value)}
+          .checked=${host.checked}
+          .disabled=${host.disabled}
+          .readOnly=${host.readonly}
+          aria-checked=${host.checked ? 'true' : 'false'}
+          aria-invalid=${host.error ? 'true' : 'false'}
+          aria-describedby=${host.helperTextId}
+          @change=${host.handleInputChange}
+          @focus=${host.handleFocus}
+          @blur=${host.handleBlur}
         />
-        <span class="biz-radio-button__control" aria-hidden="true">
+        <span class="biz-radio-button__control">
           <slot name="icon-slot">
-            <span class="biz-radio-button__dot"></span>
+            <span class="biz-radio-button__inner-dot"></span>
           </slot>
         </span>
+
         <span class="biz-radio-button__label">
-          <slot></slot>
+          <slot name="label-slot">
+            <slot></slot>
+          </slot>
         </span>
-      </label>
-      <div id=${descriptionId || ''} class="biz-radio-button__description">
-        <slot name="description-slot"></slot>
       </div>
+
+      <slot name="end-slot"></slot>
+    </label>
+
+    <div id=${host.helperTextId} class="biz-radio-button__description">
+      <slot name="description-slot">
+        <slot name="helper-text-slot"></slot>
+      </slot>
     </div>
-  `;
-};
+  </div>
+`;

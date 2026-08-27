@@ -1,9 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import './RadioButton.wc';
-import { RadioButton } from './RadioButton.wc';
+import { fn } from 'storybook/test';
+import type { RadioButtonHost } from './RadioButton.js';
+import './RadioButton.wc.js';
 
-const meta: Meta<RadioButton> = {
+type Args = Required<RadioButtonHost> & {
+  defaultSlot?: string;
+  iconSlot?: string;
+  descriptionSlot?: string;
+};
+
+const meta: Meta<Args> = {
   title: 'Components/Forms/RadioButton',
   component: 'biz-radio-button',
   tags: ['autodocs'],
@@ -12,31 +19,41 @@ const meta: Meta<RadioButton> = {
     value: { control: 'text' },
     name: { control: 'text' },
     size: {
-      control: { type: 'select' },
+      control: 'select',
       options: ['small', 'medium', 'large'],
     },
     variant: {
-      control: { type: 'select' },
-      options: ['standard', 'button', 'card'],
+      control: 'select',
+      options: ['standard', 'button', 'card', 'outlined', 'filled'],
     },
     labelPosition: {
-      control: { type: 'select' },
+      control: 'select',
       options: ['right', 'left'],
     },
     readonly: { control: 'boolean' },
     disabled: { control: 'boolean' },
     error: { control: 'boolean' },
+    defaultSlot: { control: 'text' },
+    iconSlot: { control: 'text' },
+    descriptionSlot: { control: 'text' },
   },
   args: {
     checked: false,
     value: 'option1',
-    name: 'demo-radio',
+    name: 'radio-group',
     size: 'medium',
     variant: 'standard',
     labelPosition: 'right',
     readonly: false,
     disabled: false,
     error: false,
+    helperTextId: 'radio-helper-text',
+    defaultSlot: '라디오 버튼 옵션',
+    iconSlot: '',
+    descriptionSlot: '',
+    handleInputChange: fn(),
+    handleFocus: fn(),
+    handleBlur: fn(),
   },
   render: (args) => html`
     <biz-radio-button
@@ -46,76 +63,76 @@ const meta: Meta<RadioButton> = {
       .size=${args.size}
       .variant=${args.variant}
       label-position=${args.labelPosition}
-      ?readonly=${args.readonly}
-      ?disabled=${args.disabled}
-      ?error=${args.error}
+      .readonly=${args.readonly}
+      .disabled=${args.disabled}
+      .error=${args.error}
+      @change=${args.handleInputChange}
+      @focus=${args.handleFocus}
+      @blur=${args.handleBlur}
     >
-      라디오 옵션 항목
+      ${args.defaultSlot}
+      ${args.iconSlot ? html`<span slot="icon-slot">${args.iconSlot}</span>` : ''}
+      ${args.descriptionSlot
+        ? html`<span slot="description-slot">${args.descriptionSlot}</span>`
+        : ''}
     </biz-radio-button>
   `,
 };
 
 export default meta;
-type Story = StoryObj<RadioButton>;
+type Story = StoryObj<Args>;
 
 export const Default: Story = {};
 
 export const Variants: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <biz-radio-button name="variant-group" value="standard" variant="standard" checked>
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <biz-radio-button .variant=${'standard'} .name=${args.name} value="standard">
         Standard Variant
       </biz-radio-button>
-      <biz-radio-button name="variant-group" value="button" variant="button">
+      <biz-radio-button .variant=${'outlined'} .name=${args.name} value="outlined">
+        Outlined Variant
+      </biz-radio-button>
+      <biz-radio-button .variant=${'filled'} .name=${args.name} value="filled">
+        Filled Variant
+      </biz-radio-button>
+      <biz-radio-button .variant=${'button'} .name=${args.name} value="button">
         Button Variant
       </biz-radio-button>
-      <biz-radio-button name="variant-group" value="card" variant="card">
+      <biz-radio-button .variant=${'card'} .name=${args.name} value="card">
         Card Variant
-        <span slot="description-slot">카드 형태의 풍부한 보조 설명 영역입니다.</span>
       </biz-radio-button>
     </div>
   `,
 };
 
 export const Sizes: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <biz-radio-button name="size-group" size="small" value="sm">Small Size</biz-radio-button>
-      <biz-radio-button name="size-group" size="medium" value="md" checked>Medium Size</biz-radio-button>
-      <biz-radio-button name="size-group" size="large" value="lg">Large Size</biz-radio-button>
-    </div>
-  `,
-};
-
-export const LabelPositions: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <biz-radio-button name="label-pos-group" label-position="right" value="right" checked>
-        Right Label Position (Default)
-      </biz-radio-button>
-      <biz-radio-button name="label-pos-group" label-position="left" value="left">
-        Left Label Position
-      </biz-radio-button>
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <biz-radio-button .size=${'small'} .name=${args.name} value="sm"> Small Size </biz-radio-button>
+      <biz-radio-button .size=${'medium'} .name=${args.name} value="md"> Medium Size </biz-radio-button>
+      <biz-radio-button .size=${'large'} .name=${args.name} value="lg"> Large Size </biz-radio-button>
     </div>
   `,
 };
 
 export const States: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-radio-button name="state-group" value="disabled" disabled>
+      <biz-radio-button .checked=${true} .name=${args.name} value="checked">
+        Checked State
+      </biz-radio-button>
+      <biz-radio-button .disabled=${true} .name=${args.name} value="disabled">
         Disabled State
       </biz-radio-button>
 
-      <biz-radio-button name="state-group" value="disabled-checked" disabled checked>
+      <biz-radio-button .disabled=${true} .checked=${true} .name=${args.name} value="disabled-checked">
         Disabled Checked State
       </biz-radio-button>
-
-      <biz-radio-button name="state-group" value="readonly" readonly checked>
+      <biz-radio-button .readonly=${true} .checked=${true} .name=${args.name} value="readonly">
         Readonly State
       </biz-radio-button>
-
-      <biz-radio-button name="state-group" value="error" error>
+      <biz-radio-button .error=${true} .name=${args.name} value="error">
         Error State
         <span slot="description-slot">필수 선택 항목입니다.</span>
       </biz-radio-button>
@@ -123,14 +140,34 @@ export const States: Story = {
   `,
 };
 
-export const CustomSlots: Story = {
-  render: () => html`
-    <biz-radio-button name="custom-slot-group" value="custom" checked>
-      커스텀 아이콘 & 설명
-      <svg slot="icon-slot" width="10" height="10" viewBox="0 0 24 24" fill="#2563eb">
-        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-      </svg>
-      <span slot="description-slot">아이콘 슬롯과 디스크립션 슬롯이 재정의된 커스텀 모드입니다.</span>
+export const LabelPositions: Story = {
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <biz-radio-button label-position="right" .name=${args.name} value="right">
+        Right Label Position
+      </biz-radio-button>
+      <biz-radio-button label-position="left" .name=${args.name} value="left">
+        Left Label Position
+      </biz-radio-button>
+    </div>
+  `,
+};
+
+export const Events: Story = {
+  args: {
+    handleInputChange: fn(),
+    handleFocus: fn(),
+    handleBlur: fn(),
+  },
+  render: (args) => html`
+    <biz-radio-button
+      .name=${args.name}
+      value="event-test"
+      @change=${args.handleInputChange}
+      @focus=${args.handleFocus}
+      @blur=${args.handleBlur}
+    >
+      이벤트 테스트 (Change, Focus, Blur)
     </biz-radio-button>
   `,
 };
