@@ -1,11 +1,11 @@
+import {createComponent} from '@lit/react';
 import React from 'react';
-import { createComponent } from '@lit/react';
-import { DateRangePicker as DateRangePickerWc } from './DateRangePicker.wc.ts';
+import { BizDateRangePicker } from './DateRangePicker.wc.js';
 
 export const DateRangePicker = createComponent({
-  tagName: 'biz-date-range-picker',
-  elementClass: DateRangePickerWc,
   react: React,
+  tagName: 'biz-date-range-picker',
+  elementClass: BizDateRangePicker,
   events: {
     onChange: 'change',
     onInput: 'input',
@@ -13,6 +13,6 @@ export const DateRangePicker = createComponent({
     onRangeEndSelect: 'range-end-select',
     onOpen: 'open',
     onClose: 'close',
-    onClear: 'clear',
-  },
+    onClear: 'clear'
+  }
 });
