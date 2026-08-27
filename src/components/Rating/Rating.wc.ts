@@ -1,20 +1,11 @@
-import { LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ratingStyles } from './Rating.css';
-import { RatingTemplate } from './Rating';
+import { ratingStyles } from './Rating.css.js';
+import { RatingTemplate, type RatingHost } from './Rating.js';
 
-/**
- * @element biz-rating
- * 
- * @slot icon-empty-slot
- * @slot icon-half-slot isHalf == true
- * @slot icon-filled-slot
- * @slot value-label-slot
- * @slot biz-rating__helper
- */
 @customElement('biz-rating')
-export class BizRating extends LitElement {
-  static styles = ratingStyles;
+export class BizRating extends LitElement implements RatingHost {
+  static override styles = ratingStyles;
 
   @property({ type: Number })
   value = 0;
@@ -44,160 +35,148 @@ export class BizRating extends LitElement {
   name: string | null = null;
 
   @state()
-  private hoverValue: number | null = null;
+  hoverValue: number | null = null;
 
-  @state()
-  private focused = false;
-
-  private calculateValueFromEvent(e: MouseEvent, index: number): number {
-    const target = e.currentTarget as HTMLElement;
+  private calculateValueFromEvent(event: MouseEvent, index: number): number {
+    const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const x = event.clientX - rect.left;
     const width = rect.width;
+    const isHalf = x < width / 2;
 
-    let targetValue = index + 1;
+    let calculatedValue = index + 1;
 
-    if (this.precision < 1) {
+    if (this.precision === 0.5 && isHalf) {
+      calculatedValue -= 0.5;
+    } else if (this.precision < 1 && this.precision > 0) {
       const ratio = x / width;
-      const steppedRatio = Math.ceil(ratio / this.precision) * this.precision;
-      targetValue = index + steppedRatio;
+      const roundedRatio = Math.ceil(ratio / this.precision) * this.precision;
+      calculatedValue = index + Math.min(Math.max(roundedRatio, this.precision), 1);
     }
 
-    return Math.min(Math.max(targetValue, 0), this.max);
+    return parseFloat(calculatedValue.toFixed(2));
   }
 
-  private handleItemMouseMove(e: MouseEvent, index: number): void {
+  handleMouseMove(event: MouseEvent, index: number): void {
     if (this.disabled || this.readonly) return;
-    const nextHoverValue = this.calculateValueFromEvent(e, index);
+
+    const nextHoverValue = this.calculateValueFromEvent(event, index);
     if (this.hoverValue !== nextHoverValue) {
       this.hoverValue = nextHoverValue;
       this.dispatchEvent(
         new CustomEvent('hover-change', {
-          detail: { value: this.hoverValue },
           bubbles: true,
           composed: true,
+          detail: { value: this.hoverValue },
         })
       );
     }
   }
 
-  private handleItemMouseLeave(): void {
+  handleMouseLeave(): void {
     if (this.disabled || this.readonly) return;
+
     if (this.hoverValue !== null) {
       this.hoverValue = null;
       this.dispatchEvent(
         new CustomEvent('hover-change', {
-          detail: { value: this.value },
           bubbles: true,
           composed: true,
+          detail: { value: this.value },
         })
       );
     }
   }
 
-  private handleItemClick(e: MouseEvent, index: number): void {
+  handleClick(event: MouseEvent, index: number): void {
     if (this.disabled || this.readonly) return;
-    const selectedValue = this.calculateValueFromEvent(e, index);
-    this.setValue(selectedValue);
-  }
 
-  private setValue(newValue: number): void {
-    if (this.allowClear && this.value === newValue) {
+    const selectedValue = this.calculateValueFromEvent(event, index);
+
+    if (this.allowClear && this.value === selectedValue) {
       this.value = 0;
       this.dispatchEvent(
         new CustomEvent('clear', {
           bubbles: true,
           composed: true,
+          detail: { value: 0 },
         })
       );
-    } else {
-      this.value = newValue;
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          bubbles: true,
+          composed: true,
+          detail: { value: 0 },
+        })
+      );
+      return;
     }
 
-    this.dispatchEvent(
-      new CustomEvent('input', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
-
+    this.value = selectedValue;
     this.dispatchEvent(
       new CustomEvent('change', {
-        detail: { value: this.value },
         bubbles: true,
         composed: true,
+        detail: { value: this.value },
       })
     );
   }
 
-  private handleKeyDown(e: KeyboardEvent): void {
+  handleKeyDown(event: KeyboardEvent): void {
     if (this.disabled || this.readonly) return;
 
-    const step = this.precision || 1;
-    let handled = false;
+    const step = this.precision > 0 ? this.precision : 1;
+    let newValue = this.value;
 
-    switch (e.key) {
+    switch (event.key) {
       case 'ArrowRight':
       case 'ArrowUp':
-        this.setValue(Math.min(this.max, this.value + step));
-        handled = true;
+        event.preventDefault();
+        newValue = Math.min(this.max, parseFloat((this.value + step).toFixed(2)));
         break;
       case 'ArrowLeft':
       case 'ArrowDown':
-        this.setValue(Math.max(0, this.value - step));
-        handled = true;
+        event.preventDefault();
+        newValue = Math.max(0, parseFloat((this.value - step).toFixed(2)));
         break;
       case 'Home':
-        this.setValue(0);
-        handled = true;
+        event.preventDefault();
+        newValue = 0;
         break;
       case 'End':
-        this.setValue(this.max);
-        handled = true;
+        event.preventDefault();
+        newValue = this.max;
         break;
-      case 'Escape':
-        this.hoverValue = null;
-        handled = true;
-        break;
+      default:
+        return;
     }
 
-    if (handled) {
-      e.preventDefault();
-      e.stopPropagation();
+    if (newValue !== this.value) {
+      if (this.allowClear && newValue === 0) {
+        this.value = 0;
+        this.dispatchEvent(
+          new CustomEvent('clear', {
+            bubbles: true,
+            composed: true,
+            detail: { value: 0 },
+          })
+        );
+      } else {
+        this.value = newValue;
+      }
+
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          bubbles: true,
+          composed: true,
+          detail: { value: this.value },
+        })
+      );
     }
   }
 
-  private handleFocus(): void {
-    if (this.disabled) return;
-    this.focused = true;
-  }
-
-  private handleBlur(): void {
-    this.focused = false;
-    this.hoverValue = null;
-  }
-
-  render() {
-    return RatingTemplate({
-      value: this.value,
-      max: this.max,
-      precision: this.precision,
-      allowClear: this.allowClear,
-      readonly: this.readonly,
-      disabled: this.disabled,
-      showTooltip: this.showTooltip,
-      size: this.size,
-      name: this.name,
-      hoverValue: this.hoverValue,
-      focused: this.focused,
-      onItemMouseMove: this.handleItemMouseMove.bind(this),
-      onItemMouseLeave: this.handleItemMouseLeave.bind(this),
-      onItemClick: this.handleItemClick.bind(this),
-      onKeyDown: this.handleKeyDown.bind(this),
-      onFocus: this.handleFocus.bind(this),
-      onBlur: this.handleBlur.bind(this),
-    });
+  override render() {
+    return RatingTemplate(this);
   }
 }
 
