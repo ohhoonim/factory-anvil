@@ -1,1 +1,1 @@
-export { FileUploader as FileUploaderWc } from './FileUploader.wc';
+export { BizFileUploader } from './FileUploader.wc.js';

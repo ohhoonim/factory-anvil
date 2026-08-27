@@ -1,113 +1,232 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import './FileUploader.wc';
+import { fn } from 'storybook/test';
+import './FileUploader.wc.js';
+import type { FileUploaderHost, FileUploadedFile } from './FileUploader.js';
 
-const meta: Meta = {
+type Args = Required<FileUploaderHost> & {
+  'label-slot': string;
+  'drop-zone-content-slot': string;
+  'file-item-slot': string;
+  'upload-button-slot': string;
+  'helper-text-slot': string;
+  onChange: (e: CustomEvent) => void;
+  onFileAdd: (e: CustomEvent) => void;
+  onFileRemove: (e: CustomEvent) => void;
+  onUploadProgress: (e: CustomEvent) => void;
+  onError: (e: CustomEvent) => void;
+  onClear: (e: CustomEvent) => void;
+};
+
+const meta: Meta<Args> = {
   title: 'Components/Forms/FileUploader',
   component: 'biz-file-uploader',
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['dropzone', 'button', 'compact']
+      options: ['dropzone', 'button', 'compact'],
     },
     size: {
       control: { type: 'select' },
-      options: ['small', 'medium', 'large']
+      options: ['small', 'medium', 'large'],
     },
+    accept: { control: 'text' },
+    multiple: { control: 'boolean' },
+    maxSize: { control: 'number' },
+    maxCount: { control: 'number' },
+    autoUpload: { control: 'boolean' },
     disabled: { control: 'boolean' },
     readonly: { control: 'boolean' },
     error: { control: 'boolean' },
-    multiple: { control: 'boolean' },
-    accept: { control: 'text' },
-    maxSize: { control: 'number' },
-    maxCount: { control: 'number' },
-    helperText: { control: 'text' }
+    fullWidth: { control: 'boolean' },
+    isDragOver: { control: 'boolean' },
+    isUploading: { control: 'boolean' },
+    errorMessage: { control: 'text' },
+    'label-slot': { control: 'text' },
+    'drop-zone-content-slot': { control: 'text' },
+    'file-item-slot': { control: 'text' },
+    'upload-button-slot': { control: 'text' },
+    'helper-text-slot': { control: 'text' },
   },
   args: {
-    variant: 'dropzone',
-    size: 'medium',
+    value: [],
+    accept: '.png,.jpg,.jpeg',
+    multiple: true,
+    maxSize: 5242880, // 5MB
+    maxCount: 5,
+    autoUpload: true,
     disabled: false,
     readonly: false,
     error: false,
-    multiple: false,
-    helperText: '최대 10MB까지 업로드 가능합니다.'
-  }
+    variant: 'dropzone',
+    size: 'medium',
+    fullWidth: false,
+    isDragOver: false,
+    isUploading: false,
+    errorMessage: '',
+    'label-slot': 'Upload Documents',
+    'drop-zone-content-slot': '',
+    'file-item-slot': '',
+    'upload-button-slot': '',
+    'helper-text-slot': 'PNG, JPG up to 5MB (Max 5 files)',
+    onChange: fn(),
+    onFileAdd: fn(),
+    onFileRemove: fn(),
+    onUploadProgress: fn(),
+    onError: fn(),
+    onClear: fn(),
+  },
+  render: (args) => html`
+    <biz-file-uploader
+      .value=${args.value}
+      .accept=${args.accept}
+      ?multiple=${args.multiple}
+      .maxSize=${args.maxSize}
+      .maxCount=${args.maxCount}
+      ?autoUpload=${args.autoUpload}
+      ?disabled=${args.disabled}
+      ?readonly=${args.readonly}
+      ?error=${args.error}
+      .variant=${args.variant}
+      .size=${args.size}
+      ?full-width=${args.fullWidth}
+      .errorMessage=${args.errorMessage}
+      @change=${args.onChange}
+      @file-add=${args.onFileAdd}
+      @file-remove=${args.onFileRemove}
+      @upload-progress=${args.onUploadProgress}
+      @error=${args.onError}
+      @clear=${args.onClear}
+    >
+      ${args['label-slot']
+        ? html`<label slot="label-slot" style="font-weight: 600; font-size: 14px;">${args['label-slot']}</label>`
+        : ''}
+      ${args['drop-zone-content-slot']
+        ? html`<div slot="drop-zone-content-slot">${args['drop-zone-content-slot']}</div>`
+        : ''}
+      ${args['file-item-slot']
+        ? html`<div slot="file-item-slot">${args['file-item-slot']}</div>`
+        : ''}
+      ${args['upload-button-slot']
+        ? html`<button slot="upload-button-slot">${args['upload-button-slot']}</button>`
+        : ''}
+      ${args['helper-text-slot']
+        ? html`<span slot="helper-text-slot" style="font-size: 12px; color: #6b7280;">${args['helper-text-slot']}</span>`
+        : ''}
+    </biz-file-uploader>
+  `,
 };
 
 export default meta;
-type Story = StoryObj;
+type Story = StoryObj<Args>;
 
-export const Default: Story = {
-  render: (args) => html`
-    <biz-file-uploader
-      .variant="${args.variant}"
-      .size="${args.size}"
-      ?disabled="${args.disabled}"
-      ?readonly="${args.readonly}"
-      ?error="${args.error}"
-      ?multiple="${args.multiple}"
-      .accept="${args.accept}"
-      .maxSize="${args.maxSize}"
-      .maxCount="${args.maxCount}"
-      .helperText="${args.helperText}"
-    >
-      <span slot="label-slot">프로필 이미지 업로드</span>
-    </biz-file-uploader>
-  `
-};
+export const Default: Story = {};
 
-export const ButtonMode: Story = {
-  args: {
-    variant: 'button'
-  },
+export const Variants: Story = {
   render: (args) => html`
-    <biz-file-uploader .variant="${args.variant}" .helperText="${args.helperText}">
-      <span slot="label-slot">첨부파일</span>
-    </biz-file-uploader>
-  `
-};
-
-export const CompactMode: Story = {
-  args: {
-    variant: 'compact'
-  },
-  render: (args) => html`
-    <biz-file-uploader .variant="${args.variant}" .helperText="${args.helperText}">
-      <span slot="label-slot">아바타 등록</span>
-    </biz-file-uploader>
-  `
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <div>
+        <h3>Drop Zone Mode (Default)</h3>
+        <biz-file-uploader
+          .variant=${'dropzone'}
+          .size=${args.size}
+          .value=${args.value}
+          @change=${args.onChange}
+        ></biz-file-uploader>
+      </div>
+      <div>
+        <h3>Button Mode</h3>
+        <biz-file-uploader
+          .variant=${'button'}
+          .size=${args.size}
+          .value=${args.value}
+          @change=${args.onChange}
+        ></biz-file-uploader>
+      </div>
+      <div>
+        <h3>Compact Mode</h3>
+        <biz-file-uploader
+          .variant=${'compact'}
+          .size=${args.size}
+          .value=${args.value}
+          @change=${args.onChange}
+        ></biz-file-uploader>
+      </div>
+    </div>
+  `,
 };
 
 export const Sizes: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-file-uploader size="small" helper-text="Small 사이즈">
-        <span slot="label-slot">Small</span>
-      </biz-file-uploader>
-      <biz-file-uploader size="medium" helper-text="Medium 사이즈">
-        <span slot="label-slot">Medium</span>
-      </biz-file-uploader>
-      <biz-file-uploader size="large" helper-text="Large 사이즈">
-        <span slot="label-slot">Large</span>
-      </biz-file-uploader>
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <div>
+        <h3>Small</h3>
+        <biz-file-uploader
+          .size=${'small'}
+          .variant=${args.variant}
+          .value=${args.value}
+        ></biz-file-uploader>
+      </div>
+      <div>
+        <h3>Medium</h3>
+        <biz-file-uploader
+          .size=${'medium'}
+          .variant=${args.variant}
+          .value=${args.value}
+        ></biz-file-uploader>
+      </div>
+      <div>
+        <h3>Large</h3>
+        <biz-file-uploader
+          .size=${'large'}
+          .variant=${args.variant}
+          .value=${args.value}
+        ></biz-file-uploader>
+      </div>
     </div>
-  `
+  `,
 };
 
-export const States: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-file-uploader disabled helper-text="비활성화 상태입니다.">
-        <span slot="label-slot">Disabled State</span>
-      </biz-file-uploader>
-      <biz-file-uploader readonly helper-text="읽기 전용 상태입니다.">
-        <span slot="label-slot">Readonly State</span>
-      </biz-file-uploader>
-      <biz-file-uploader error helper-text="올바르지 않은 파일 형식입니다.">
-        <span slot="label-slot">Error State</span>
-      </biz-file-uploader>
-    </div>
-  `
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
 };
 
+export const Readonly: Story = {
+  args: {
+    readonly: true,
+    value: [
+      { name: 'document_v1.pdf', size: 1048576, status: 'success' },
+      { name: 'image_preview.png', size: 2097152, status: 'success' },
+    ],
+  },
+};
+
+export const ErrorState: Story = {
+  args: {
+    error: true,
+    errorMessage: 'File size exceeds maximum limit (5MB).',
+  },
+};
+
+export const WithFilesAndProgress: Story = {
+  args: {
+    value: [
+      { name: 'completed_report.pdf', size: 1258291, status: 'success' },
+      { name: 'large_video_upload.mp4', size: 15728640, status: 'uploading', progress: 65 },
+    ] as FileUploadedFile[],
+  },
+};
+
+export const EventHandlers: Story = {
+  args: {
+    onChange: fn(),
+    onFileAdd: fn(),
+    onFileRemove: fn(),
+    onUploadProgress: fn(),
+    onError: fn(),
+    onClear: fn(),
+  },
+};
