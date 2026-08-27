@@ -1,10 +1,10 @@
-import { createComponent } from '@lit/react';
-import { ImageUpload as ImageUploadWc } from "./ImageUpload.wc";
 import React from 'react';
+import { createComponent } from '@lit/react';
+import { BizImageUpload } from './ImageUpload.wc.js';
 
 export const ImageUpload = createComponent({
   tagName: 'biz-image-upload',
-  elementClass: ImageUploadWc,
+  elementClass: BizImageUpload,
   react: React,
   events: {
     onChange: 'change',
@@ -12,7 +12,7 @@ export const ImageUpload = createComponent({
     onCropComplete: 'crop-complete',
     onCropCancel: 'crop-cancel',
     onRemove: 'remove',
-    onClear: 'clear',
     onError: 'error',
+    onClear: 'clear',
   },
 });
