@@ -1,111 +1,133 @@
-import { LitElement, type TemplateResult } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { checkboxGroupStyles } from './CheckboxGroup.css.js';
-import { CheckboxGroupTemplate } from './CheckboxGroup.js';
-
-let instanceCounter = 0;
-
-/**
- * @element biz-checkbox-group
- * @slot label-slot
- * @slot helper-text-slot
- * @slot (default) 
- */
+import { LitElement } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import { type CheckboxGroupHost, CheckboxGroupTemplate } from "./CheckboxGroup";
+import { checkboxGroupStyles } from "./CheckboxGroup.css";
 
 @customElement('biz-checkbox-group')
-export class CheckboxGroup extends LitElement {
+export class BizCheckboxGroup extends LitElement implements CheckboxGroupHost {
+  static formAssociated = true;
   static styles = checkboxGroupStyles;
 
-  @property({ type: Array }) value: string[] = [];
-  @property({ type: String }) name = '';
-  @property({ type: String }) orientation: 'vertical' | 'horizontal' = 'vertical';
-  @property({ type: String }) variant: 'standard' | 'card' | 'button' = 'standard';
-  @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
-  @property({ type: Boolean }) required = false;
-  @property({ type: Boolean }) disabled = false;
-  @property({ type: Boolean }) readonly = false;
-  @property({ type: Boolean }) error = false;
-  @property({ type: Boolean, attribute: 'full-width' }) fullWidth = false;
-  @property({ type: Number }) min = 0;
-  @property({ type: Number }) max = Number.POSITIVE_INFINITY;
+  private internals: ElementInternals;
 
-  @state() private labelId = `biz-checkbox-group-label-${++instanceCounter}`;
-  @state() private helperId = `biz-checkbox-group-helper-${instanceCounter}`;
-
-  private handleSlotChange(): void {
-    this.syncChildCheckboxes();
+  constructor() {
+    super();
+    this.internals = this.attachInternals();
   }
 
-  protected updated(changedProperties: Map<string | number | symbol, unknown>): void {
+  @property({ type: Array }) value: string[] = [];
+  @property({ type: String }) name: string = '';
+  @property({ type: String }) orientation: 'vertical' | 'horizontal' = 'vertical';
+  @property({ type: Boolean }) required: boolean = false;
+  @property({ type: Boolean }) disabled: boolean = false;
+  @property({ type: Boolean }) readonly: boolean = false;
+  @property({ type: Boolean }) error: boolean = false;
+  @property({ type: Number }) min: number = 0;
+  @property({ type: Number }) max: number = Infinity;
+  @property({ type: String }) variant: 'standard' | 'card' | 'button' = 'standard';
+  @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
+  @property({ type: Boolean, attribute: 'full-width' }) fullWidth: boolean = false;
+
+  private get checkboxes(): HTMLInputElement[] {
+    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement;
+    if (!slot) return [];
+    
+    const assigned = slot.assignedElements({ flatten: true });
+    const results: HTMLInputElement[] = [];
+
+    assigned.forEach((el) => {
+      if (el instanceof HTMLInputElement && el.type === 'checkbox') {
+        results.push(el);
+      } else if (el instanceof HTMLElement) {
+        const nested = el.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+        nested.forEach((input) => results.push(input));
+      }
+    });
+
+    return results;
+  }
+
+  protected updated(changedProperties: Map<string, any>): void {
     super.updated(changedProperties);
     if (
       changedProperties.has('value') ||
       changedProperties.has('disabled') ||
       changedProperties.has('readonly') ||
-      changedProperties.has('name')
+      changedProperties.has('required')
     ) {
-      this.syncChildCheckboxes();
+      this.syncCheckboxes();
+      this.validateForm();
     }
   }
 
-  private getSlottedCheckboxes(): HTMLInputElement[] {
-    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
-    if (!slot) return [];
-    
-    const assigned = slot.assignedElements({ flatten: true });
-    const checkboxes: HTMLInputElement[] = [];
-
-    assigned.forEach((el) => {
-      if (el instanceof HTMLInputElement && el.type === 'checkbox') {
-        checkboxes.push(el);
-      }
-      const nested = el.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
-      nested.forEach((input) => checkboxes.push(input));
-    });
-
-    return checkboxes;
+  public handleSlotChange(): void {
+    this.syncCheckboxes();
+    this.validateForm();
   }
 
-  private syncChildCheckboxes(): void {
-    const checkboxes = this.getSlottedCheckboxes();
-    checkboxes.forEach((cb) => {
-      if (this.name) cb.name = this.name;
-      cb.checked = this.value.includes(cb.value);
+  private syncCheckboxes(): void {
+    const currentValues = Array.isArray(this.value) ? this.value : [];
+    
+    this.checkboxes.forEach((cb) => {
+      cb.checked = currentValues.includes(cb.value);
       cb.disabled = this.disabled;
-      cb.readOnly = this.readonly;
-      
-      cb.removeEventListener('change', this.handleChildChange);
-      cb.addEventListener('change', this.handleChildChange);
+      if (this.readonly) {
+        cb.setAttribute('readonly', 'true');
+      } else {
+        cb.removeAttribute('readonly');
+      }
     });
   }
 
-  private handleChildChange = (e: Event): void => {
-    if (this.disabled || this.readonly) return;
-    
-    const target = e.target as HTMLInputElement;
-    let newValue = [...this.value];
+  private validateForm(): void {
+    if (this.required && this.value.length === 0) {
+      this.internals.setValidity(
+        { valueMissing: true },
+        '하나 이상의 항목을 선택해 주세요.',
+        this.checkboxes[0]
+      );
+    } else if (this.value.length < this.min) {
+      this.internals.setValidity(
+        { rangeUnderflow: true },
+        `최소 ${this.min}개 이상 선택해야 합니다.`,
+        this.checkboxes[0]
+      );
+    } else {
+      this.internals.setValidity({});
+    }
+  }
 
+  public handleCheckboxChange(e: Event): void {
+    if (this.readonly || this.disabled) {
+      e.preventDefault();
+      return;
+    }
+
+    const target = e.target as HTMLInputElement;
+    if (!target || target.type !== 'checkbox') return;
+
+    let newValue = [...this.value];
     if (target.checked) {
-      if (newValue.length < this.max && !newValue.includes(target.value)) {
-        newValue.push(target.value);
-      } else if (newValue.length >= this.max) {
+      if (newValue.length < this.max) {
+        if (!newValue.includes(target.value)) {
+          newValue.push(target.value);
+        }
+      } else {
         target.checked = false;
         return;
       }
     } else {
-      newValue = newValue.filter((v) => v !== target.value);
+      newValue = newValue.filter((val) => val !== target.value);
     }
 
     this.value = newValue;
-    this.dispatchChangeEvent();
-  };
+    this.validateForm();
 
-  private dispatchChangeEvent(): void {
     this.dispatchEvent(
       new CustomEvent('change', {
         detail: { value: this.value },
         bubbles: true,
-        composed: true
+        composed: true,
       })
     );
   }
@@ -113,41 +135,26 @@ export class CheckboxGroup extends LitElement {
   public clear(): void {
     if (this.disabled || this.readonly) return;
     this.value = [];
-    this.syncChildCheckboxes();
-    this.dispatchChangeEvent();
+    this.syncCheckboxes();
+    this.validateForm();
+
     this.dispatchEvent(
       new CustomEvent('clear', {
+        detail: { value: [] },
         bubbles: true,
-        composed: true
+        composed: true,
+      })
+    );
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: [] },
+        bubbles: true,
+        composed: true,
       })
     );
   }
 
-  private handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      this.clear();
-    }
-  }
-
-  render(): TemplateResult {
-    return CheckboxGroupTemplate({
-      labelId: this.labelId,
-      helperId: this.helperId,
-      orientation: this.orientation,
-      size: this.size,
-      variant: this.variant,
-      fullWidth: this.fullWidth,
-      required: this.required,
-      disabled: this.disabled,
-      readonly: this.readonly,
-      error: this.error,
-      onSlotChange: () => this.handleSlotChange()
-    });
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'biz-checkbox-group': CheckboxGroup;
+  render() {
+    return CheckboxGroupTemplate(this);
   }
 }

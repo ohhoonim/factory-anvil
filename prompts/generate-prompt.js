@@ -65,6 +65,7 @@ const promptTemplate = `# {ComponentName} Biz-UI 웹 컴포넌트 개발 프롬�
    - index.ts (통합 export)
 3. 네임스페이스 및 명명 규칙:
    - 커스텀 엘리먼트 태그명: \`biz-{componentNameKebab}\`
+   - Lit 엘리먼트 클래스명: \`Biz{ComponentName}\`
    - CSS Design Token / Custom Properties: \`--biz-{componentNameKebab}-*\`
    - 루트 CSS 클래스명: \`biz-{componentNameKebab}\`
    - Lit 코어 템플릿 export 명칭: \`{ComponentName}Template\`
@@ -73,7 +74,7 @@ const promptTemplate = `# {ComponentName} Biz-UI 웹 컴포넌트 개발 프롬�
    - React Event Handler 매핑: Custom Event \`clear\` -> React Prop \`onClear\`
 
 [작성 대상 컴포넌트 정보]
-- 컴포넌트 명칭 (PascalCase): {ComponentName}
+- 컴포넌트 명칭 (PascalCase): Biz{ComponentName}
 - 커스텀 엘리먼트 태그명 (kebab-case): biz-{componentNameKebab}
 - Lit 스타일 변수명 (camelCase): {componentNameCamel}Styles
 
@@ -168,7 +169,7 @@ const promptTemplate = `# {ComponentName} Biz-UI 웹 컴포넌트 개발 프롬�
 
 \`\`\`\`text
 [요청 사항]
-1~4단계에서 작성된 코드와 요구사항 정의서를 바탕으로 컴포넌트 품질 관리를 위한 Storybook 문서 파일(\`{ComponentName}.stories.ts\`)과 단위/통합 테스트 파일(\`{ComponentName}.test.ts\`) 코드를 작성해 주세요.
+1~4단계에서 작성된 코드와 요구사항 정의서를 바탕으로 컴포넌트 품질 관리를 위한 Storybook 문서 파일(\`{ComponentName}.stories.ts\`) 코드를 작성해 주세요.
 
 [작성 조건 - {ComponentName}.stories.ts]
 1. Storybook v7+ CSF 3.0 명세를 준수하여 기본 Meta 및 Stories를 구현하세요.
