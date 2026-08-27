@@ -1,9 +1,7 @@
-import { html } from 'lit';
-import { classMap } from "lit/directives/class-map.js";
-import { styleMap } from "lit/directives/style-map.js";
+import { html } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
-export interface MarkdownEditorTemplateProps {
+export interface MarkdownEditorHost {
   value: string;
   mode: 'split' | 'edit' | 'preview';
   placeholder: string;
@@ -14,207 +12,204 @@ export interface MarkdownEditorTemplateProps {
   readonly: boolean;
   disabled: boolean;
   sanitize: boolean;
-  parsedHtml: string;
-  wordCount: number;
+  variant?: 'outlined' | 'filled' | 'standard';
+  size?: 'small' | 'medium' | 'large';
+  isFocused: boolean;
+  isResizing: boolean;
+  isError?: boolean;
+  isLoading?: boolean;
+  splitRatio: number;
   charCount: number;
+  wordCount: number;
   lineCount: number;
   cursorLine: number;
   cursorCol: number;
-  onInput: (e: Event) => void;
-  onKeyDown: (e: KeyboardEvent) => void;
-  onScroll: (e: Event) => void;
-  onToolbarAction: (action: string) => void;
-  onModeChange: (mode: 'split' | 'edit' | 'preview') => void;
-  onMouseDownResizer: (e: MouseEvent) => void;
-  onFocus: (e: FocusEvent) => void;
-  onBlur: (e: FocusEvent) => void;
-  onDrop: (e: DragEvent) => void;
+  renderedHtml: string;
+  
+  handleInput: (e: Event) => void;
+  handleFocus: (e: FocusEvent) => void;
+  handleBlur: (e: FocusEvent) => void;
+  handleKeyDown: (e: KeyboardEvent) => void;
+  handleScroll: (e: Event) => void;
+  handleResizerMouseDown: (e: MouseEvent) => void;
+  handleModeChange: (mode: 'split' | 'edit' | 'preview') => void;
+  insertFormat: (type: string) => void;
 }
 
-export const MarkdownEditorTemplate = (props: MarkdownEditorTemplateProps) => html`
-  <div
-    class=${classMap({
-      'biz-markdown-editor': true,
-      'biz-markdown-editor--split': props.mode === 'split',
-      'biz-markdown-editor--edit': props.mode === 'edit',
-      'biz-markdown-editor--preview': props.mode === 'preview',
-      'biz-markdown-editor--disabled': props.disabled,
-      'biz-markdown-editor--readonly': props.readonly,
-    })}
-    style=${styleMap({
-      height: props.height,
-      maxHeight: props.maxHeight || 'none',
-    })}
-  >
+export const MarkdownEditorTemplate = (host: MarkdownEditorHost) => {
+  const containerClasses = [
+    'biz-markdown-editor',
+    `biz-markdown-editor--${host.variant || 'outlined'}`,
+    `biz-markdown-editor--${host.size || 'medium'}`,
+    `biz-markdown-editor--mode-${host.mode}`,
+    host.isFocused ? 'biz-markdown-editor--focused' : '',
+    host.isResizing ? 'biz-markdown-editor--resizing' : '',
+    host.disabled ? 'biz-markdown-editor--disabled' : '',
+    host.readonly ? 'biz-markdown-editor--readonly' : '',
+    host.isError ? 'biz-markdown-editor--error' : '',
+    host.isLoading ? 'biz-markdown-editor--loading' : ''
+  ].filter(Boolean).join(' ');
+
+  return html`
     <div
-      role="toolbar"
-      aria-label="마크다운 에디터 도구 모음"
-      class="biz-markdown-editor__toolbar"
+      class="${containerClasses}"
+      style="height: ${host.height}; ${host.maxHeight ? `max-height: ${host.maxHeight};` : ''}"
     >
-      <div class="biz-markdown-editor__toolbar-group">
-        <slot name="toolbar-left-slot">
+      <!-- Screen Reader Live Region -->
+      <div class="biz-markdown-editor__sr-only" aria-live="polite">
+        현재 모드: ${host.mode}. 글자 수: ${host.charCount}, 단어 수: ${host.wordCount}
+      </div>
+
+      <!-- Toolbar -->
+      <div class="biz-markdown-editor__toolbar" role="toolbar" aria-label="에디터 도구 모음">
+        <div class="biz-markdown-editor__toolbar-group">
+          <slot name="start-slot"></slot>
+          <slot name="toolbar-left-slot"></slot>
+
           <button
             type="button"
+            class="biz-markdown-editor__toolbar-btn"
             aria-label="굵게"
-            ?disabled=${props.disabled || props.readonly}
-            @click=${() => props.onToolbarAction('bold')}
+            ?disabled="${host.disabled || host.readonly}"
+            @click="${() => host.insertFormat('bold')}"
           >
-            B
+            <b>B</b>
           </button>
           <button
             type="button"
+            class="biz-markdown-editor__toolbar-btn"
             aria-label="기울임"
-            ?disabled=${props.disabled || props.readonly}
-            @click=${() => props.onToolbarAction('italic')}
+            ?disabled="${host.disabled || host.readonly}"
+            @click="${() => host.insertFormat('italic')}"
           >
-            I
+            <i>I</i>
           </button>
           <button
             type="button"
-            aria-label="제목"
-            ?disabled=${props.disabled || props.readonly}
-            @click=${() => props.onToolbarAction('heading')}
-          >
-            H
-          </button>
-          <button
-            type="button"
+            class="biz-markdown-editor__toolbar-btn"
             aria-label="링크 삽입"
-            ?disabled=${props.disabled || props.readonly}
-            @click=${() => props.onToolbarAction('link')}
+            ?disabled="${host.disabled || host.readonly}"
+            @click="${() => host.insertFormat('link')}"
           >
             Link
           </button>
           <button
             type="button"
-            aria-label="이미지 주입"
-            ?disabled=${props.disabled || props.readonly}
-            @click=${() => props.onToolbarAction('image')}
+            class="biz-markdown-editor__toolbar-btn"
+            aria-label="이미지 삽입"
+            ?disabled="${host.disabled || host.readonly}"
+            @click="${() => host.insertFormat('image')}"
           >
             Image
           </button>
-          <button
-            type="button"
-            aria-label="목록"
-            ?disabled=${props.disabled || props.readonly}
-            @click=${() => props.onToolbarAction('list')}
-          >
-            List
-          </button>
-        </slot>
-      </div>
+        </div>
 
-      <div class="biz-markdown-editor__toolbar-group">
-        <slot name="toolbar-right-slot">
+        <div class="biz-markdown-editor__toolbar-group">
+          <slot name="toolbar-right-slot"></slot>
+          <slot name="end-slot"></slot>
+
           <button
             type="button"
-            aria-label="분할 뷰 모드"
-            class=${classMap({ active: props.mode === 'split' })}
-            ?disabled=${props.disabled}
-            @click=${() => props.onModeChange('split')}
+            class="biz-markdown-editor__toolbar-btn ${host.mode === 'split' ? 'biz-markdown-editor__toolbar-btn--active' : ''}"
+            aria-label="분할 뷰"
+            ?disabled="${host.disabled}"
+            @click="${() => host.handleModeChange('split')}"
           >
             Split
           </button>
           <button
             type="button"
-            aria-label="에디터 전용 모드"
-            class=${classMap({ active: props.mode === 'edit' })}
-            ?disabled=${props.disabled}
-            @click=${() => props.onModeChange('edit')}
+            class="biz-markdown-editor__toolbar-btn ${host.mode === 'edit' ? 'biz-markdown-editor__toolbar-btn--active' : ''}"
+            aria-label="편집기만 보기"
+            ?disabled="${host.disabled}"
+            @click="${() => host.handleModeChange('edit')}"
           >
             Edit
           </button>
           <button
             type="button"
-            aria-label="미리보기 전용 모드"
-            class=${classMap({ active: props.mode === 'preview' })}
-            ?disabled=${props.disabled}
-            @click=${() => props.onModeChange('preview')}
+            class="biz-markdown-editor__toolbar-btn ${host.mode === 'preview' ? 'biz-markdown-editor__toolbar-btn--active' : ''}"
+            aria-label="미리보기만 보기"
+            ?disabled="${host.disabled}"
+            @click="${() => host.handleModeChange('preview')}"
           >
             Preview
           </button>
+        </div>
+      </div>
+
+      <!-- Main Workspace -->
+      <div class="biz-markdown-editor__main">
+        <!-- Editor Pane -->
+        <div
+          class="biz-markdown-editor__pane biz-markdown-editor__pane--editor"
+          style="--editor-width: ${host.splitRatio}%"
+        >
+          <div class="biz-markdown-editor__pane-header">
+            <slot name="label-slot"></slot>
+            <slot name="editor-header-slot"></slot>
+          </div>
+          <textarea
+            class="biz-markdown-editor__textarea"
+            role="textbox"
+            aria-multiline="true"
+            aria-label="마크다운 에디터 입력창"
+            .value="${host.value}"
+            placeholder="${host.placeholder}"
+            ?autofocus="${host.autofocus}"
+            ?readonly="${host.readonly}"
+            ?disabled="${host.disabled}"
+            @input="${host.handleInput}"
+            @focus="${host.handleFocus}"
+            @blur="${host.handleBlur}"
+            @keydown="${host.handleKeyDown}"
+            @scroll="${host.handleScroll}"
+          ></textarea>
+        </div>
+
+        <!-- Split Resizer -->
+        <div
+          class="biz-markdown-editor__resizer"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="에디터 및 미리보기 크기 조절 바"
+          @mousedown="${host.handleResizerMouseDown}"
+        ></div>
+
+        <!-- Preview Pane -->
+        <div
+          class="biz-markdown-editor__pane biz-markdown-editor__pane--preview"
+          role="region"
+          aria-label="미리보기"
+        >
+          <div class="biz-markdown-editor__pane-header">
+            <slot name="preview-header-slot"></slot>
+          </div>
+          <div class="biz-markdown-editor__preview-content" @scroll="${host.handleScroll}">
+            <slot name="custom-preview-slot">
+              ${unsafeHTML(host.renderedHtml)}
+            </slot>
+          </div>
+        </div>
+      </div>
+
+      <!-- Helper Text Slot -->
+      <slot name="helper-text-slot"></slot>
+
+      <!-- Status Bar -->
+      <div class="biz-markdown-editor__statusbar">
+        <slot name="statusbar-slot">
+          <div class="biz-markdown-editor__statusbar-info">
+            <span>Lines: ${host.lineCount}</span>
+            <span>Words: ${host.wordCount}</span>
+            <span>Chars: ${host.charCount}</span>
+          </div>
+          <div class="biz-markdown-editor__statusbar-info">
+            <span>Ln: ${host.cursorLine}, Col: ${host.cursorCol}</span>
+            <span>Mode: ${host.mode.toUpperCase()}</span>
+          </div>
         </slot>
       </div>
     </div>
-
-    <div class="biz-markdown-editor__body">
-      ${props.mode !== 'preview'
-        ? html`
-            <div class="biz-markdown-editor__editor-container">
-              <slot name="editor-header-slot"></slot>
-              <textarea
-                id="editor-textarea"
-                class="biz-markdown-editor__textarea"
-                role="textbox"
-                aria-multiline="true"
-                aria-label="마크다운 에디터"
-                .value=${props.value}
-                placeholder=${props.placeholder}
-                ?autofocus=${props.autofocus}
-                ?readonly=${props.readonly}
-                ?disabled=${props.disabled}
-                @input=${props.onInput}
-                @keydown=${props.onKeyDown}
-                @scroll=${props.onScroll}
-                @focus=${props.onFocus}
-                @blur=${props.onBlur}
-                @drop=${props.onDrop}
-              ></textarea>
-            </div>
-          `
-        : ''}
-      ${props.mode === 'split'
-        ? html`
-            <div
-              role="separator"
-              aria-orientation="vertical"
-              aria-label="화면 분할 조절바"
-              class="biz-markdown-editor__resizer"
-              @mousedown=${props.onMouseDownResizer}
-            ></div>
-          `
-        : ''}
-      ${props.mode !== 'edit'
-        ? html`
-            <div
-              class="biz-markdown-editor__preview-container"
-              role="region"
-              aria-label="미리보기"
-              @scroll=${props.onScroll}
-            >
-              <slot name="preview-header-slot"></slot>
-              <slot name="custom-preview-slot">
-                <div class="biz-markdown-editor__preview-content">
-                  ${unsafeHTML(props.parsedHtml)}
-                </div>
-              </slot>
-            </div>
-          `
-        : ''}
-    </div>
-
-    <div class="biz-markdown-editor__statusbar">
-      <slot name="statusbar-slot">
-        <span class="biz-markdown-editor__status-item">
-          Ln ${props.cursorLine}, Col ${props.cursorCol}
-        </span>
-        <span class="biz-markdown-editor__status-item">
-          Lines: ${props.lineCount}
-        </span>
-        <span class="biz-markdown-editor__status-item">
-          Words: ${props.wordCount}
-        </span>
-        <span class="biz-markdown-editor__status-item">
-          Chars: ${props.charCount}
-        </span>
-        <span class="biz-markdown-editor__status-item">
-          Mode: ${props.mode}
-        </span>
-      </slot>
-    </div>
-
-    <div aria-live="polite" class="biz-markdown-editor__sr-only">
-      현재 ${props.mode} 모드입니다.
-    </div>
-  </div>
-`;
+  `;
+};

@@ -1,4 +1,4 @@
-import { css } from 'lit';
+import { css } from "lit";
 
 export const markdownEditorStyles = css`
   :host {
@@ -27,13 +27,20 @@ export const markdownEditorStyles = css`
     --biz-markdown-editor-focus-ring-color: rgba(37, 99, 235, 0.2);
     --biz-markdown-editor-toolbar-btn-hover-bg: #e5e7eb;
 
-    /* Colors - Disabled & Readonly */
+    /* Colors - Disabled */
     --biz-markdown-editor-disabled-bg: #f3f4f6;
     --biz-markdown-editor-disabled-text-color: #9ca3af;
-    --biz-markdown-editor-error-border-color: #dc2626;
+
+    /* Colors - Error & Loading */
+    --biz-markdown-editor-error-border-color: #ef4444;
+    --biz-markdown-editor-error-ring-color: rgba(239, 68, 68, 0.2);
 
     display: block;
     width: var(--biz-markdown-editor-width);
+    box-sizing: border-box;
+  }
+
+  *, *::before, *::after {
     box-sizing: border-box;
   }
 
@@ -47,8 +54,7 @@ export const markdownEditorStyles = css`
     background-color: var(--biz-markdown-editor-bg);
     color: var(--biz-markdown-editor-text-color);
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   /* Variants */
@@ -57,20 +63,20 @@ export const markdownEditorStyles = css`
   }
 
   .biz-markdown-editor--filled {
-    border: none;
     background-color: var(--biz-markdown-editor-toolbar-bg);
+    border: 1px solid transparent;
   }
 
   .biz-markdown-editor--standard {
     border: none;
-    border-bottom: 2px solid var(--biz-markdown-editor-border-color);
+    border-bottom: 1px solid var(--biz-markdown-editor-border-color);
     border-radius: 0;
   }
 
   /* Sizes */
   .biz-markdown-editor--small {
     --biz-markdown-editor-toolbar-height: 34px;
-    --biz-markdown-editor-statusbar-height: 22px;
+    --biz-markdown-editor-statusbar-height: 24px;
     font-size: 12px;
   }
 
@@ -82,8 +88,42 @@ export const markdownEditorStyles = css`
 
   .biz-markdown-editor--large {
     --biz-markdown-editor-toolbar-height: 50px;
-    --biz-markdown-editor-statusbar-height: 34px;
+    --biz-markdown-editor-statusbar-height: 32px;
     font-size: 16px;
+  }
+
+  /* States */
+  .biz-markdown-editor:hover:not(.biz-markdown-editor--disabled) {
+    border-color: var(--biz-markdown-editor-focus-border-color);
+  }
+
+  .biz-markdown-editor--focused {
+    border-color: var(--biz-markdown-editor-focus-border-color);
+    box-shadow: 0 0 0 3px var(--biz-markdown-editor-focus-ring-color);
+  }
+
+  .biz-markdown-editor--error {
+    border-color: var(--biz-markdown-editor-error-border-color);
+  }
+
+  .biz-markdown-editor--error.biz-markdown-editor--focused {
+    box-shadow: 0 0 0 3px var(--biz-markdown-editor-error-ring-color);
+  }
+
+  .biz-markdown-editor--disabled {
+    background-color: var(--biz-markdown-editor-disabled-bg);
+    color: var(--biz-markdown-editor-disabled-text-color);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .biz-markdown-editor--readonly {
+    background-color: var(--biz-markdown-editor-statusbar-bg);
+  }
+
+  .biz-markdown-editor--loading {
+    pointer-events: none;
+    opacity: 0.6;
   }
 
   /* Toolbar */
@@ -95,7 +135,7 @@ export const markdownEditorStyles = css`
     background-color: var(--biz-markdown-editor-toolbar-bg);
     border-bottom: 1px solid var(--biz-markdown-editor-border-color);
     padding: 0 8px;
-    box-sizing: border-box;
+    gap: 8px;
   }
 
   .biz-markdown-editor__toolbar-group {
@@ -104,74 +144,112 @@ export const markdownEditorStyles = css`
     gap: 4px;
   }
 
-  .biz-markdown-editor__toolbar button {
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 4px;
+  .biz-markdown-editor__toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 4px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
     cursor: pointer;
+    color: inherit;
     font-size: inherit;
-    color: var(--biz-markdown-editor-text-color);
   }
 
-  .biz-markdown-editor__toolbar button:hover:not(:disabled) {
+  .biz-markdown-editor__toolbar-btn:hover:not(:disabled) {
     background-color: var(--biz-markdown-editor-toolbar-btn-hover-bg);
   }
 
-  .biz-markdown-editor__toolbar button.active {
+  .biz-markdown-editor__toolbar-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .biz-markdown-editor__toolbar-btn--active {
     background-color: var(--biz-markdown-editor-resizer-bg);
     font-weight: bold;
   }
 
-  /* Body & Layout Modes */
-  .biz-markdown-editor__body {
+  /* Main Workspace & Modes */
+  .biz-markdown-editor__main {
     display: flex;
     flex: 1;
-    min-height: 0;
+    overflow: hidden;
     position: relative;
   }
 
-  .biz-markdown-editor__editor-container,
-  .biz-markdown-editor__preview-container {
-    flex: 1;
+  .biz-markdown-editor__pane {
     display: flex;
     flex-direction: column;
-    overflow: auto;
-    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
   }
 
+  .biz-markdown-editor__pane--editor {
+    width: var(--editor-width, 50%);
+    background-color: var(--biz-markdown-editor-editor-bg);
+  }
+
+  .biz-markdown-editor__pane--preview {
+    flex: 1;
+    background-color: var(--biz-markdown-editor-preview-bg);
+  }
+
+  .biz-markdown-editor--mode-edit .biz-markdown-editor__pane--editor {
+    width: 100%;
+  }
+
+  .biz-markdown-editor--mode-edit .biz-markdown-editor__pane--preview,
+  .biz-markdown-editor--mode-edit .biz-markdown-editor__resizer {
+    display: none;
+  }
+
+  .biz-markdown-editor--mode-preview .biz-markdown-editor__pane--editor,
+  .biz-markdown-editor--mode-preview .biz-markdown-editor__resizer {
+    display: none;
+  }
+
+  .biz-markdown-editor--mode-preview .biz-markdown-editor__pane--preview {
+    width: 100%;
+  }
+
+  /* Header Slots */
+  .biz-markdown-editor__pane-header {
+    border-bottom: 1px solid var(--biz-markdown-editor-border-color);
+    background: var(--biz-markdown-editor-toolbar-bg);
+  }
+
+  /* Editor Textarea */
   .biz-markdown-editor__textarea {
     width: 100%;
     height: 100%;
     border: none;
-    padding: 12px;
-    resize: none;
     outline: none;
+    resize: none;
+    padding: 12px;
     font-family: monospace;
     font-size: inherit;
-    background-color: var(--biz-markdown-editor-editor-bg);
-    color: var(--biz-markdown-editor-text-color);
-    box-sizing: border-box;
+    line-height: 1.5;
+    color: inherit;
+    background: transparent;
   }
 
-  .biz-markdown-editor__preview-container {
-    background-color: var(--biz-markdown-editor-preview-bg);
+  .biz-markdown-editor__textarea:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Preview Render Area */
+  .biz-markdown-editor__preview-content {
+    height: 100%;
+    overflow-y: auto;
     padding: 12px;
-    border-left: 1px solid var(--biz-markdown-editor-border-color);
-  }
-
-  .biz-markdown-editor--edit .biz-markdown-editor__preview-container,
-  .biz-markdown-editor--preview .biz-markdown-editor__editor-container {
-    display: none;
-  }
-
-  .biz-markdown-editor--preview .biz-markdown-editor__preview-container {
-    border-left: none;
   }
 
   /* Split Resizer */
   .biz-markdown-editor__resizer {
     width: 4px;
+    height: 100%;
     background-color: var(--biz-markdown-editor-resizer-bg);
     cursor: col-resize;
     user-select: none;
@@ -179,7 +257,7 @@ export const markdownEditorStyles = css`
   }
 
   .biz-markdown-editor__resizer:hover,
-  .biz-markdown-editor__resizer:active {
+  .biz-markdown-editor--resizing .biz-markdown-editor__resizer {
     background-color: var(--biz-markdown-editor-resizer-hover-bg);
   }
 
@@ -187,49 +265,20 @@ export const markdownEditorStyles = css`
   .biz-markdown-editor__statusbar {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
+    justify-content: space-between;
     height: var(--biz-markdown-editor-statusbar-height);
     background-color: var(--biz-markdown-editor-statusbar-bg);
     border-top: 1px solid var(--biz-markdown-editor-border-color);
     padding: 0 12px;
-    font-size: 12px;
-    color: var(--biz-markdown-editor-disabled-text-color);
-    box-sizing: border-box;
+    font-size: 0.85em;
   }
 
-  /* States: Focus, Hover, Active, Disabled, Readonly, Error, Loading */
-  .biz-markdown-editor:focus-within {
-    border-color: var(--biz-markdown-editor-focus-border-color);
-    box-shadow: 0 0 0 3px var(--biz-markdown-editor-focus-ring-color);
+  .biz-markdown-editor__statusbar-info {
+    display: flex;
+    gap: 12px;
   }
 
-  .biz-markdown-editor--disabled {
-    background-color: var(--biz-markdown-editor-disabled-bg);
-    color: var(--biz-markdown-editor-disabled-text-color);
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
-
-  .biz-markdown-editor--disabled .biz-markdown-editor__textarea {
-    background-color: var(--biz-markdown-editor-disabled-bg);
-    cursor: not-allowed;
-  }
-
-  .biz-markdown-editor--readonly .biz-markdown-editor__textarea {
-    background-color: var(--biz-markdown-editor-disabled-bg);
-  }
-
-  .biz-markdown-editor--error {
-    border-color: var(--biz-markdown-editor-error-border-color);
-  }
-
-  .biz-markdown-editor--loading {
-    pointer-events: none;
-    opacity: 0.6;
-  }
-
-  /* Screen Reader Only */
+  /* Visually Hidden Live Region */
   .biz-markdown-editor__sr-only {
     position: absolute;
     width: 1px;

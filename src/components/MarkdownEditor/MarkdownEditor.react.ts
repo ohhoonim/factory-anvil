@@ -1,6 +1,6 @@
-import { createComponent } from '@lit/react';
-import { BizMarkdownEditor } from "./MarkdownEditor.wc";
 import React from 'react';
+import { createComponent } from '@lit/react';
+import { BizMarkdownEditor } from './MarkdownEditor.wc.js';
 
 export const MarkdownEditor = createComponent({
   tagName: 'biz-markdown-editor',
@@ -12,6 +12,6 @@ export const MarkdownEditor = createComponent({
     onUploadImage: 'upload-image',
     onFocus: 'focus',
     onBlur: 'blur',
-    onClear: 'clear',
-  },
+    onClear: 'clear'
+  }
 });
