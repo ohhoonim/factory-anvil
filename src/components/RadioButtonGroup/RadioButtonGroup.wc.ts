@@ -1,118 +1,129 @@
-import { LitElement } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { RadioButtonGroupTemplate } from "./RadioButtonGroup";
+import { LitElement, type PropertyValues } from "lit";
+import { customElement, property, state, query } from "lit/decorators.js";
+import { type RadioButtonGroupHost, RadioButtonGroupTemplate } from "./RadioButtonGroup";
 import { radioButtonGroupStyles } from "./RadioButtonGroup.css";
 
-/**
- * @element biz-radio-button-group
- * 
- * @slot label-slot
- * @slot (default)
- * @slot helper-text-slot
- */
 @customElement('biz-radio-button-group')
-export class BizRadioButtonGroup extends LitElement {
+export class BizRadioButtonGroup extends LitElement implements RadioButtonGroupHost {
   static styles = radioButtonGroupStyles;
 
-  @property({ type: String }) value = '';
-  @property({ type: String }) name = '';
-  @property({ type: String }) orientation: 'vertical' | 'horizontal' = 'vertical';
-  @property({ type: Boolean, reflect: true }) required = false;
-  @property({ type: Boolean, reflect: true }) disabled = false;
-  @property({ type: Boolean, reflect: true }) readonly = false;
-  @property({ type: Boolean, reflect: true }) error = false;
-  @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
-  @property({ type: String }) variant: 'standard' | 'card' | 'button' | 'outlined' | 'filled' = 'standard';
-  @property({ type: String }) label = '';
-  @property({ type: String, attribute: 'helper-text' }) helperText = '';
-  @property({ type: Boolean, attribute: 'full-width', reflect: true }) fullWidth = false;
+  @property({ type: String })
+  value = '';
 
-  @state() private labelId = `biz-radio-group-label-${Math.random().toString(36).substring(2, 9)}`;
-  @state() private helperTextId = `biz-radio-group-helper-${Math.random().toString(36).substring(2, 9)}`;
+  @property({ type: String })
+  name = '';
 
-  firstUpdated() {
-    this.addEventListener('keydown', this.handleKeyDown.bind(this));
+  @property({ type: String })
+  orientation: 'vertical' | 'horizontal' = 'vertical';
+
+  @property({ type: String })
+  variant: 'standard' | 'card' | 'button' = 'standard';
+
+  @property({ type: String })
+  size: 'small' | 'medium' | 'large' = 'medium';
+
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  @property({ type: Boolean, reflect: true })
+  disabled = false;
+
+  @property({ type: Boolean, reflect: true })
+  readonly = false;
+
+  @property({ type: Boolean, reflect: true })
+  error = false;
+
+  @property({ type: Boolean, attribute: 'full-width', reflect: true })
+  fullWidth = false;
+
+  @state()
+  hasLabel = false;
+
+  @state()
+  hasHelperText = false;
+
+  labelId = `biz-radio-group-label-${Math.random().toString(36).substring(2, 9)}`;
+  helperTextId = `biz-radio-group-helper-${Math.random().toString(36).substring(2, 9)}`;
+
+  @query('slot:not([name])')
+  private defaultSlot?: HTMLSlotElement;
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('keydown', this.handleKeyDown);
   }
 
-  updated(changedProperties: Map<string, unknown>) {
-    if (changedProperties.has('name') || changedProperties.has('disabled') || changedProperties.has('readonly') || changedProperties.has('value')) {
-      this.syncSubRadioButtons();
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  protected updated(changedProperties: PropertyValues) {
+    super.updated(changedProperties);
+
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('name') ||
+      changedProperties.has('disabled') ||
+      changedProperties.has('readonly') ||
+      changedProperties.has('required')
+    ) {
+      this.syncChildRadioButtons();
     }
   }
 
-  private getRadios(): HTMLElement[] {
-    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement;
-    if (!slot) return [];
-    return slot
-      .assignedElements({ flatten: true })
-      .filter((el): el is HTMLElement => el.tagName.toLowerCase().includes('radio') || el.getAttribute('role') === 'radio');
+  private getRadioItems(): HTMLInputElement[] {
+    if (!this.defaultSlot) return [];
+    const assigned = this.defaultSlot.assignedElements({ flatten: true });
+    const items: HTMLInputElement[] = [];
+
+    assigned.forEach((el) => {
+      if (el instanceof HTMLInputElement && el.type === 'radio') {
+        items.push(el);
+      } else {
+        const radios = el.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+        radios.forEach((r) => items.push(r));
+      }
+    });
+
+    return items;
   }
 
-  private syncSubRadioButtons() {
-    const radios = this.getRadios();
+  private syncChildRadioButtons() {
+    const radios = this.getRadioItems();
     radios.forEach((radio) => {
-      if (this.name) radio.setAttribute('name', this.name);
-      if (this.disabled) radio.setAttribute('disabled', '');
-      else radio.removeAttribute('disabled');
-
-      if (this.readonly) radio.setAttribute('readonly', '');
-      else radio.removeAttribute('readonly');
-
-      const radioValue = radio.getAttribute('value') || (radio as HTMLInputElement).value;
-      if (radioValue === this.value) {
-        radio.setAttribute('checked', '');
-        (radio as HTMLInputElement).checked = true;
-      } else {
-        radio.removeAttribute('checked');
-        (radio as HTMLInputElement).checked = false;
+      if (this.name) {
+        radio.name = this.name;
       }
+      radio.checked = radio.value === this.value;
+      radio.disabled = this.disabled;
+      radio.readOnly = this.readonly;
+      radio.required = this.required;
     });
   }
 
-  private handleSlotChange() {
-    this.syncSubRadioButtons();
-  }
+  handleSlotChange = () => {
+    this.syncChildRadioButtons();
+  };
 
-  private handleValueChange(e: Event) {
-    if (this.disabled || this.readonly) return;
-    const target = e.target as HTMLElement | HTMLInputElement;
-    const newValue = (target as HTMLInputElement).value || target.getAttribute('value') || '';
-    
-    if (this.value !== newValue) {
-      this.value = newValue;
-      this.dispatchChangeEvent();
-    }
-  }
+  handleLabelSlotChange = (e: Event) => {
+    const slot = e.target as HTMLSlotElement;
+    this.hasLabel = slot.assignedNodes({ flatten: true }).length > 0;
+  };
 
-  private dispatchChangeEvent() {
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
+  handleHelperSlotChange = (e: Event) => {
+    const slot = e.target as HTMLSlotElement;
+    this.hasHelperText = slot.assignedNodes({ flatten: true }).length > 0;
+  };
 
-  public clear() {
-    if (this.disabled || this.readonly) return;
-    this.value = '';
-    this.syncSubRadioButtons();
-    this.dispatchEvent(
-      new CustomEvent('clear', {
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private handleKeyDown(e: KeyboardEvent) {
+  private handleKeyDown = (e: KeyboardEvent) => {
     if (this.disabled || this.readonly) return;
 
-    const radios = this.getRadios();
+    const radios = this.getRadioItems().filter((r) => !r.disabled);
     if (radios.length === 0) return;
 
-    const currentIndex = radios.findIndex((radio) => radio === document.activeElement || radio.contains(document.activeElement as Node) || (radio as HTMLInputElement).checked);
+    const currentIndex = radios.findIndex((r) => r.checked || r === shadowRootActiveElement(this.shadowRoot) || r === document.activeElement);
 
     let nextIndex = -1;
 
@@ -120,65 +131,50 @@ export class BizRadioButtonGroup extends LitElement {
       case 'ArrowDown':
       case 'ArrowRight':
         e.preventDefault();
-        nextIndex = currentIndex < radios.length - 1 ? currentIndex + 1 : 0;
+        nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % radios.length;
         break;
       case 'ArrowUp':
       case 'ArrowLeft':
         e.preventDefault();
-        nextIndex = currentIndex > 0 ? currentIndex - 1 : radios.length - 1;
+        nextIndex = currentIndex < 0 ? radios.length - 1 : (currentIndex - 1 + radios.length) % radios.length;
         break;
+      case 'Space':
       case ' ':
-      case 'Enter':
-        if (currentIndex >= 0) {
-          const radio = radios[currentIndex];
-          const radioValue = radio.getAttribute('value') || (radio as HTMLInputElement).value;
-          if (radioValue && this.value !== radioValue) {
-            this.value = radioValue;
-            this.dispatchChangeEvent();
-          }
+        if (currentIndex >= 0 && !radios[currentIndex].checked) {
+          e.preventDefault();
+          this.selectRadio(radios[currentIndex]);
         }
-        break;
-      case 'Escape':
-        this.clear();
-        break;
+        return;
       default:
-        break;
+        return;
     }
 
-    if (nextIndex !== -1) {
+    if (nextIndex >= 0) {
       const targetRadio = radios[nextIndex];
       targetRadio.focus();
-      const radioValue = targetRadio.getAttribute('value') || (targetRadio as HTMLInputElement).value;
-      if (radioValue) {
-        this.value = radioValue;
-        this.dispatchChangeEvent();
-      }
+      this.selectRadio(targetRadio);
+    }
+  };
+
+  private selectRadio(radio: HTMLInputElement) {
+    if (this.value !== radio.value) {
+      this.value = radio.value;
+      this.dispatchEvent(
+        new CustomEvent('change', {
+          detail: { value: this.value },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
   render() {
-    return RadioButtonGroupTemplate({
-      value: this.value,
-      name: this.name,
-      orientation: this.orientation,
-      required: this.required,
-      disabled: this.disabled,
-      readonly: this.readonly,
-      error: this.error,
-      size: this.size,
-      variant: this.variant,
-      label: this.label,
-      helperText: this.helperText,
-      labelId: this.labelId,
-      helperTextId: this.helperTextId,
-      handleSlotChange: this.handleSlotChange.bind(this),
-      handleValueChange: this.handleValueChange.bind(this),
-    });
+    return RadioButtonGroupTemplate(this);
   }
 }
 
-declare global {
-  interface HTMLElementTagNameMap {
-    'biz-radio-button-group': BizRadioButtonGroup;
-  }
+function shadowRootActiveElement(root: ShadowRoot | null): Element | null {
+  if (!root) return null;
+  return root.activeElement;
 }
