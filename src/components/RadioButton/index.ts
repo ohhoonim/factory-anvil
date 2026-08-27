@@ -1,1 +1,1 @@
-export { RadioButton as RadioButtonWc } from './RadioButton.wc';
+export { BizRadioButton } from './RadioButton.wc';

@@ -1,13 +1,12 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { RadioButton as RadioButtonWc } from './RadioButton.wc';
+import { BizRadioButton } from './RadioButton.wc.js';
 
 export const RadioButton = createComponent({
   tagName: 'biz-radio-button',
-  elementClass: RadioButtonWc,
+  elementClass: BizRadioButton,
   react: React,
   events: {
-    onInput: 'input',
     onChange: 'change',
     onFocus: 'focus',
     onBlur: 'blur',
