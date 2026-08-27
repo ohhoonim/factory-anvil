@@ -1,20 +1,11 @@
-import { LitElement, type PropertyValues } from 'lit';
-import { customElement, property, state } from "lit/decorators.js";
-import { MarkdownEditorTemplate } from "./MarkdownEditor";
-import { markdownEditorStyles } from "./MarkdownEditor.css";
+import { LitElement, html } from 'lit';
+import { customElement, property, state, query } from 'lit/decorators.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { markdownEditorStyles } from './MarkdownEditor.css.js';
+import { MarkdownEditorTemplate, type MarkdownEditorHost } from './MarkdownEditor.js';
 
-/**
- * @element biz-markdown-editor
- * 
- * @slot toolbar-left-slot
- * @slot toolbar-right-slot
- * @slot editor-header-slot
- * @slot preview-header-slot
- * @slot custom-preview-slot
- * @slot statusbar-slot
- */
 @customElement('biz-markdown-editor')
-export class BizMarkdownEditor extends LitElement {
+export class BizMarkdownEditor extends LitElement implements MarkdownEditorHost {
   static styles = markdownEditorStyles;
 
   @property({ type: String }) value = '';
@@ -27,237 +18,210 @@ export class BizMarkdownEditor extends LitElement {
   @property({ type: Boolean }) readonly = false;
   @property({ type: Boolean }) disabled = false;
   @property({ type: Boolean }) sanitize = true;
+  @property({ type: String }) variant?: 'outlined' | 'filled' | 'standard' = 'outlined';
+  @property({ type: String }) size?: 'small' | 'medium' | 'large' = 'medium';
 
-  @state() private parsedHtml = '';
-  @state() private wordCount = 0;
-  @state() private charCount = 0;
-  @state() private lineCount = 1;
-  @state() private cursorLine = 1;
-  @state() private cursorCol = 1;
+  @state() isFocused = false;
+  @state() isResizing = false;
+  @state() isError = false;
+  @state() isLoading = false;
+  @state() splitRatio = 50;
+  @state() charCount = 0;
+  @state() wordCount = 0;
+  @state() lineCount = 1;
+  @state() cursorLine = 1;
+  @state() cursorCol = 1;
+  @state() renderedHtml = '';
+
+  @query('.biz-markdown-editor__textarea') textareaEl?: HTMLTextAreaElement;
+  @query('.biz-markdown-editor__preview-content') previewEl?: HTMLDivElement;
 
   private isSyncingScroll = false;
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.updateStatsAndRender(this.value);
+  }
+
   firstUpdated() {
-    this.updateParsedContent();
-    if (this.autofocus) {
-      const textarea = this.shadowRoot?.querySelector('#editor-textarea') as HTMLTextAreaElement;
-      textarea?.focus();
+    if (this.autofocus && this.textareaEl) {
+      this.textareaEl.focus();
     }
   }
 
-  willUpdate(changedProperties: PropertyValues) {
-    if (changedProperties.has('value') || changedProperties.has('sanitize')) {
-      this.updateParsedContent();
+  updated(changedProperties: Map<string, unknown>) {
+    if (changedProperties.has('value')) {
+      this.updateStatsAndRender(this.value);
     }
   }
 
-  private parseMarkdown(input: string): string {
-    let html = input
+  private escapeHtml(str: string): string {
+    return str
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
-    if (!this.sanitize) {
-      html = input;
+  private parseMarkdown(text: string): string {
+    let raw = text;
+    if (this.sanitize) {
+      raw = this.escapeHtml(raw);
     }
 
-    html = html
+    const htmlStr = raw
       .replace(/^### (.*$)/gim, '<h3>$1</h3>')
       .replace(/^## (.*$)/gim, '<h2>$1</h2>')
       .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-      .replace(/\*\*(.* animate?)\*\*/gim, '<b>$1</b>')
-      .replace(/\*(.* animate?)\*/gim, '<i>$1</i>')
-      .replace(/!\[(.*?)\]\((.*?)\)/gim, '<img src="$2" alt="$1" referrerpolicy="no-referrer" width="400px" height="300px"/>')
+      .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
+      .replace(/\*(.*)\*/gim, '<i>$1</i>')
       .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
       .replace(/\n/gim, '<br />');
 
-    return html;
+    return htmlStr;
   }
 
-  private updateParsedContent() {
-    this.parsedHtml = this.parseMarkdown(this.value);
-    this.calculateStats();
-  }
-
-  private calculateStats() {
-    const text = this.value || '';
-    this.charCount = text.length;
-    this.wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
-    const lines = text.split('\n');
+  private updateStatsAndRender(val: string) {
+    this.charCount = val.length;
+    this.wordCount = val.trim() ? val.trim().split(/\s+/).length : 0;
+    const lines = val.split('\n');
     this.lineCount = lines.length;
+    this.renderedHtml = this.parseMarkdown(val);
   }
 
-  private updateCursorPosition(textarea: HTMLTextAreaElement) {
-    const start = textarea.selectionStart;
-    const textBeforeCursor = textarea.value.substring(0, start);
-    const lines = textBeforeCursor.split('\n');
+  private updateCursorStats() {
+    if (!this.textareaEl) return;
+    const pos = this.textareaEl.selectionStart;
+    const val = this.textareaEl.value;
+    const lines = val.substring(0, pos).split('\n');
     this.cursorLine = lines.length;
     this.cursorCol = lines[lines.length - 1].length + 1;
   }
 
-  private handleInput(e: Event) {
+  handleInput(e: Event) {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
-    this.updateCursorPosition(target);
+    this.updateCursorStats();
 
     this.dispatchEvent(
       new CustomEvent('change', {
-        detail: { markdown: this.value, html: this.parsedHtml },
         bubbles: true,
         composed: true,
+        detail: { markdown: this.value, html: this.renderedHtml }
       })
     );
   }
 
-  private handleKeyDown(e: KeyboardEvent) {
-    const target = e.target as HTMLTextAreaElement;
+  handleFocus(e: FocusEvent) {
+    this.isFocused = true;
+    this.dispatchEvent(
+      new CustomEvent('focus', {
+        bubbles: true,
+        composed: true,
+        detail: e
+      })
+    );
+  }
+
+  handleBlur(e: FocusEvent) {
+    this.isFocused = false;
+    this.dispatchEvent(
+      new CustomEvent('blur', {
+        bubbles: true,
+        composed: true,
+        detail: e
+      })
+    );
+  }
+
+  handleKeyDown(e: KeyboardEvent) {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    const modifier = isMac ? e.metaKey : e.ctrlKey;
+    const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
 
-    if (modifier && e.key.toLowerCase() === 'b') {
+    if (cmdOrCtrl && e.key.toLowerCase() === 'b') {
       e.preventDefault();
-      this.applyFormatting('**', '**');
+      this.insertFormat('bold');
       return;
     }
-
-    if (modifier && e.key.toLowerCase() === 'i') {
+    if (cmdOrCtrl && e.key.toLowerCase() === 'i') {
       e.preventDefault();
-      this.applyFormatting('*', '*');
+      this.insertFormat('italic');
       return;
     }
-
-    if (modifier && e.key.toLowerCase() === 'k') {
+    if (cmdOrCtrl && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      this.applyFormatting('[', '](url)');
-      return;
-    }
-
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-      this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
-      this.updateComplete.then(() => {
-        target.selectionStart = target.selectionEnd = start + 2;
-        this.updateCursorPosition(target);
-      });
+      this.insertFormat('link');
       return;
     }
 
     if (e.key === 'Escape') {
-      target.blur();
+      if (this.textareaEl) {
+        this.textareaEl.focus();
+      }
       return;
     }
 
-    const pairMap: Record<string, string> = {
+    const pairs: Record<string, string> = {
       '*': '*',
       '`': '`',
       '[': ']',
-      '(': ')',
+      '(': ')'
     };
 
-    if (pairMap[e.key]) {
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
+    if (pairs[e.key] && this.textareaEl) {
+      const start = this.textareaEl.selectionStart;
+      const end = this.textareaEl.selectionEnd;
       if (start !== end) {
         e.preventDefault();
         const selected = this.value.substring(start, end);
-        const closing = pairMap[e.key];
-        this.value =
-          this.value.substring(0, start) +
-          e.key +
-          selected +
-          closing +
-          this.value.substring(end);
-        this.updateComplete.then(() => {
-          target.selectionStart = start + 1;
-          target.selectionEnd = end + 1;
-        });
+        const replacement = `${e.key}${selected}${pairs[e.key]}`;
+        this.value = this.value.substring(0, start) + replacement + this.value.substring(end);
+        this.requestUpdate();
+        setTimeout(() => {
+          if (this.textareaEl) {
+            this.textareaEl.setSelectionRange(start + 1, end + 1);
+          }
+        }, 0);
+        return;
       }
     }
 
-    setTimeout(() => this.updateCursorPosition(target), 0);
-  }
-
-  private applyFormatting(prefix: string, suffix: string) {
-    const textarea = this.shadowRoot?.querySelector('#editor-textarea') as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = this.value.substring(start, end);
-    const replacement = `${prefix}${selectedText}${suffix}`;
-
-    this.value = this.value.substring(0, start) + replacement + this.value.substring(end);
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { markdown: this.value, html: this.parsedHtml },
-        bubbles: true,
-        composed: true,
-      })
-    );
-
-    this.updateComplete.then(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + prefix.length, end + prefix.length);
-      this.updateCursorPosition(textarea);
-    });
-  }
-
-  private handleToolbarAction(action: string) {
-    switch (action) {
-      case 'bold':
-        this.applyFormatting('**', '**');
-        break;
-      case 'italic':
-        this.applyFormatting('*', '*');
-        break;
-      case 'heading':
-        this.applyFormatting('# ', '');
-        break;
-      case 'link':
-        this.applyFormatting('[', '](https://)');
-        break;
-      case 'image':
-        this.applyFormatting('![alt](', ')');
-        break;
-      case 'list':
-        this.applyFormatting('- ', '');
-        break;
+    if (e.key === 'Enter' && this.textareaEl) {
+      const start = this.textareaEl.selectionStart;
+      const currentLine = this.value.substring(0, start).split('\n').pop() || '';
+      const listMatch = currentLine.match(/^(\s*(-|\*|\d+\.)\s+)/);
+      if (listMatch) {
+        e.preventDefault();
+        const prefix = listMatch[1];
+        const insertion = `\n${prefix}`;
+        this.value = this.value.substring(0, start) + insertion + this.value.substring(start);
+        this.requestUpdate();
+        setTimeout(() => {
+          if (this.textareaEl) {
+            const newPos = start + insertion.length;
+            this.textareaEl.setSelectionRange(newPos, newPos);
+          }
+        }, 0);
+        return;
+      }
     }
+
+    setTimeout(() => this.updateCursorStats(), 0);
   }
 
-  private handleModeChange(newMode: 'split' | 'edit' | 'preview') {
-    this.mode = newMode;
-    this.dispatchEvent(
-      new CustomEvent('mode-change', {
-        detail: { mode: this.mode },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
+  handleScroll(e: Event) {
+    if (!this.syncScroll || this.mode !== 'split' || this.isSyncingScroll) return;
 
-  private handleScroll(e: Event) {
-    if (!this.syncScroll || this.isSyncingScroll || this.mode !== 'split') return;
-
-    const source = e.target as HTMLElement;
-    const isEditor = source.classList.contains('biz-markdown-editor__textarea');
-
-    const editorEl = this.shadowRoot?.querySelector('.biz-markdown-editor__textarea') as HTMLElement;
-    const previewEl = this.shadowRoot?.querySelector('.biz-markdown-editor__preview-container') as HTMLElement;
-
-    if (!editorEl || !previewEl) return;
-
+    const target = e.target as HTMLElement;
     this.isSyncingScroll = true;
 
-    if (isEditor) {
-      const percentage = editorEl.scrollTop / (editorEl.scrollHeight - editorEl.clientHeight || 1);
-      previewEl.scrollTop = percentage * (previewEl.scrollHeight - previewEl.clientHeight);
-    } else {
-      const percentage = previewEl.scrollTop / (previewEl.scrollHeight - previewEl.clientHeight || 1);
-      editorEl.scrollTop = percentage * (editorEl.scrollHeight - editorEl.clientHeight);
+    if (target === this.textareaEl && this.previewEl) {
+      const percentage = target.scrollTop / (target.scrollHeight - target.clientHeight || 1);
+      this.previewEl.scrollTop = percentage * (this.previewEl.scrollHeight - this.previewEl.clientHeight);
+    } else if (target === this.previewEl && this.textareaEl) {
+      const percentage = target.scrollTop / (target.scrollHeight - target.clientHeight || 1);
+      this.textareaEl.scrollTop = percentage * (this.textareaEl.scrollHeight - this.textareaEl.clientHeight);
     }
 
     requestAnimationFrame(() => {
@@ -265,24 +229,22 @@ export class BizMarkdownEditor extends LitElement {
     });
   }
 
-  private handleMouseDownResizer(e: MouseEvent) {
+  handleResizerMouseDown(e: MouseEvent) {
     e.preventDefault();
-    const body = this.shadowRoot?.querySelector('.biz-markdown-editor__body') as HTMLElement;
-    const editor = this.shadowRoot?.querySelector('.biz-markdown-editor__editor-container') as HTMLElement;
-    if (!body || !editor) return;
-
-    const startX = e.clientX;
-    const startWidth = editor.getBoundingClientRect().width;
-    const totalWidth = body.getBoundingClientRect().width;
+    this.isResizing = true;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const newWidth = Math.max(100, Math.min(totalWidth - 100, startWidth + deltaX));
-      const flexBasis = `${(newWidth / totalWidth) * 100}%`;
-      editor.style.flex = `0 0 ${flexBasis}`;
+      if (!this.isResizing) return;
+      const rect = this.getBoundingClientRect();
+      const offsetX = moveEvent.clientX - rect.left;
+      let ratio = (offsetX / rect.width) * 100;
+      if (ratio < 15) ratio = 15;
+      if (ratio > 85) ratio = 85;
+      this.splitRatio = ratio;
     };
 
     const onMouseUp = () => {
+      this.isResizing = false;
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
@@ -291,84 +253,86 @@ export class BizMarkdownEditor extends LitElement {
     window.addEventListener('mouseup', onMouseUp);
   }
 
-  private handleFocus(e: FocusEvent) {
+  handleModeChange(newMode: 'split' | 'edit' | 'preview') {
+    this.mode = newMode;
     this.dispatchEvent(
-      new CustomEvent('focus', {
-        detail: e,
+      new CustomEvent('mode-change', {
         bubbles: true,
         composed: true,
+        detail: { mode: this.mode }
       })
     );
   }
 
-  private handleBlur(e: FocusEvent) {
-    this.dispatchEvent(
-      new CustomEvent('blur', {
-        detail: e,
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
+  insertFormat(type: string) {
+    if (!this.textareaEl || this.readonly || this.disabled) return;
 
-  private handleDrop(e: DragEvent) {
-    if (!e.dataTransfer?.files || e.dataTransfer.files.length === 0) return;
+    const start = this.textareaEl.selectionStart;
+    const end = this.textareaEl.selectionEnd;
+    const selected = this.value.substring(start, end);
 
-    const file = e.dataTransfer.files[0];
-    if (file.type.startsWith('image/')) {
-      e.preventDefault();
-      const insert = (url: string) => {
-        this.applyFormatting(`![${file.name}](`, `${url})`);
-      };
+    let formatted = '';
+    let cursorOffset = 0;
 
-      this.dispatchEvent(
-        new CustomEvent('upload-image', {
-          detail: { file, insert },
-          bubbles: true,
-          composed: true,
-        })
-      );
+    switch (type) {
+      case 'bold':
+        formatted = `**${selected || 'bold text'}**`;
+        cursorOffset = selected ? formatted.length : 2;
+        break;
+      case 'italic':
+        formatted = `*${selected || 'italic text'}*`;
+        cursorOffset = selected ? formatted.length : 1;
+        break;
+      case 'link':
+        formatted = `[${selected || 'link text'}](https://)`;
+        cursorOffset = selected ? formatted.length - 1 : 1;
+        break;
+      case 'image':
+        formatted = `![${selected || 'alt text'}](https://)`;
+        cursorOffset = selected ? formatted.length - 1 : 2;
+        break;
+      default:
+        return;
     }
+
+    this.value = this.value.substring(0, start) + formatted + this.value.substring(end);
+    this.updateStatsAndRender(this.value);
+
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        bubbles: true,
+        composed: true,
+        detail: { markdown: this.value, html: this.renderedHtml }
+      })
+    );
+
+    setTimeout(() => {
+      if (this.textareaEl) {
+        this.textareaEl.focus();
+        this.textareaEl.setSelectionRange(start + cursorOffset, start + cursorOffset);
+      }
+    }, 0);
   }
 
   public clear() {
     this.value = '';
-    this.updateParsedContent();
+    this.updateStatsAndRender('');
     this.dispatchEvent(
       new CustomEvent('clear', {
         bubbles: true,
         composed: true,
+        detail: null
       })
     );
   }
 
   render() {
-    return MarkdownEditorTemplate({
-      value: this.value,
-      mode: this.mode,
-      placeholder: this.placeholder,
-      syncScroll: this.syncScroll,
-      height: this.height,
-      maxHeight: this.maxHeight,
-      autofocus: this.autofocus,
-      readonly: this.readonly,
-      disabled: this.disabled,
-      sanitize: this.sanitize,
-      parsedHtml: this.parsedHtml,
-      wordCount: this.wordCount,
-      charCount: this.charCount,
-      lineCount: this.lineCount,
-      cursorLine: this.cursorLine,
-      cursorCol: this.cursorCol,
-      onInput: this.handleInput.bind(this),
-      onKeyDown: this.handleKeyDown.bind(this),
-      onScroll: this.handleScroll.bind(this),
-      onToolbarAction: this.handleToolbarAction.bind(this),
-      onModeChange: this.handleModeChange.bind(this),
-      onMouseDownResizer: this.handleMouseDownResizer.bind(this),
-      onFocus: this.handleFocus.bind(this),
-      onBlur: this.handleBlur.bind(this),
-      onDrop: this.handleDrop.bind(this),
-    });
+    return html`${MarkdownEditorTemplate(this)}`;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'biz-markdown-editor': BizMarkdownEditor;
   }
 }

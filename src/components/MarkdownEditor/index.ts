@@ -1,1 +1,1 @@
-export { BizMarkdownEditor } from './MarkdownEditor.wc';
+export { BizMarkdownEditor } from './MarkdownEditor.wc.js';
