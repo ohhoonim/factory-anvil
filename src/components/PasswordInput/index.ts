@@ -1,1 +1,1 @@
-export { BizPasswordInput } from './PasswordInput.wc';
+export { BizPasswordInput } from './PasswordInput.wc.ts';
