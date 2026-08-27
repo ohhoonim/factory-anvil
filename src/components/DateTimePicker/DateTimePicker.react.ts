@@ -1,14 +1,14 @@
-import { createComponent } from '@lit/react';
-import { BizDateTimePicker } from "./DateTimePicker.wc";
 import React from 'react';
+import { createComponent } from '@lit/react';
+import { BizDateTimePicker } from './DateTimePicker.wc.js';
 
 export const DateTimePicker = createComponent({
   tagName: 'biz-date-time-picker',
   elementClass: BizDateTimePicker,
   react: React,
   events: {
-    onInput: 'input',
     onChange: 'change',
+    onInput: 'input',
     onOpen: 'open',
     onClose: 'close',
     onDateChange: 'date-change',

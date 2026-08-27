@@ -1,1 +1,1 @@
-export * from './DateTimePicker.wc';
+export { BizDateTimePicker } from './DateTimePicker.wc.js';

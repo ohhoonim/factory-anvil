@@ -17,18 +17,19 @@
    - DateTimePicker.wc.ts (LitElement 기반 웹 컴포넌트 클래스)
    - DateTimePicker.react.ts (@lit/react 기반 React 래퍼)
    - DateTimePicker.stories.ts (Storybook 문서 및 a11y 검증)
-   - DateTimePicker.test.ts (Vitest 및 Playwright 테스트)
    - index.ts (통합 export)
 3. 네임스페이스 및 명명 규칙:
    - 커스텀 엘리먼트 태그명: `biz-date-time-picker`
+   - Lit 엘리먼트 클래스명: `BizDateTimePicker`
    - CSS Design Token / Custom Properties: `--biz-date-time-picker-*`
    - 루트 CSS 클래스명: `biz-date-time-picker`
    - Lit 코어 템플릿 export 명칭: `DateTimePickerTemplate`
+   - 템플릿 함수 파라미터 'host'의 인터페이스 export 명칭:`DateTimePickerHost` 
    - Lit 스타일 export 변수명: `export const dateTimePickerStyles = css`...``
    - React Event Handler 매핑: Custom Event `clear` -> React Prop `onClear`
 
 [작성 대상 컴포넌트 정보]
-- 컴포넌트 명칭 (PascalCase): DateTimePicker
+- 컴포넌트 명칭 (PascalCase): BizDateTimePicker
 - 커스텀 엘리먼트 태그명 (kebab-case): biz-date-time-picker
 - Lit 스타일 변수명 (camelCase): dateTimePickerStyles
 
@@ -190,7 +191,7 @@
 - 날짜 및 시간 탐색 시 포커스된 위치의 전체 정보(예: "2026년 8월 7일 금요일", "오후 4시 47분")를 스크린 리더가 명확하게 안내하도록 `aria-label`을 동적으로 생성하고, 최종 일시 선택 완료 시 `aria-live="polite"` 영역을 통해 조합된 전체 일시 텍스트를 음성 출력합니다.
 ---
 
-위 컨텍스트와 요구사항을 완벽히 이해했음을 확인하고, 다음 단계(코어 템플릿 및 스타일 생성) 진행 준비가 되었음을 알려주세요. 아직 코드를 작성하지 마세요.
+현 단계는 1단계입니다. 위 컨텍스트와 요구사항을 완벽히 이해했음을 확인하고, 다음 단계(코어 템플릿 및 스타일 생성) 진행 준비가 되었음을 알려주세요. 아직 코드를 작성하지 마세요.
 ````
 
 ---
@@ -206,6 +207,8 @@
 2. 템플릿 함수는 `DateTimePickerTemplate` 명칭으로 export 하세요.
 3. 요구사항 정의서 2절의 슬롯 명세(`label-slot`, `start-slot`, `end-slot`, `helper-text-slot` 등)를 올바르게 배치하세요.
 4. 속성(Properties), 상태(States), 이벤트 핸들러 바인딩 구조를 템플릿 내에 반영하세요.
+5. 템플릿 함수의 파라미터명은 'host'를 사용하고, host타입을 인터페이스로 작성해주세요. 
+6. host타입은 `DateTimePickerHost` 명칭으로 export 하세요.
 
 [작성 조건 - DateTimePicker.css.ts]
 1. `import { css } from 'lit';` 구문을 작성하세요.
@@ -230,8 +233,8 @@
 1단계의 요구사항 정의서와 2단계에서 작성된 코어 템플릿/스타일을 바탕으로 웹 컴포넌트 클래스 파일(`DateTimePicker.wc.ts`) 코드를 작성해 주세요.
 
 [작성 조건 - DateTimePicker.wc.ts]
-1. `LitElement`를 상속받아 클래스를 구현하고, `@customElement('biz-date-time-picker')` 디코레이터를 사용하여 커스텀 엘리먼트로 등록하세요.
-2. 2단계에서 생성한 `DateTimePickerTemplate` 및 `DateTimePicker.css.ts`의 `dateTimePickerStyles`를 임포트하세요.
+1. `LitElement`를 상속받고, 2단계에서 생성한 `DateTimePickerHost`를 implements 하여  클래스를 구현하고, `@customElement('biz-date-time-picker')` 디코레이터를 사용하여 커스텀 엘리먼트로 등록하세요.
+2. 2단계에서 생성한 `DateTimePickerTemplate` 및 `DateTimePicker.css.ts`의 `dateTimePickerStyles`를 임포트하세요. `DateTimePickerHost`를 type 임포트하세요.
 3. 정적 클래스 속성으로 `static styles = dateTimePickerStyles;` 구문을 사용하여 스타일을 연결하고, `render()` 메서드에 `DateTimePickerTemplate`을 바인딩하세요.
 4. 요구사항 정의서 3.1절의 속성(Properties/Attributes)을 Lit의 `@property` 및 `@state` 디코레이터로 정의하세요.
 5. 요구사항 정의서 3.3절의 이벤트(`input`, `change`, `clear` 등)를 발생시키는 내부 이벤트 핸들러 및 `CustomEvent` 방출 메서드를 구현하세요. (`bubbles: true`, `composed: true`, `detail` 객체 구성 준수)
@@ -265,29 +268,27 @@
 
 [출력 형식]
 - 각 파일별 경로(`src/components/DateTimePicker/DateTimePicker.react.ts`, `src/components/DateTimePicker/index.ts`, `src/react.ts`)를 명시하고 해당 코드 블록만 출력하세요.
-- 코드를 작성한 후 5단계(Storybook 및 테스트 코드 생성) 진행 준비가 되었음을 알려주고 대기하세요.
+- 코드를 작성한 후 5단계(Storybook 생성 프롬프트) 진행 준비가 되었음을 알려주고 대기하세요.
 ````
 
 ---
 
-## [Prompt 5] 5단계: Storybook 및 테스트 코드 생성 프롬프트
+## [Prompt 5] 5단계: Storybook 생성 프롬프트
 
 ````text
 [요청 사항]
-1~4단계에서 작성된 코드와 요구사항 정의서를 바탕으로 컴포넌트 품질 관리를 위한 Storybook 문서 파일(`DateTimePicker.stories.ts`)과 단위/통합 테스트 파일(`DateTimePicker.test.ts`) 코드를 작성해 주세요.
+1~4단계에서 작성된 코드와 요구사항 정의서를 바탕으로 컴포넌트 품질 관리를 위한 Storybook 문서 파일(`DateTimePicker.stories.ts`) 코드를 작성해 주세요.
 
 [작성 조건 - DateTimePicker.stories.ts]
 1. Storybook v7+ CSF 3.0 명세를 준수하여 기본 Meta 및 Stories를 구현하세요.
-2. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 및 1.3절의 Sizes(`Small`, `Medium`, `Large`)를 시연하는 Story를 작성하세요.
-3. 요구사항 정의서 3.2절의 주요 States(`Disabled`, `Readonly`, `Error`, `Loading` 등)를 시연하는 Story를 작성하세요.
-4. `@storybook/addon-a11y` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
-
-[작성 조건 - DateTimePicker.test.ts]
-1. Vitest 및 Playwright 환경에서 실행 가능한 테스트 스위트를 구현하세요.
-2. [단위 테스트]: Properties 변경에 따른 DOM 반영, 3.3절 커스텀 이벤트(`input`, `change`, `clear` 등) 방출 여부 및 `detail` 데이터 검증을 수행하세요.
-3. [통합 및 접근성 테스트]: 5.1절 ARIA 속성(`aria-invalid`, `aria-describedby` 등) 바인딩 및 5.2절 키보드 네비게이션(`Tab`, `Escape`, `Enter` 등) 동작을 브라우저 상에서 검증하는 시나리오를 구현하세요.
+2. 컴포넌트의 Host 속성 타입(e.g., `DateTimePickerHost`)에 `Required<T>`를 적용하여 모든 프로퍼티를 필수화한 후, Slot 관련 컨트롤 키를 추가한 `Args` 타입을 정의하세요.
+3. `Args` 타입을 Meta와 StoryObj 의 제네릭 타입으로 사용하시오.
+4. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 및 1.3절의 Sizes(`Small`, `Medium`, `Large`)를 시연하는 Story를 작성하세요.
+5. 요구사항 정의서 3.2절의 주요 States(`Disabled`, `Readonly`, `Error`, `Loading` 등)를 시연하는 Story를 작성하세요.
+6. `@storybook/addon-a11y` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
+7. 3단계에서 작성한 DateTimePicker.ws.ts에서 dispatchEvent 를 분석하여 각 이벤트에 대한 story를 작성하세요.. action()말고 fn() 을 사용하세요.
 
 [출력 형식]
-- 각 파일별 경로(`src/components/DateTimePicker/DateTimePicker.stories.ts`, `src/components/DateTimePicker/DateTimePicker.test.ts`)를 명시하고 해당 코드 블록만 출력하세요.
+- 파일 경로(`src/components/DateTimePicker/DateTimePicker.stories.ts`)를 명시하고 해당 코드 블록만 출력하세요.
 - 모든 코드 작성이 완료되면 전체 개발 공정(Phase 1~5)이 성공적으로 종료되었음을 최종 안내해 주세요.
 ````
