@@ -1,6 +1,6 @@
 import React from 'react';
-import { BizPasswordInput } from "./PasswordInput.wc";
 import { createComponent } from '@lit/react';
+import { BizPasswordInput } from './PasswordInput.wc.ts';
 
 export const PasswordInput = createComponent({
   tagName: 'biz-password-input',

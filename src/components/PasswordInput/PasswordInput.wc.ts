@@ -1,125 +1,145 @@
 import { LitElement } from 'lit';
-import { customElement, property } from "lit/decorators.js";
-import { PasswordInputTemplate } from "./PasswordInput";
-import { passwordInputStyles } from "./PasswordInput.css";
+import { customElement, property, state } from 'lit/decorators.js';
+import { PasswordInputTemplate, type PasswordInputHost } from './PasswordInput.ts';
+import { passwordInputStyles } from './PasswordInput.css.ts';
 
-/**
- * @element biz-password-input
- * 
- * @slot label-slot
- * @slot start-slot
- * @slot toggle-icon-slot
- * @slot end-slot
- * @slot helper-text-slot
- */
 @customElement('biz-password-input')
-export class BizPasswordInput extends LitElement {
-  static styles = passwordInputStyles;
+export class BizPasswordInput extends LitElement implements PasswordInputHost {
+  static override styles = passwordInputStyles;
 
-  @property({ type: String }) value = '';
-  @property({ type: String }) placeholder = '';
-  @property({ type: Boolean, reflect: true }) visible = false;
-  @property({ type: Boolean, reflect: true }) required = false;
-  @property({ type: Boolean, reflect: true }) readonly = false;
-  @property({ type: Boolean, reflect: true }) disabled = false;
-  @property({ type: Boolean, reflect: true }) error = false;
-  @property({ type: Boolean, reflect: true }) clearable = false;
-  @property({ type: String, reflect: true }) variant: 'outlined' | 'filled' | 'standard' = 'outlined';
-  @property({ type: String, reflect: true }) size: 'small' | 'medium' | 'large' = 'medium';
-  @property({ type: Boolean, attribute: 'full-width', reflect: true }) fullWidth = false;
+  @property({ type: String })
+  value = '';
 
-  handleInput(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    this.value = inputElement.value;
+  @property({ type: String })
+  placeholder = '';
+
+  @property({ type: Boolean, reflect: true })
+  visible = false;
+
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  @property({ type: Boolean, reflect: true })
+  readonly = false;
+
+  @property({ type: Boolean, reflect: true })
+  disabled = false;
+
+  @property({ type: Boolean, reflect: true })
+  error = false;
+
+  @property({ type: Boolean, reflect: true })
+  clearable = false;
+
+  @property({ type: String })
+  variant: 'outlined' | 'filled' | 'standard' = 'outlined';
+
+  @property({ type: String })
+  size: 'small' | 'medium' | 'large' = 'medium';
+
+  @property({ type: Boolean, attribute: 'full-width', reflect: true })
+  fullWidth = false;
+
+  handleInput(event: InputEvent): void {
+    const target = event.target as HTMLInputElement;
+    this.value = target.value;
     this.dispatchEvent(
       new CustomEvent('input', {
+        detail: { value: this.value },
         bubbles: true,
         composed: true,
-        detail: { value: this.value },
       })
     );
   }
 
-  handleChange(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    this.value = inputElement.value;
+  handleChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.value = target.value;
     this.dispatchEvent(
       new CustomEvent('change', {
+        detail: { value: this.value },
         bubbles: true,
         composed: true,
-        detail: { value: this.value },
       })
     );
   }
 
-  handleToggleVisibility() {
+  handleToggleVisibility(event: MouseEvent): void {
+    event.preventDefault();
     if (this.disabled || this.readonly) return;
+
     this.visible = !this.visible;
     this.dispatchEvent(
       new CustomEvent('toggle-visibility', {
+        detail: { visible: this.visible },
         bubbles: true,
         composed: true,
-        detail: { visible: this.visible },
       })
     );
   }
 
-  handleClear() {
+  handleClear(event: MouseEvent): void {
+    event.preventDefault();
     if (this.disabled || this.readonly) return;
+
     this.value = '';
     this.dispatchEvent(
       new CustomEvent('clear', {
+        detail: { value: '' },
         bubbles: true,
         composed: true,
-        detail: { value: '' },
       })
     );
     this.dispatchEvent(
       new CustomEvent('input', {
+        detail: { value: '' },
         bubbles: true,
         composed: true,
-        detail: { value: '' },
       })
     );
   }
 
-  handleFocus(event: FocusEvent) {
+  handleFocus(event: FocusEvent): void {
     this.dispatchEvent(
       new CustomEvent('focus', {
+        detail: event,
         bubbles: true,
         composed: true,
-        detail: event,
       })
     );
   }
 
-  handleBlur(event: FocusEvent) {
+  handleBlur(event: FocusEvent): void {
     this.dispatchEvent(
       new CustomEvent('blur', {
+        detail: event,
         bubbles: true,
         composed: true,
-        detail: event,
       })
     );
   }
 
-  handleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && this.clearable && this.value) {
-      this.handleClear();
+  handleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.clearable && this.value && !this.disabled && !this.readonly) {
+      this.handleClear(event as unknown as MouseEvent);
     }
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.addEventListener('keydown', this.handleKeyDown);
+  @state() hasLabel = false;
+
+  handleLabelSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    const nodes = slot.assignedNodes({ flatten: true });
+    this.hasLabel = nodes.length > 0;
   }
 
-  disconnectedCallback() {
-    this.removeEventListener('keydown', this.handleKeyDown);
-    super.disconnectedCallback();
-  }
-
-  render() {
+  override render() {
     return PasswordInputTemplate(this);
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'biz-password-input': BizPasswordInput;
   }
 }
