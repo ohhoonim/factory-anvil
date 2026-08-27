@@ -1,239 +1,251 @@
-import { customElement, property, state } from "lit/decorators.js";
-import { ChipTemplate } from "./Chip";
-import { LitElement } from 'lit';
-import { chipStyles } from "./Chip.css";
-/**
- * @element biz-chip
- * 
- * @slot label-slot
- * @slot start-slot
- * @slot chip-item-slot
- * @slot end-slot
- * @slot helper-text-slot
- */
+import { LitElement, type TemplateResult } from 'lit';
+import { customElement, property, state, query } from 'lit/decorators.js';
+import type { ChipHost } from './Chip.js';
+import { ChipTemplate } from './Chip.js';
+import { chipStyles } from './Chip.css.js';
+
 @customElement('biz-chip')
-export class BizChip extends LitElement {
+export class BizChip extends LitElement implements ChipHost {
   static styles = chipStyles;
 
   @property({ type: Array }) value: string[] = [];
-  @property({ type: String }) placeholder = '';
-  @property({ type: Object }) delimiter: string | string[] = ['Enter', ','];
-  @property({ type: Number, attribute: 'max-chips' }) maxChips = Infinity;
-  @property({ type: Boolean, attribute: 'allow-duplicates' }) allowDuplicates = false;
-  @property({ type: Boolean, reflect: true }) required = false;
-  @property({ type: Boolean, reflect: true }) readonly = false;
-  @property({ type: Boolean, reflect: true }) disabled = false;
-  @property({ type: Boolean, reflect: true }) error = false;
-  @property({ type: Boolean }) deletable = true;
+  @property({ type: String }) placeholder: string = '';
+  @property({ attribute: false }) delimiter: string | string[] = ['Enter', ','];
+  @property({ type: Number, attribute: 'max-chips' }) maxChips: number = Infinity;
+  @property({ type: Boolean, attribute: 'allow-duplicates' }) allowDuplicates: boolean = false;
+  @property({ type: Boolean, reflect: true }) required: boolean = false;
+  @property({ type: Boolean, reflect: true }) readonly: boolean = false;
+  @property({ type: Boolean, reflect: true }) disabled: boolean = false;
+  @property({ type: Boolean, reflect: true }) error: boolean = false;
+  @property({ type: Boolean, reflect: true }) deletable: boolean = true;
   @property({ type: String }) variant: 'outlined' | 'filled' | 'standard' = 'outlined';
   @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
+  @property({ type: Boolean, attribute: 'full-width', reflect: true }) fullWidth: boolean = false;
 
-  @state() private inputValue = '';
-  @state() private isFocused = false;
-  @state() private focusedChipIndex = -1;
-  @state() private liveMessage = '';
+  @state() inputValue: string = '';
+  @state() focusedChipIndex: number = -1;
+  @state() liveMessage: string = '';
+  @state() helperTextId: string = `biz-chip-helper-${Math.random().toString(36).substring(2, 9)}`;
 
-  private uniqueId = `biz-chip-helper-${Math.random().toString(36).substring(2, 9)}`;
+  @query('.biz-chip__input') private inputElement?: HTMLInputElement;
+  @query('.biz-chip__container') private containerElement?: HTMLDivElement;
 
-  private handleInput(e: InputEvent) {
-    const target = e.target as HTMLInputElement;
-    const val = target.value;
-
-    const delimiters = Array.isArray(this.delimiter) ? this.delimiter : [this.delimiter];
-    const charDelimiter = delimiters.find((d) => d.length === 1 && val.endsWith(d));
-
-    if (charDelimiter) {
-      const newText = val.slice(0, -charDelimiter.length).trim();
-      if (newText) {
-        this.addChip(newText);
-      } else {
-        this.inputValue = '';
-      }
-    } else {
-      this.inputValue = val;
+  private isDelimitKey(key: string): boolean {
+    if (Array.isArray(this.delimiter)) {
+      return this.delimiter.includes(key);
     }
+    return this.delimiter === key;
   }
 
-  private handleKeyDown(e: KeyboardEvent) {
-    if (this.disabled || this.readonly) return;
-
-    const delimiters = Array.isArray(this.delimiter) ? this.delimiter : [this.delimiter];
-
-    if (delimiters.includes(e.key)) {
-      e.preventDefault();
-      const text = this.inputValue.trim();
-      if (text) {
-        this.addChip(text);
-      }
-      return;
-    }
-
-    if (e.key === 'Backspace') {
-      if (this.inputValue === '') {
-        if (this.focusedChipIndex !== -1) {
-          this.removeChip(this.focusedChipIndex);
-          this.focusedChipIndex = this.value.length - 1 >= 0 ? this.value.length - 1 : -1;
-        } else if (this.value.length > 0) {
-          this.focusedChipIndex = this.value.length - 1;
-        }
-      }
-      return;
-    }
-
-    if (e.key === 'ArrowLeft') {
-      if (this.inputValue === '' || this.shadowRoot?.activeElement !== this.shadowRoot?.querySelector('.biz-chip__input')) {
-        if (this.focusedChipIndex === -1) {
-          this.focusedChipIndex = this.value.length - 1;
-        } else if (this.focusedChipIndex > 0) {
-          this.focusedChipIndex--;
-        }
-      }
-      return;
-    }
-
-    if (e.key === 'ArrowRight') {
-      if (this.focusedChipIndex !== -1) {
-        if (this.focusedChipIndex < this.value.length - 1) {
-          this.focusedChipIndex++;
-        } else {
-          this.focusedChipIndex = -1;
-          this.focusInput();
-        }
-      }
-      return;
-    }
-
-    if (e.key === 'Delete') {
-      if (this.focusedChipIndex !== -1) {
-        this.removeChip(this.focusedChipIndex);
-        if (this.focusedChipIndex >= this.value.length) {
-          this.focusedChipIndex = this.value.length - 1;
-        }
-      }
-      return;
-    }
-
-    if (this.focusedChipIndex !== -1) {
-      this.focusedChipIndex = -1;
-    }
+  private dispatchChangeEvent(): void {
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: [...this.value] },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
-  private addChip(text: string) {
-    if (this.value.length >= this.maxChips) {
-      this.error = true;
-      return;
-    }
-
-    if (!this.allowDuplicates && this.value.includes(text)) {
-      this.error = true;
-      return;
-    }
+  private addChip(rawText: string): void {
+    const text = rawText.trim();
+    if (!text) return;
+    if (this.value.length >= this.maxChips) return;
+    if (!this.allowDuplicates && this.value.includes(text)) return;
 
     const newValue = [...this.value, text];
     this.value = newValue;
     this.inputValue = '';
-    this.error = false;
-    this.liveMessage = `${text} 칩이 추가되었습니다.`;
-
+    
     this.dispatchEvent(
       new CustomEvent('chip-add', {
+        detail: { addedValue: text, value: [...newValue] },
         bubbles: true,
         composed: true,
-        detail: { addedValue: text, value: newValue },
       })
     );
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { value: newValue },
-      })
-    );
+    this.dispatchChangeEvent();
+    this.liveMessage = `${text} 칩이 추가되었습니다.`;
   }
 
-  private removeChip(index: number) {
+  private removeChipAtIndex(index: number): void {
     if (index < 0 || index >= this.value.length) return;
-
     const removedValue = this.value[index];
     const newValue = this.value.filter((_, i) => i !== index);
     this.value = newValue;
-    this.liveMessage = `${removedValue} 칩이 삭제되었습니다.`;
 
     this.dispatchEvent(
       new CustomEvent('chip-remove', {
+        detail: { removedValue, index, value: [...newValue] },
         bubbles: true,
         composed: true,
-        detail: { removedValue, index, value: newValue },
       })
     );
+    this.dispatchChangeEvent();
+    this.liveMessage = `${removedValue} 칩이 삭제되었습니다.`;
 
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { value: newValue },
-      })
-    );
+    if (this.value.length === 0) {
+      this.focusedChipIndex = -1;
+      this.inputElement?.focus();
+    } else if (this.focusedChipIndex >= this.value.length) {
+      this.focusedChipIndex = this.value.length - 1;
+    }
   }
 
-  private handleFocus(e: FocusEvent) {
-    this.isFocused = true;
+  public clear(): void {
+    if (this.readonly || this.disabled) return;
+    this.value = [];
+    this.inputValue = '';
+    this.focusedChipIndex = -1;
+    this.dispatchEvent(
+      new CustomEvent('clear', {
+        bubbles: true,
+        composed: true,
+      })
+    );
+    this.dispatchChangeEvent();
+  }
+
+  handleContainerClick(): void {
+    if (this.disabled) return;
+    if (this.focusedChipIndex === -1) {
+      this.inputElement?.focus();
+    }
+  }
+
+  handleInputInput(inputEl: HTMLInputElement): void {
+    const currentValue = inputEl.value;
+
+    if (typeof this.delimiter === 'string' && this.delimiter !== 'Enter') {
+      if (currentValue.includes(this.delimiter)) {
+        const parts = currentValue.split(this.delimiter);
+        parts.forEach((part, idx) => {
+          if (idx < parts.length - 1) {
+            this.addChip(part);
+          } else {
+            this.inputValue = part;
+          }
+        });
+        return;
+      }
+    } else if (Array.isArray(this.delimiter)) {
+      const charDelimiters = this.delimiter.filter((d) => d.length === 1);
+      for (const char of charDelimiters) {
+        if (currentValue.includes(char)) {
+          const parts = currentValue.split(char);
+          parts.forEach((part, idx) => {
+            if (idx < parts.length - 1) {
+              this.addChip(part);
+            } else {
+              this.inputValue = part;
+            }
+          });
+          return;
+        }
+      }
+    }
+
+    this.inputValue = currentValue;
+  }
+
+  handleInputKeydown(e: KeyboardEvent): void {
+    if (this.disabled || this.readonly) return;
+
+    if (this.isDelimitKey(e.key)) {
+      e.preventDefault();
+      this.addChip(this.inputValue);
+      return;
+    }
+
+    if (e.key === 'Backspace' && this.inputValue === '') {
+      if (this.value.length > 0) {
+        e.preventDefault();
+        this.focusedChipIndex = this.value.length - 1;
+        this.focusChipItem(this.focusedChipIndex);
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowLeft' && this.inputValue === '') {
+      if (this.value.length > 0) {
+        e.preventDefault();
+        this.focusedChipIndex = this.value.length - 1;
+        this.focusChipItem(this.focusedChipIndex);
+      }
+    }
+  }
+
+  handleInputFocus(e: FocusEvent): void {
+    this.focusedChipIndex = -1;
     this.dispatchEvent(
       new FocusEvent('focus', {
         bubbles: true,
         composed: true,
-        relatedTarget: e.relatedTarget,
       })
     );
   }
 
-  private handleBlur(e: FocusEvent) {
-    this.isFocused = false;
-    this.focusedChipIndex = -1;
+  handleInputBlur(e: FocusEvent): void {
     this.dispatchEvent(
       new FocusEvent('blur', {
         bubbles: true,
         composed: true,
-        relatedTarget: e.relatedTarget,
       })
     );
   }
 
-  private handleContainerClick() {
-    if (!this.disabled && !this.readonly) {
-      this.focusInput();
+  handleChipClick(index: number): void {
+    if (this.disabled) return;
+    this.focusedChipIndex = index;
+  }
+
+  handleChipKeydown(e: KeyboardEvent, index: number): void {
+    if (this.disabled) return;
+
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (index > 0) {
+        this.focusedChipIndex = index - 1;
+        this.focusChipItem(this.focusedChipIndex);
+      }
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (index < this.value.length - 1) {
+        this.focusedChipIndex = index + 1;
+        this.focusChipItem(this.focusedChipIndex);
+      } else {
+        this.focusedChipIndex = -1;
+        this.inputElement?.focus();
+      }
+    } else if ((e.key === 'Delete' || e.key === 'Backspace') && !this.readonly) {
+      e.preventDefault();
+      this.removeChipAtIndex(index);
+      if (this.focusedChipIndex !== -1) {
+        this.focusChipItem(this.focusedChipIndex);
+      }
+    } else if (e.key === 'Escape') {
+      this.focusedChipIndex = -1;
+      this.inputElement?.focus();
     }
   }
 
-  private focusInput() {
-    const input = this.shadowRoot?.querySelector<HTMLInputElement>('.biz-chip__input');
-    input?.focus();
+  handleRemoveChip(e: Event, index: number): void {
+    e.stopPropagation();
+    if (this.disabled || this.readonly) return;
+    this.removeChipAtIndex(index);
   }
 
-  render() {
-    return ChipTemplate({
-      value: this.value,
-      placeholder: this.placeholder,
-      variant: this.variant,
-      size: this.size,
-      disabled: this.disabled,
-      readonly: this.readonly,
-      required: this.required,
-      error: this.error,
-      deletable: this.deletable,
-      focusedChipIndex: this.focusedChipIndex,
-      isFocused: this.isFocused,
-      inputValue: this.inputValue,
-      liveMessage: this.liveMessage,
-      helperTextId: this.uniqueId,
-      onInput: this.handleInput.bind(this),
-      onKeyDown: this.handleKeyDown.bind(this),
-      onFocus: this.handleFocus.bind(this),
-      onBlur: this.handleBlur.bind(this),
-      onRemoveChip: this.removeChip.bind(this),
-      onContainerClick: this.handleContainerClick.bind(this),
+  private focusChipItem(index: number): void {
+    this.updateComplete.then(() => {
+      const chipItems = this.shadowRoot?.querySelectorAll('.biz-chip__item');
+      if (chipItems && chipItems[index]) {
+        (chipItems[index] as HTMLElement).focus();
+      }
     });
+  }
+
+  render(): TemplateResult {
+    return ChipTemplate(this);
   }
 }
 
