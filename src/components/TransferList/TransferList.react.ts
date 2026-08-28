@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { createComponent } from '@lit/react';
-import { BizTransferList } from './TransferList.wc.js';
+import { BizTransferList } from './TransferList.wc';
 
 export const TransferList = createComponent({
   tagName: 'biz-transfer-list',
@@ -10,6 +10,6 @@ export const TransferList = createComponent({
     onChange: 'change',
     onSelectChange: 'select-change',
     onSearch: 'search',
-    onReorder: 'reorder'
-  }
+    onReorder: 'reorder',
+  },
 });

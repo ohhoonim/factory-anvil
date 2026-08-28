@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html } from "lit";
 
 export interface ListItem {
   key: string | number;
@@ -7,7 +7,7 @@ export interface ListItem {
   [key: string]: unknown;
 }
 
-export interface TransferListContext {
+export interface TransferListHost {
   sourceData: ListItem[];
   targetData: ListItem[];
   value: (string | number)[];
@@ -18,257 +18,282 @@ export interface TransferListContext {
   showReorder: boolean;
   disabled: boolean;
   oneWay: boolean;
-  variant: 'horizontal' | 'vertical';
-  size: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'horizontal' | 'vertical';
   
   sourceSelectedKeys: (string | number)[];
   targetSelectedKeys: (string | number)[];
   sourceSearchQuery: string;
   targetSearchQuery: string;
-  focusedSide: 'source' | 'target' | null;
-  focusedIndex: number;
-  liveMessage: string;
 
-  handleSelectAll: (side: 'source' | 'target', checked: boolean) => void;
-  handleItemSelect: (side: 'source' | 'target', key: string | number, event?: MouseEvent | KeyboardEvent) => void;
-  handleSearchInput: (side: 'source' | 'target', event: InputEvent) => void;
+  handleSourceSelectAll: (e: Event) => void;
+  handleTargetSelectAll: (e: Event) => void;
+  handleSourceItemSelect: (key: string | number, e: Event) => void;
+  handleTargetItemSelect: (key: string | number, e: Event) => void;
+  handleSourceSearch: (e: InputEvent) => void;
+  handleTargetSearch: (e: InputEvent) => void;
   handleMoveRight: () => void;
   handleMoveAllRight: () => void;
   handleMoveLeft: () => void;
   handleMoveAllLeft: () => void;
   handleMoveUp: () => void;
   handleMoveDown: () => void;
-  handleKeyDown: (side: 'source' | 'target', event: KeyboardEvent) => void;
+  handleItemKeyDown: (key: string | number, side: 'source' | 'target', e: KeyboardEvent) => void;
 }
 
-export const TransferListTemplate = (context: TransferListContext) => {
-  const {
-    sourceData,
-    targetData,
-    sourceTitle,
-    targetTitle,
-    showSearch,
-    showSelectAll,
-    showReorder,
-    disabled,
-    oneWay,
-    variant = 'horizontal',
-    size = 'medium',
-    sourceSelectedKeys,
-    targetSelectedKeys,
-    sourceSearchQuery,
-    targetSearchQuery,
-    focusedSide,
-    focusedIndex,
-    liveMessage,
-    handleSelectAll,
-    handleItemSelect,
-    handleSearchInput,
-    handleMoveRight,
-    handleMoveAllRight,
-    handleMoveLeft,
-    handleMoveAllLeft,
-    handleMoveUp,
-    handleMoveDown,
-    handleKeyDown
-  } = context;
+export const TransferListTemplate = (host: TransferListHost) => {
+  const filteredSource = host.sourceData.filter(item =>
+    item.label.toLowerCase().includes(host.sourceSearchQuery.toLowerCase())
+  );
+  const filteredTarget = host.targetData.filter(item =>
+    item.label.toLowerCase().includes(host.targetSearchQuery.toLowerCase())
+  );
 
-  const filterItems = (data: ListItem[], query: string) => {
-    if (!query.trim()) return data;
-    return data.filter(item => item.label.toLowerCase().includes(query.toLowerCase()));
-  };
+  const isSourceAllSelected =
+    filteredSource.length > 0 &&
+    filteredSource.every(item => item.disabled || host.sourceSelectedKeys.includes(item.key));
+  const isTargetAllSelected =
+    filteredTarget.length > 0 &&
+    filteredTarget.every(item => item.disabled || host.targetSelectedKeys.includes(item.key));
 
-  const filteredSourceData = filterItems(sourceData, sourceSearchQuery);
-  const filteredTargetData = filterItems(targetData, targetSearchQuery);
-
-  const isSourceAllSelected = filteredSourceData.length > 0 && 
-    filteredSourceData.every(item => item.disabled || sourceSelectedKeys.includes(item.key));
-  const isTargetAllSelected = filteredTargetData.length > 0 && 
-    filteredTargetData.every(item => item.disabled || targetSelectedKeys.includes(item.key));
-
-  const sourceEnabledSelectedCount = filteredSourceData.filter(item => !item.disabled && sourceSelectedKeys.includes(item.key)).length;
-  const targetEnabledSelectedCount = filteredTargetData.filter(item => !item.disabled && targetSelectedKeys.includes(item.key)).length;
-
-  const renderListBox = (
-    side: 'source' | 'target',
-    title: string,
-    data: ListItem[],
-    selectedKeys: (string | number)[],
-    searchQuery: string,
-    isAllSelected: boolean,
-    headerSlotName: string,
-    emptySlotName: string
-  ) => {
-    return html`
-      <div class=${`biz-transfer-list__box biz-transfer-list__box--${side}`}>
+  return html`
+    <div
+      class="biz-transfer-list"
+      role="region"
+      aria-label="Transfer List"
+      ?data-disabled=${host.disabled}
+      data-size=${host.size || 'medium'}
+      data-variant=${host.variant || 'horizontal'}
+    >
+      <div class="biz-transfer-list__box" role="group" aria-labelledby="source-title">
         <div class="biz-transfer-list__header">
-          <slot name=${headerSlotName}>
-            <div class="biz-transfer-list__header-content">
-              ${showSelectAll ? html`
-                <input
-                  type="checkbox"
-                  class="biz-transfer-list__checkbox"
-                  .checked=${isAllSelected}
-                  .disabled=${disabled || data.length === 0}
-                  @change=${(e: Event) => handleSelectAll(side, (e.target as HTMLInputElement).checked)}
-                  aria-label=${`${title} 전체 선택`}
-                />
-              ` : ''}
-              <span class="biz-transfer-list__header-title">${title}</span>
-              <span class="biz-transfer-list__header-count">
-                ${selectedKeys.length}/${data.length}
-              </span>
-            </div>
+          <slot name="source-header-slot">
+            ${host.showSelectAll
+              ? html`
+                  <input
+                    type="checkbox"
+                    class="biz-transfer-list__checkbox"
+                    .checked=${isSourceAllSelected}
+                    ?disabled=${host.disabled || filteredSource.length === 0}
+                    @change=${host.handleSourceSelectAll}
+                    aria-label="Select all source items"
+                  />
+                `
+              : ''}
+            <span id="source-title" class="biz-transfer-list__title">${host.sourceTitle}</span>
+            <span class="biz-transfer-list__count">
+              ${host.sourceSelectedKeys.length}/${host.sourceData.length}
+            </span>
           </slot>
         </div>
 
-        ${showSearch ? html`
-          <div class="biz-transfer-list__search">
-            <input
-              type="text"
-              class="biz-transfer-list__search-input"
-              placeholder="검색..."
-              .value=${searchQuery}
-              .disabled=${disabled}
-              @input=${(e: InputEvent) => handleSearchInput(side, e)}
-              aria-label=${`${title} 검색`}
-            />
-          </div>
-        ` : ''}
+        ${host.showSearch
+          ? html`
+              <div class="biz-transfer-list__search">
+                <input
+                  type="text"
+                  class="biz-transfer-list__search-input"
+                  placeholder="Search..."
+                  .value=${host.sourceSearchQuery}
+                  ?disabled=${host.disabled}
+                  @input=${host.handleSourceSearch}
+                  aria-label="Search source items"
+                />
+              </div>
+            `
+          : ''}
 
-        <div
-          class="biz-transfer-list__body"
-          role="listbox"
-          aria-multiselectable="true"
-          aria-label=${title}
-          tabindex=${disabled ? -1 : 0}
-          @keydown=${(e: KeyboardEvent) => handleKeyDown(side, e)}
-        >
-          ${data.length === 0 ? html`
-            <div class="biz-transfer-list__empty">
-              <slot name=${emptySlotName}>데이터가 없습니다.</slot>
-            </div>
-          ` : html`
-            <ul class="biz-transfer-list__list">
-              ${data.map((item, index) => {
-                const isSelected = selectedKeys.includes(item.key);
-                const isFocused = focusedSide === side && focusedIndex === index;
-                const itemDisabled = disabled || Boolean(item.disabled);
-
+        <ul class="biz-transfer-list__list" role="listbox" aria-multiselectable="true" tabindex="0">
+          ${filteredSource.length === 0
+            ? html`
+                <li class="biz-transfer-list__empty">
+                  <slot name="empty-source-slot">No items</slot>
+                </li>
+              `
+            : filteredSource.map(item => {
+                const isSelected = host.sourceSelectedKeys.includes(item.key);
+                const isDisabled = host.disabled || Boolean(item.disabled);
                 return html`
                   <li
-                    class=${`biz-transfer-list__item ${isSelected ? 'biz-transfer-list__item--selected' : ''} ${isFocused ? 'biz-transfer-list__item--focused' : ''} ${itemDisabled ? 'biz-transfer-list__item--disabled' : ''}`}
+                    class="biz-transfer-list__item"
                     role="option"
-                    aria-selected=${isSelected ? 'true' : 'false'}
-                    aria-disabled=${itemDisabled ? 'true' : 'false'}
-                    @click=${(e: MouseEvent) => !itemDisabled && handleItemSelect(side, item.key, e)}
+                    aria-selected=${isSelected}
+                    aria-disabled=${isDisabled}
+                    ?data-selected=${isSelected}
+                    ?data-disabled=${isDisabled}
+                    tabindex=${isDisabled ? '-1' : '0'}
+                    @click=${(e: Event) => !isDisabled && host.handleSourceItemSelect(item.key, e)}
+                    @keydown=${(e: KeyboardEvent) => !isDisabled && host.handleItemKeyDown(item.key, 'source', e)}
                   >
                     <input
                       type="checkbox"
                       class="biz-transfer-list__checkbox"
                       .checked=${isSelected}
-                      .disabled=${itemDisabled}
+                      ?disabled=${isDisabled}
                       tabindex="-1"
-                      aria-hidden="true"
                     />
-                    <div class="biz-transfer-list__item-content">
-                      <slot name="item-slot" .item=${item}>
-                        <span class="biz-transfer-list__item-label">${item.label}</span>
-                      </slot>
-                    </div>
+                    <slot name="item-slot" .item=${item}>
+                      <span class="biz-transfer-list__item-label">${item.label}</span>
+                    </slot>
                   </li>
                 `;
               })}
-            </ul>
-          `}
-        </div>
+        </ul>
 
         <div class="biz-transfer-list__footer">
           <slot name="footer-slot"></slot>
         </div>
       </div>
-    `;
-  };
 
-  return html`
-    <div
-      class=${`biz-transfer-list biz-transfer-list--${variant} biz-transfer-list--${size} ${disabled ? 'biz-transfer-list--disabled' : ''}`}
-      role="group"
-      aria-label="Transfer List"
-    >
-      <div class="biz-transfer-list__live-region" aria-live="polite" aria-atomic="true">
-        ${liveMessage}
-      </div>
-
-      ${renderListBox('source', sourceTitle, filteredSourceData, sourceSelectedKeys, sourceSearchQuery, isSourceAllSelected, 'source-header-slot', 'empty-source-slot')}
-
-      <div class="biz-transfer-list__actions" role="group" aria-label="이동 제어">
+      <div class="biz-transfer-list__actions" role="group" aria-label="Transfer Controls">
         <slot name="action-controls-slot">
           <button
             type="button"
             class="biz-transfer-list__btn"
-            .disabled=${disabled || sourceEnabledSelectedCount === 0}
-            @click=${handleMoveRight}
-            aria-label="선택 항목 우측 이동"
+            ?disabled=${host.disabled || host.sourceSelectedKeys.length === 0}
+            @click=${host.handleMoveRight}
+            aria-label="Move Selected Right"
           >
             &gt;
           </button>
           <button
             type="button"
             class="biz-transfer-list__btn"
-            .disabled=${disabled || filteredSourceData.filter(i => !i.disabled).length === 0}
-            @click=${handleMoveAllRight}
-            aria-label="전체 항목 우측 이동"
+            ?disabled=${host.disabled || host.sourceData.length === 0}
+            @click=${host.handleMoveAllRight}
+            aria-label="Move All Right"
           >
             &gt;&gt;
           </button>
-          ${!oneWay ? html`
-            <button
-              type="button"
-              class="biz-transfer-list__btn"
-              .disabled=${disabled || targetEnabledSelectedCount === 0}
-              @click=${handleMoveLeft}
-              aria-label="선택 항목 좌측 이동"
-            >
-              &lt;
-            </button>
-            <button
-              type="button"
-              class="biz-transfer-list__btn"
-              .disabled=${disabled || filteredTargetData.filter(i => !i.disabled).length === 0}
-              @click=${handleMoveAllLeft}
-              aria-label="전체 항목 좌측 이동"
-            >
-              &lt;&lt;
-            </button>
-          ` : ''}
+          ${!host.oneWay
+            ? html`
+                <button
+                  type="button"
+                  class="biz-transfer-list__btn"
+                  ?disabled=${host.disabled || host.targetSelectedKeys.length === 0}
+                  @click=${host.handleMoveLeft}
+                  aria-label="Move Selected Left"
+                >
+                  &lt;
+                </button>
+                <button
+                  type="button"
+                  class="biz-transfer-list__btn"
+                  ?disabled=${host.disabled || host.targetData.length === 0}
+                  @click=${host.handleMoveAllLeft}
+                  aria-label="Move All Left"
+                >
+                  &lt;&lt;
+                </button>
+              `
+            : ''}
         </slot>
       </div>
 
-      ${renderListBox('target', targetTitle, filteredTargetData, targetSelectedKeys, targetSearchQuery, isTargetAllSelected, 'target-header-slot', 'empty-target-slot')}
-
-      ${showReorder ? html`
-        <div class="biz-transfer-list__reorder-actions" role="group" aria-label="순서 제어">
-          <button
-            type="button"
-            class="biz-transfer-list__btn"
-            .disabled=${disabled || targetSelectedKeys.length !== 1}
-            @click=${handleMoveUp}
-            aria-label="위로 이동"
-          >
-            ▲
-          </button>
-          <button
-            type="button"
-            class="biz-transfer-list__btn"
-            .disabled=${disabled || targetSelectedKeys.length !== 1}
-            @click=${handleMoveDown}
-            aria-label="아래로 이동"
-          >
-            ▼
-          </button>
+      <div class="biz-transfer-list__box" role="group" aria-labelledby="target-title">
+        <div class="biz-transfer-list__header">
+          <slot name="target-header-slot">
+            ${host.showSelectAll
+              ? html`
+                  <input
+                    type="checkbox"
+                    class="biz-transfer-list__checkbox"
+                    .checked=${isTargetAllSelected}
+                    ?disabled=${host.disabled || filteredTarget.length === 0}
+                    @change=${host.handleTargetSelectAll}
+                    aria-label="Select all target items"
+                  />
+                `
+              : ''}
+            <span id="target-title" class="biz-transfer-list__title">${host.targetTitle}</span>
+            <span class="biz-transfer-list__count">
+              ${host.targetSelectedKeys.length}/${host.targetData.length}
+            </span>
+          </slot>
         </div>
-      ` : ''}
+
+        ${host.showSearch
+          ? html`
+              <div class="biz-transfer-list__search">
+                <input
+                  type="text"
+                  class="biz-transfer-list__search-input"
+                  placeholder="Search..."
+                  .value=${host.targetSearchQuery}
+                  ?disabled=${host.disabled}
+                  @input=${host.handleTargetSearch}
+                  aria-label="Search target items"
+                />
+              </div>
+            `
+          : ''}
+
+        <ul class="biz-transfer-list__list" role="listbox" aria-multiselectable="true" tabindex="0">
+          ${filteredTarget.length === 0
+            ? html`
+                <li class="biz-transfer-list__empty">
+                  <slot name="empty-target-slot">No items</slot>
+                </li>
+              `
+            : filteredTarget.map(item => {
+                const isSelected = host.targetSelectedKeys.includes(item.key);
+                const isDisabled = host.disabled || Boolean(item.disabled);
+                return html`
+                  <li
+                    class="biz-transfer-list__item"
+                    role="option"
+                    aria-selected=${isSelected}
+                    aria-disabled=${isDisabled}
+                    ?data-selected=${isSelected}
+                    ?data-disabled=${isDisabled}
+                    tabindex=${isDisabled ? '-1' : '0'}
+                    @click=${(e: Event) => !isDisabled && host.handleTargetItemSelect(item.key, e)}
+                    @keydown=${(e: KeyboardEvent) => !isDisabled && host.handleItemKeyDown(item.key, 'target', e)}
+                  >
+                    <input
+                      type="checkbox"
+                      class="biz-transfer-list__checkbox"
+                      .checked=${isSelected}
+                      ?disabled=${isDisabled}
+                      tabindex="-1"
+                    />
+                    <slot name="item-slot" .item=${item}>
+                      <span class="biz-transfer-list__item-label">${item.label}</span>
+                    </slot>
+                  </li>
+                `;
+              })}
+        </ul>
+
+        <div class="biz-transfer-list__footer">
+          <slot name="footer-slot"></slot>
+        </div>
+      </div>
+
+      ${host.showReorder
+        ? html`
+            <div class="biz-transfer-list__reorder-actions" role="group" aria-label="Reorder Controls">
+              <button
+                type="button"
+                class="biz-transfer-list__btn"
+                ?disabled=${host.disabled || host.targetSelectedKeys.length !== 1}
+                @click=${host.handleMoveUp}
+                aria-label="Move Up"
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                class="biz-transfer-list__btn"
+                ?disabled=${host.disabled || host.targetSelectedKeys.length !== 1}
+                @click=${host.handleMoveDown}
+                aria-label="Move Down"
+              >
+                ▼
+              </button>
+            </div>
+          `
+        : ''}
     </div>
   `;
 };

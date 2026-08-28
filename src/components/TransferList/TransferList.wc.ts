@@ -1,20 +1,11 @@
 import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { transferListStyles } from './TransferList.css.js';
-import { TransferListTemplate, type ListItem, type TransferListContext } from './TransferList.js';
+import { TransferListTemplate, type ListItem, type TransferListHost } from './TransferList';
+import { transferListStyles } from './TransferList.css';
 
-/**
- * @element biz-transfer-list
- * 
- * @slot ${headerSlotName} 사용자 정의
- * @slot ${emptySlotName} 사용자 정의
- * @slot item-slot
- * @slot footer-slot
- * @slot action-controls-slot
- */
 @customElement('biz-transfer-list')
-export class BizTransferList extends LitElement {
-  static override styles = transferListStyles;
+export class BizTransferList extends LitElement implements TransferListHost {
+  static styles = transferListStyles;
 
   @property({ type: Array, attribute: 'source-data' })
   sourceData: ListItem[] = [];
@@ -47,356 +38,321 @@ export class BizTransferList extends LitElement {
   oneWay = false;
 
   @property({ type: String })
-  variant: 'horizontal' | 'vertical' = 'horizontal';
-
-  @property({ type: String })
   size: 'small' | 'medium' | 'large' = 'medium';
 
-  @state()
-  private sourceSelectedKeys: (string | number)[] = [];
+  @property({ type: String })
+  variant: 'horizontal' | 'vertical' = 'horizontal';
 
   @state()
-  private targetSelectedKeys: (string | number)[] = [];
+  sourceSelectedKeys: (string | number)[] = [];
 
   @state()
-  private sourceSearchQuery = '';
+  targetSelectedKeys: (string | number)[] = [];
 
   @state()
-  private targetSearchQuery = '';
+  sourceSearchQuery = '';
 
   @state()
-  private focusedSide: 'source' | 'target' | null = null;
+  targetSearchQuery = '';
 
-  @state()
-  private focusedIndex = -1;
+  private liveRegion: HTMLElement | null = null;
 
-  @state()
-  private liveMessage = '';
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.initLiveRegion();
+  }
 
-  override updated(changedProperties: Map<string | number | symbol, unknown>) {
-    super.updated(changedProperties);
-
-    if (changedProperties.has('value')) {
-      this.syncDataWithValue();
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this.liveRegion && this.liveRegion.parentNode) {
+      this.liveRegion.parentNode.removeChild(this.liveRegion);
     }
   }
 
-  private syncDataWithValue() {
-    if (!this.value) return;
-    const allItems = [...this.sourceData, ...this.targetData];
-    const targetMap = new Map<string | number, ListItem>();
-
-    this.value.forEach(val => {
-      const found = allItems.find(item => item.key === val);
-      if (found) {
-        targetMap.set(val, found);
-      }
-    });
-
-    const newTargetData = Array.from(targetMap.values());
-    const newSourceData = allItems.filter(item => !targetMap.has(item.key));
-
-    this.sourceData = newSourceData;
-    this.targetData = newTargetData;
+  private initLiveRegion(): void {
+    const liveEl = document.createElement('div');
+    liveEl.setAttribute('aria-live', 'polite');
+    liveEl.setAttribute('aria-atomic', 'true');
+    liveEl.style.position = 'absolute';
+    liveEl.style.width = '1px';
+    liveEl.style.height = '1px';
+    liveEl.style.padding = '0';
+    liveEl.style.overflow = 'hidden';
+    liveEl.style.clip = 'rect(0, 0, 0, 0)';
+    liveEl.style.whiteSpace = 'nowrap';
+    liveEl.style.border = '0';
+    document.body.appendChild(liveEl);
+    this.liveRegion = liveEl;
   }
 
-  private getFilteredItems(side: 'source' | 'target'): ListItem[] {
-    const data = side === 'source' ? this.sourceData : this.targetData;
-    const query = side === 'source' ? this.sourceSearchQuery : this.targetSearchQuery;
-    if (!query.trim()) return data;
-    return data.filter(item => item.label.toLowerCase().includes(query.toLowerCase()));
+  private announce(message: string): void {
+    if (this.liveRegion) {
+      this.liveRegion.textContent = message;
+    }
   }
 
-  private dispatchSelectChangeEvent() {
+  handleSourceSelectAll = (): void => {
+    if (this.disabled) return;
+    const filteredSource = this.sourceData.filter(
+      item =>
+        !item.disabled && item.label.toLowerCase().includes(this.sourceSearchQuery.toLowerCase())
+    );
+    const allFilteredKeys = filteredSource.map(item => item.key);
+    const isAllSelected = allFilteredKeys.every(key => this.sourceSelectedKeys.includes(key));
+
+    if (isAllSelected) {
+      this.sourceSelectedKeys = this.sourceSelectedKeys.filter(
+        key => !allFilteredKeys.includes(key)
+      );
+    } else {
+      this.sourceSelectedKeys = Array.from(
+        new Set([...this.sourceSelectedKeys, ...allFilteredKeys])
+      );
+    }
+    this.emitSelectChange();
+  };
+
+  handleTargetSelectAll = (): void => {
+    if (this.disabled) return;
+    const filteredTarget = this.targetData.filter(
+      item =>
+        !item.disabled && item.label.toLowerCase().includes(this.targetSearchQuery.toLowerCase())
+    );
+    const allFilteredKeys = filteredTarget.map(item => item.key);
+    const isAllSelected = allFilteredKeys.every(key => this.targetSelectedKeys.includes(key));
+
+    if (isAllSelected) {
+      this.targetSelectedKeys = this.targetSelectedKeys.filter(
+        key => !allFilteredKeys.includes(key)
+      );
+    } else {
+      this.targetSelectedKeys = Array.from(
+        new Set([...this.targetSelectedKeys, ...allFilteredKeys])
+      );
+    }
+    this.emitSelectChange();
+  };
+
+  handleSourceItemSelect = (key: string | number): void => {
+    if (this.disabled) return;
+    if (this.sourceSelectedKeys.includes(key)) {
+      this.sourceSelectedKeys = this.sourceSelectedKeys.filter(k => k !== key);
+    } else {
+      this.sourceSelectedKeys = [...this.sourceSelectedKeys, key];
+    }
+    this.emitSelectChange();
+  };
+
+  handleTargetItemSelect = (key: string | number): void => {
+    if (this.disabled) return;
+    if (this.targetSelectedKeys.includes(key)) {
+      this.targetSelectedKeys = this.targetSelectedKeys.filter(k => k !== key);
+    } else {
+      this.targetSelectedKeys = [...this.targetSelectedKeys, key];
+    }
+    this.emitSelectChange();
+  };
+
+  handleSourceSearch = (e: InputEvent): void => {
+    const input = e.target as HTMLInputElement;
+    this.sourceSearchQuery = input.value;
     this.dispatchEvent(
-      new CustomEvent('select-change', {
+      new CustomEvent('search', {
         bubbles: true,
         composed: true,
-        detail: {
-          sourceSelectedKeys: [...this.sourceSelectedKeys],
-          targetSelectedKeys: [...this.targetSelectedKeys]
-        }
+        detail: { side: 'source', query: this.sourceSearchQuery },
       })
     );
-  }
+  };
 
-  private dispatchChangeEvent(movedKeys: (string | number)[], direction: 'left' | 'right') {
+  handleTargetSearch = (e: InputEvent): void => {
+    const input = e.target as HTMLInputElement;
+    this.targetSearchQuery = input.value;
+    this.dispatchEvent(
+      new CustomEvent('search', {
+        bubbles: true,
+        composed: true,
+        detail: { side: 'target', query: this.targetSearchQuery },
+      })
+    );
+  };
+
+  handleMoveRight = (): void => {
+    if (this.disabled || this.sourceSelectedKeys.length === 0) return;
+    const movedKeys = [...this.sourceSelectedKeys];
+    const itemsToMove = this.sourceData.filter(item => movedKeys.includes(item.key));
+    
+    this.sourceData = this.sourceData.filter(item => !movedKeys.includes(item.key));
+    this.targetData = [...this.targetData, ...itemsToMove];
     this.value = this.targetData.map(item => item.key);
+    this.sourceSelectedKeys = [];
+
+    this.emitChangeEvent(movedKeys, 'right');
+    this.announce(`${movedKeys.length}개 항목이 우측 선택 리스트로 이동되었습니다.`);
+  };
+
+  handleMoveAllRight = (): void => {
+    if (this.disabled || this.sourceData.length === 0) return;
+    const itemsToMove = this.sourceData.filter(item => !item.disabled);
+    const movedKeys = itemsToMove.map(item => item.key);
+
+    this.sourceData = this.sourceData.filter(item => item.disabled);
+    this.targetData = [...this.targetData, ...itemsToMove];
+    this.value = this.targetData.map(item => item.key);
+    this.sourceSelectedKeys = [];
+
+    this.emitChangeEvent(movedKeys, 'right');
+    this.announce(`전체 ${movedKeys.length}개 항목이 우측 선택 리스트로 이동되었습니다.`);
+  };
+
+  handleMoveLeft = (): void => {
+    if (this.disabled || this.oneWay || this.targetSelectedKeys.length === 0) return;
+    const movedKeys = [...this.targetSelectedKeys];
+    const itemsToMove = this.targetData.filter(item => movedKeys.includes(item.key));
+
+    this.targetData = this.targetData.filter(item => !movedKeys.includes(item.key));
+    this.sourceData = [...this.sourceData, ...itemsToMove];
+    this.value = this.targetData.map(item => item.key);
+    this.targetSelectedKeys = [];
+
+    this.emitChangeEvent(movedKeys, 'left');
+    this.announce(`${movedKeys.length}개 항목이 좌측 원본 리스트로 이동되었습니다.`);
+  };
+
+  handleMoveAllLeft = (): void => {
+    if (this.disabled || this.oneWay || this.targetData.length === 0) return;
+    const itemsToMove = this.targetData.filter(item => !item.disabled);
+    const movedKeys = itemsToMove.map(item => item.key);
+
+    this.targetData = this.targetData.filter(item => item.disabled);
+    this.sourceData = [...this.sourceData, ...itemsToMove];
+    this.value = this.targetData.map(item => item.key);
+    this.targetSelectedKeys = [];
+
+    this.emitChangeEvent(movedKeys, 'left');
+    this.announce(`전체 ${movedKeys.length}개 항목이 좌측 원본 리스트로 이동되었습니다.`);
+  };
+
+  handleMoveUp = (): void => {
+    if (this.disabled || this.targetSelectedKeys.length !== 1) return;
+    const key = this.targetSelectedKeys[0];
+    const index = this.targetData.findIndex(item => item.key === key);
+    if (index > 0) {
+      const updated = [...this.targetData];
+      const temp = updated[index];
+      updated[index] = updated[index - 1];
+      updated[index - 1] = temp;
+      this.targetData = updated;
+      this.value = updated.map(item => item.key);
+      this.emitReorderEvent(key, index - 1);
+    }
+  };
+
+  handleMoveDown = (): void => {
+    if (this.disabled || this.targetSelectedKeys.length !== 1) return;
+    const key = this.targetSelectedKeys[0];
+    const index = this.targetData.findIndex(item => item.key === key);
+    if (index >= 0 && index < this.targetData.length - 1) {
+      const updated = [...this.targetData];
+      const temp = updated[index];
+      updated[index] = updated[index + 1];
+      updated[index + 1] = temp;
+      this.targetData = updated;
+      this.value = updated.map(item => item.key);
+      this.emitReorderEvent(key, index + 1);
+    }
+  };
+
+  handleItemKeyDown = (key: string | number, side: 'source' | 'target', e: KeyboardEvent): void => {
+    if (this.disabled) return;
+
+    if (e.key === ' ') {
+      e.preventDefault();
+      if (side === 'source') {
+        this.handleSourceItemSelect(key);
+      } else {
+        this.handleTargetItemSelect(key);
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (side === 'source') {
+        if (!this.sourceSelectedKeys.includes(key)) {
+          this.sourceSelectedKeys = [...this.sourceSelectedKeys, key];
+        }
+        this.handleMoveRight();
+      } else if (!this.oneWay) {
+        if (!this.targetSelectedKeys.includes(key)) {
+          this.targetSelectedKeys = [...this.targetSelectedKeys, key];
+        }
+        this.handleMoveLeft();
+      }
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+      e.preventDefault();
+      if (side === 'source') {
+        this.handleSourceSelectAll();
+      } else {
+        this.handleTargetSelectAll();
+      }
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const currentEl = e.currentTarget as HTMLElement;
+      const listContainer = currentEl.parentElement;
+      if (!listContainer) return;
+      
+      const items = Array.from(listContainer.querySelectorAll<HTMLElement>('.biz-transfer-list__item[tabindex="0"]'));
+      const currentIndex = items.indexOf(currentEl);
+      
+      if (e.key === 'ArrowDown' && currentIndex < items.length - 1) {
+        items[currentIndex + 1].focus();
+      } else if (e.key === 'ArrowUp' && currentIndex > 0) {
+        items[currentIndex - 1].focus();
+      }
+    }
+  };
+
+  private emitChangeEvent(movedKeys: (string | number)[], direction: 'left' | 'right'): void {
     this.dispatchEvent(
       new CustomEvent('change', {
         bubbles: true,
         composed: true,
         detail: {
-          sourceData: [...this.sourceData],
-          targetData: [...this.targetData],
+          sourceData: this.sourceData,
+          targetData: this.targetData,
           movedKeys,
-          direction
-        }
+          direction,
+        },
       })
     );
   }
 
-  private handleSelectAll = (side: 'source' | 'target', checked: boolean) => {
-    const filteredData = this.getFilteredItems(side);
-    const validKeys = filteredData.filter(item => !item.disabled).map(item => item.key);
-
-    if (side === 'source') {
-      if (checked) {
-        this.sourceSelectedKeys = Array.from(new Set([...this.sourceSelectedKeys, ...validKeys]));
-      } else {
-        this.sourceSelectedKeys = this.sourceSelectedKeys.filter(key => !validKeys.includes(key));
-      }
-    } else {
-      if (checked) {
-        this.targetSelectedKeys = Array.from(new Set([...this.targetSelectedKeys, ...validKeys]));
-      } else {
-        this.targetSelectedKeys = this.targetSelectedKeys.filter(key => !validKeys.includes(key));
-      }
-    }
-
-    this.dispatchSelectChangeEvent();
-  }
-
-  private handleItemSelect = (side: 'source' | 'target', key: string | number, event?: MouseEvent | KeyboardEvent) => {
-    let selectedKeys = side === 'source' ? [...this.sourceSelectedKeys] : [...this.targetSelectedKeys];
-
-    if (selectedKeys.includes(key)) {
-      selectedKeys = selectedKeys.filter(k => k !== key);
-    } else {
-      selectedKeys.push(key);
-    }
-
-    if (side === 'source') {
-      this.sourceSelectedKeys = selectedKeys;
-    } else {
-      this.targetSelectedKeys = selectedKeys;
-    }
-
-    const filteredData = this.getFilteredItems(side);
-    this.focusedSide = side;
-    this.focusedIndex = filteredData.findIndex(item => item.key === key);
-
-    this.dispatchSelectChangeEvent();
-  }
-
-  private handleSearchInput = (side: 'source' | 'target', event: InputEvent) => {
-    const query = (event.target as HTMLInputElement).value;
-    if (side === 'source') {
-      this.sourceSearchQuery = query;
-    } else {
-      this.targetSearchQuery = query;
-    }
-
+  private emitSelectChange(): void {
     this.dispatchEvent(
-      new CustomEvent('search', {
+      new CustomEvent('select-change', {
         bubbles: true,
         composed: true,
         detail: {
-          side,
-          query
-        }
+          sourceSelectedKeys: this.sourceSelectedKeys,
+          targetSelectedKeys: this.targetSelectedKeys,
+        },
       })
     );
   }
 
-  private handleMoveRight = () => {
-    const movedItems = this.sourceData.filter(
-      item => !item.disabled && this.sourceSelectedKeys.includes(item.key)
-    );
-    if (movedItems.length === 0) return;
-
-    const movedKeys = movedItems.map(item => item.key);
-    this.sourceData = this.sourceData.filter(item => !movedKeys.includes(item.key));
-    this.targetData = [...this.targetData, ...movedItems];
-    this.sourceSelectedKeys = this.sourceSelectedKeys.filter(key => !movedKeys.includes(key));
-
-    this.liveMessage = `${movedItems.length}개 항목이 우측 선택 리스트로 이동되었습니다.`;
-    this.dispatchChangeEvent(movedKeys, 'right');
-  }
-
-  private handleMoveAllRight = () => {
-    const movedItems = this.getFilteredItems('source').filter(item => !item.disabled);
-    if (movedItems.length === 0) return;
-
-    const movedKeys = movedItems.map(item => item.key);
-    this.sourceData = this.sourceData.filter(item => !movedKeys.includes(item.key));
-    this.targetData = [...this.targetData, ...movedItems];
-    this.sourceSelectedKeys = this.sourceSelectedKeys.filter(key => !movedKeys.includes(key));
-
-    this.liveMessage = `전체 ${movedItems.length}개 항목이 우측 선택 리스트로 이동되었습니다.`;
-    this.dispatchChangeEvent(movedKeys, 'right');
-  }
-
-  private handleMoveLeft = () => {
-    if (this.oneWay) return;
-    const movedItems = this.targetData.filter(
-      item => !item.disabled && this.targetSelectedKeys.includes(item.key)
-    );
-    if (movedItems.length === 0) return;
-
-    const movedKeys = movedItems.map(item => item.key);
-    this.targetData = this.targetData.filter(item => !movedKeys.includes(item.key));
-    this.sourceData = [...this.sourceData, ...movedItems];
-    this.targetSelectedKeys = this.targetSelectedKeys.filter(key => !movedKeys.includes(key));
-
-    this.liveMessage = `${movedItems.length}개 항목이 좌측 원본 리스트로 이동되었습니다.`;
-    this.dispatchChangeEvent(movedKeys, 'left');
-  }
-
-  private handleMoveAllLeft = () => {
-    if (this.oneWay) return;
-    const movedItems = this.getFilteredItems('target').filter(item => !item.disabled);
-    if (movedItems.length === 0) return;
-
-    const movedKeys = movedItems.map(item => item.key);
-    this.targetData = this.targetData.filter(item => !movedKeys.includes(item.key));
-    this.sourceData = [...this.sourceData, ...movedItems];
-    this.targetSelectedKeys = this.targetSelectedKeys.filter(key => !movedKeys.includes(key));
-
-    this.liveMessage = `전체 ${movedItems.length}개 항목이 좌측 원본 리스트로 이동되었습니다.`;
-    this.dispatchChangeEvent(movedKeys, 'left');
-  }
-
-  private handleMoveUp = () => {
-    if (this.targetSelectedKeys.length !== 1) return;
-    const key = this.targetSelectedKeys[0];
-    const index = this.targetData.findIndex(item => item.key === key);
-    if (index <= 0) return;
-
-    const newTargetData = [...this.targetData];
-    const [movedItem] = newTargetData.splice(index, 1);
-    const newIndex = index - 1;
-    newTargetData.splice(newIndex, 0, movedItem);
-
-    this.targetData = newTargetData;
-    this.value = this.targetData.map(item => item.key);
-
+  private emitReorderEvent(movedKey: string | number, newIndex: number): void {
     this.dispatchEvent(
       new CustomEvent('reorder', {
         bubbles: true,
         composed: true,
         detail: {
-          targetData: [...this.targetData],
-          movedKey: key,
-          newIndex
-        }
+          targetData: this.targetData,
+          movedKey,
+          newIndex,
+        },
       })
     );
   }
 
-  private handleMoveDown = () => {
-    if (this.targetSelectedKeys.length !== 1) return;
-    const key = this.targetSelectedKeys[0];
-    const index = this.targetData.findIndex(item => item.key === key);
-    if (index < 0 || index >= this.targetData.length - 1) return;
-
-    const newTargetData = [...this.targetData];
-    const [movedItem] = newTargetData.splice(index, 1);
-    const newIndex = index + 1;
-    newTargetData.splice(newIndex, 0, movedItem);
-
-    this.targetData = newTargetData;
-    this.value = this.targetData.map(item => item.key);
-
-    this.dispatchEvent(
-      new CustomEvent('reorder', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          targetData: [...this.targetData],
-          movedKey: key,
-          newIndex
-        }
-      })
-    );
-  }
-
-  private handleKeyDown = (side: 'source' | 'target', event: KeyboardEvent) => {
-    if (this.disabled) return;
-    const filteredData = this.getFilteredItems(side);
-    if (filteredData.length === 0) return;
-
-    let currentIndex = this.focusedSide === side ? this.focusedIndex : 0;
-    if (currentIndex < 0) currentIndex = 0;
-
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        this.focusedSide = side;
-        this.focusedIndex = Math.min(currentIndex + 1, filteredData.length - 1);
-        break;
-
-      case 'ArrowUp':
-        event.preventDefault();
-        this.focusedSide = side;
-        this.focusedIndex = Math.max(currentIndex - 1, 0);
-        break;
-
-      case ' ':
-        event.preventDefault();
-        if (filteredData[currentIndex] && !filteredData[currentIndex].disabled) {
-          this.handleItemSelect(side, filteredData[currentIndex].key, event);
-        }
-        break;
-
-      case 'Enter':
-        event.preventDefault();
-        if (side === 'source') {
-          this.handleMoveRight();
-        } else {
-          this.handleMoveLeft();
-        }
-        break;
-
-      case 'a':
-      case 'A':
-        if (event.ctrlKey || event.metaKey) {
-          event.preventDefault();
-          this.handleSelectAll(side, true);
-        }
-        break;
-    }
-  }
-
-  override render() {
-    const context: TransferListContext = {
-      sourceData: this.sourceData,
-      targetData: this.targetData,
-      value: this.value,
-      sourceTitle: this.sourceTitle,
-      targetTitle: this.targetTitle,
-      showSearch: this.showSearch,
-      showSelectAll: this.showSelectAll,
-      showReorder: this.showReorder,
-      disabled: this.disabled,
-      oneWay: this.oneWay,
-      variant: this.variant,
-      size: this.size,
-      sourceSelectedKeys: this.sourceSelectedKeys,
-      targetSelectedKeys: this.targetSelectedKeys,
-      sourceSearchQuery: this.sourceSearchQuery,
-      targetSearchQuery: this.targetSearchQuery,
-      focusedSide: this.focusedSide,
-      focusedIndex: this.focusedIndex,
-      liveMessage: this.liveMessage,
-      handleSelectAll: this.handleSelectAll,
-      handleItemSelect: this.handleItemSelect,
-      handleSearchInput: this.handleSearchInput,
-      handleMoveRight: this.handleMoveRight,
-      handleMoveAllRight: this.handleMoveAllRight,
-      handleMoveLeft: this.handleMoveLeft,
-      handleMoveAllLeft: this.handleMoveAllLeft,
-      handleMoveUp: this.handleMoveUp,
-      handleMoveDown: this.handleMoveDown,
-      handleKeyDown: this.handleKeyDown
-    };
-
-    return TransferListTemplate(context);
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'biz-transfer-list': BizTransferList;
+  render() {
+    return TransferListTemplate(this);
   }
 }

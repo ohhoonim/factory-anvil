@@ -2,7 +2,7 @@ import { css } from 'lit';
 
 export const transferListStyles = css`
   :host {
-    /* Layout & Sizing */
+    /* Layout & Sizing Design Tokens */
     --biz-transfer-list-width: 600px;
     --biz-transfer-list-box-width: 250px;
     --biz-transfer-list-box-height: 320px;
@@ -37,23 +37,12 @@ export const transferListStyles = css`
     box-sizing: border-box;
   }
 
-  *, *::before, *::after {
-    box-sizing: inherit;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
-  .biz-transfer-list__live-region {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  /* Root Container */
   .biz-transfer-list {
     display: flex;
     flex-direction: row;
@@ -61,119 +50,132 @@ export const transferListStyles = css`
     gap: var(--biz-transfer-list-gap);
     width: var(--biz-transfer-list-width);
     color: var(--biz-transfer-list-text-color);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   /* Variants */
-  .biz-transfer-list--vertical {
+  .biz-transfer-list[data-variant='vertical'] {
     flex-direction: column;
     width: var(--biz-transfer-list-box-width);
   }
 
-  .biz-transfer-list--vertical .biz-transfer-list__actions {
+  .biz-transfer-list[data-variant='vertical'] .biz-transfer-list__actions,
+  .biz-transfer-list[data-variant='vertical'] .biz-transfer-list__reorder-actions {
     flex-direction: row;
   }
 
+  /* Variant styling mapping for Outlined / Filled / Standard compatibility */
+  .biz-transfer-list[data-variant='outlined'] .biz-transfer-list__box {
+    border: 1px solid var(--biz-transfer-list-border-color);
+    background-color: var(--biz-transfer-list-bg);
+  }
+
+  .biz-transfer-list[data-variant='filled'] .biz-transfer-list__box {
+    border: 1px solid transparent;
+    background-color: var(--biz-transfer-list-header-bg);
+  }
+
+  .biz-transfer-list[data-variant='standard'] .biz-transfer-list__box {
+    border: none;
+    border-bottom: 2px solid var(--biz-transfer-list-border-color);
+    border-radius: 0;
+  }
+
   /* Sizes */
-  .biz-transfer-list--small {
+  .biz-transfer-list[data-size='small'] {
     --biz-transfer-list-box-width: 200px;
     --biz-transfer-list-box-height: 240px;
     --biz-transfer-list-item-height: 32px;
-    font-size: 13px;
+    --biz-transfer-list-gap: 10px;
+    font-size: 12px;
   }
 
-  .biz-transfer-list--medium {
+  .biz-transfer-list[data-size='medium'] {
     --biz-transfer-list-box-width: 250px;
     --biz-transfer-list-box-height: 320px;
     --biz-transfer-list-item-height: 40px;
+    --biz-transfer-list-gap: 16px;
     font-size: 14px;
   }
 
-  .biz-transfer-list--large {
+  .biz-transfer-list[data-size='large'] {
     --biz-transfer-list-box-width: 300px;
     --biz-transfer-list-box-height: 400px;
     --biz-transfer-list-item-height: 48px;
+    --biz-transfer-list-gap: 20px;
     font-size: 16px;
   }
 
-  /* List Box */
+  /* Box Layout */
   .biz-transfer-list__box {
     display: flex;
     flex-direction: column;
     width: var(--biz-transfer-list-box-width);
     height: var(--biz-transfer-list-box-height);
-    background-color: var(--biz-transfer-list-bg);
     border: 1px solid var(--biz-transfer-list-border-color);
     border-radius: var(--biz-transfer-list-border-radius);
+    background-color: var(--biz-transfer-list-bg);
     overflow: hidden;
   }
 
-  /* Header */
   .biz-transfer-list__header {
-    background-color: var(--biz-transfer-list-header-bg);
-    border-bottom: 1px solid var(--biz-transfer-list-border-color);
-    padding: 8px 12px;
-  }
-
-  .biz-transfer-list__header-content {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--biz-transfer-list-header-bg);
+    border-bottom: 1px solid var(--biz-transfer-list-border-color);
+    font-weight: 600;
   }
 
-  .biz-transfer-list__header-title {
-    font-weight: 600;
+  .biz-transfer-list__title {
     flex: 1;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
-  .biz-transfer-list__header-count {
+  .biz-transfer-list__count {
     font-size: 0.85em;
-    color: #6b7280;
+    color: var(--biz-transfer-list-disabled-text);
   }
 
-  /* Search */
   .biz-transfer-list__search {
-    padding: 8px;
+    padding: 6px 8px;
     border-bottom: 1px solid var(--biz-transfer-list-border-color);
   }
 
   .biz-transfer-list__search-input {
     width: 100%;
-    padding: 6px 10px;
+    padding: 4px 8px;
     border: 1px solid var(--biz-transfer-list-border-color);
     border-radius: calc(var(--biz-transfer-list-border-radius) - 2px);
-    font-size: inherit;
     outline: none;
-    background-color: var(--biz-transfer-list-bg);
-    color: inherit;
+    font-size: inherit;
   }
 
   .biz-transfer-list__search-input:focus {
-    border-color: var(--biz-transfer-list-btn-active-bg);
+    border-color: var(--biz-transfer-list-item-selected-text);
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
   }
 
-  /* List Body */
-  .biz-transfer-list__body {
+  .biz-transfer-list__list {
     flex: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
     overflow-y: auto;
     outline: none;
   }
 
-  .biz-transfer-list__body:focus-visible {
-    box-shadow: inset 0 0 0 2px var(--biz-transfer-list-btn-active-bg);
+  .biz-transfer-list__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--biz-transfer-list-disabled-text);
   }
 
-  .biz-transfer-list__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* Items */
+  /* Items & Interactions */
   .biz-transfer-list__item {
     display: flex;
     align-items: center;
@@ -185,64 +187,49 @@ export const transferListStyles = css`
     transition: background-color 0.15s ease, color 0.15s ease;
   }
 
-  .biz-transfer-list__item:hover:not(.biz-transfer-list__item--disabled) {
+  .biz-transfer-list__item:hover:not([data-disabled]) {
     background-color: var(--biz-transfer-list-item-hover-bg);
   }
 
-  .biz-transfer-list__item--selected {
+  .biz-transfer-list__item:focus-visible {
+    outline: 2px solid var(--biz-transfer-list-item-selected-text);
+    outline-offset: -2px;
+  }
+
+  .biz-transfer-list__item[data-selected] {
     background-color: var(--biz-transfer-list-item-selected-bg);
     color: var(--biz-transfer-list-item-selected-text);
   }
 
-  .biz-transfer-list__item--focused {
-    outline: 2px solid var(--biz-transfer-list-btn-active-bg);
-    outline-offset: -2px;
-  }
-
-  .biz-transfer-list__item--disabled {
+  .biz-transfer-list__item[data-disabled] {
     cursor: not-allowed;
-    opacity: 0.5;
+    color: var(--biz-transfer-list-disabled-text);
+    background-color: transparent;
   }
 
-  .biz-transfer-list__item-content {
+  .biz-transfer-list__item-label {
     flex: 1;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .biz-transfer-list__checkbox {
-    cursor: inherit;
+    cursor: pointer;
   }
 
-  /* Empty State */
-  .biz-transfer-list__empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 16px;
-    color: #9ca3af;
-    font-size: 0.9em;
+  .biz-transfer-list__checkbox:disabled {
+    cursor: not-allowed;
   }
 
-  /* Footer */
-  .biz-transfer-list__footer:not(:empty) {
-    border-top: 1px solid var(--biz-transfer-list-border-color);
-    padding: 8px 12px;
-    background-color: var(--biz-transfer-list-header-bg);
-  }
-
-  /* Action Buttons Container */
+  /* Actions & Reorder */
   .biz-transfer-list__actions,
   .biz-transfer-list__reorder-actions {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    justify-content: center;
   }
 
-  /* Action Button Styles */
   .biz-transfer-list__btn {
     display: inline-flex;
     align-items: center;
@@ -254,20 +241,13 @@ export const transferListStyles = css`
     border: 1px solid var(--biz-transfer-list-btn-border-color);
     border-radius: var(--biz-transfer-list-border-radius);
     color: var(--biz-transfer-list-text-color);
-    font-size: 14px;
-    font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
-    outline: none;
+    font-size: 14px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
 
   .biz-transfer-list__btn:hover:not(:disabled) {
     background-color: var(--biz-transfer-list-btn-hover-bg);
-    border-color: #9ca3af;
-  }
-
-  .biz-transfer-list__btn:focus-visible {
-    box-shadow: 0 0 0 2px var(--biz-transfer-list-btn-active-bg);
   }
 
   .biz-transfer-list__btn:active:not(:disabled) {
@@ -275,15 +255,24 @@ export const transferListStyles = css`
     color: var(--biz-transfer-list-btn-active-text);
   }
 
-  .biz-transfer-list__btn:disabled {
-    background-color: var(--biz-transfer-list-disabled-bg);
-    color: var(--biz-transfer-list-disabled-text);
-    border-color: var(--biz-transfer-list-disabled-border);
-    cursor: not-allowed;
+  .biz-transfer-list__btn:focus-visible {
+    outline: 2px solid var(--biz-transfer-list-item-selected-text);
+    outline-offset: 2px;
   }
 
-  /* Disabled State for Component */
-  .biz-transfer-list--disabled {
+  .biz-transfer-list__btn:disabled {
+    cursor: not-allowed;
+    background-color: var(--biz-transfer-list-disabled-bg);
+    border-color: var(--biz-transfer-list-disabled-border);
+    color: var(--biz-transfer-list-disabled-text);
+  }
+
+  .biz-transfer-list__footer {
+    border-top: 1px solid var(--biz-transfer-list-border-color);
+  }
+
+  /* Component Level States */
+  .biz-transfer-list[data-disabled] {
     opacity: 0.6;
     pointer-events: none;
   }
