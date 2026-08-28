@@ -1,98 +1,72 @@
-import { LitElement } from 'lit';
+import { LitElement, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ToggleButtonTemplate, type ToggleButtonTemplateProps } from './ToggleButton.js';
+import { ToggleButtonTemplate, type ToggleButtonHost } from './ToggleButton.js';
 import { toggleButtonStyles } from './ToggleButton.css.js';
 
 @customElement('biz-toggle-button')
-export class BizToggleButton extends LitElement {
+export class BizToggleButton extends LitElement implements ToggleButtonHost {
   static styles = toggleButtonStyles;
 
-  @property({ type: Boolean, reflect: true })
-  checked = false;
+  @property({ type: String, reflect: true })
+  value: string = '';
 
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  pressed: boolean = false;
+
+  @property({ type: Boolean, attribute: 'multiple', reflect: true })
+  multiple: boolean = false;
+
+  @property({ type: Boolean, attribute: 'enforce-selection', reflect: true })
+  enforceSelection: boolean = false;
 
   @property({ type: Boolean, reflect: true })
-  readonly = false;
+  disabled: boolean = false;
 
-  @property({ type: String })
-  variant: 'standard' | 'filled' | 'outlined' = 'standard';
+  @property({ type: String, reflect: true })
+  variant: 'standard' | 'outlined' | 'contained' = 'standard';
 
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   size: 'small' | 'medium' | 'large' = 'medium';
 
-  @property({ type: String, attribute: 'label-position' })
-  labelPosition: 'left' | 'right' = 'right';
+  @property({ type: Boolean, attribute: 'full-width', reflect: true })
+  fullWidth: boolean = false;
 
-  private _handleToggle = (e: Event) => {
-    e.stopPropagation();
-    if (this.disabled || this.readonly) return;
-
-    this.checked = !this.checked;
-
-    this.dispatchEvent(
-      new CustomEvent('toggle', {
-        detail: { checked: this.checked },
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-      })
-    );
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { checked: this.checked },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  };
-
-  private _handleKeyDown = (e: KeyboardEvent) => {
-    if (this.disabled || this.readonly) return;
-
-    if (e.key === ' ' || e.key === 'Enter') {
-      e.preventDefault();
-      this._handleToggle(e);
+  handleClick(event: MouseEvent): void {
+    if (this.disabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
     }
-  };
+    this.toggle();
+  }
 
-  private _handleFocus = (e: FocusEvent) => {
+  handleKeyDown(event: KeyboardEvent): void {
+    if (this.disabled) return;
+
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      this.toggle();
+    }
+  }
+
+  private toggle(): void {
+    const nextPressed = !this.pressed;
+    this.pressed = nextPressed;
+
     this.dispatchEvent(
-      new CustomEvent('focus', {
-        detail: e,
-        bubbles: false,
-        composed: true,
+      new CustomEvent<{ pressed: boolean; value: string }>('change', {
+        detail: {
+          pressed: this.pressed,
+          value: this.value
+        },
+        bubbles: true,
+        composed: true
       })
     );
-  };
+  }
 
-  private _handleBlur = (e: FocusEvent) => {
-    this.dispatchEvent(
-      new CustomEvent('blur', {
-        detail: e,
-        bubbles: false,
-        composed: true,
-      })
-    );
-  };
-
-  render() {
-    const templateProps: ToggleButtonTemplateProps = {
-      checked: this.checked,
-      disabled: this.disabled,
-      readonly: this.readonly,
-      variant: this.variant,
-      size: this.size,
-      labelPosition: this.labelPosition,
-      onToggle: this._handleToggle,
-      onKeyDown: this._handleKeyDown,
-      onFocus: this._handleFocus,
-      onBlur: this._handleBlur,
-    };
-
-    return ToggleButtonTemplate(templateProps);
+  override render(): TemplateResult {
+    return ToggleButtonTemplate(this);
   }
 }
 

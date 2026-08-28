@@ -1,1 +1,1 @@
-export * from './ToggleButton.wc';
+export { BizToggleButton } from './ToggleButton.wc';

@@ -17,18 +17,19 @@
    - ToggleButton.wc.ts (LitElement 기반 웹 컴포넌트 클래스)
    - ToggleButton.react.ts (@lit/react 기반 React 래퍼)
    - ToggleButton.stories.ts (Storybook 문서 및 a11y 검증)
-   - ToggleButton.test.ts (Vitest 및 Playwright 테스트)
    - index.ts (통합 export)
 3. 네임스페이스 및 명명 규칙:
    - 커스텀 엘리먼트 태그명: `biz-toggle-button`
+   - Lit 엘리먼트 클래스명: `BizToggleButton`
    - CSS Design Token / Custom Properties: `--biz-toggle-button-*`
    - 루트 CSS 클래스명: `biz-toggle-button`
    - Lit 코어 템플릿 export 명칭: `ToggleButtonTemplate`
+   - 템플릿 함수 파라미터 'host'의 인터페이스 export 명칭:`ToggleButtonHost` 
    - Lit 스타일 export 변수명: `export const toggleButtonStyles = css`...``
    - React Event Handler 매핑: Custom Event `clear` -> React Prop `onClear`
 
 [작성 대상 컴포넌트 정보]
-- 컴포넌트 명칭 (PascalCase): ToggleButton
+- 컴포넌트 명칭 (PascalCase): BizToggleButton
 - 커스텀 엘리먼트 태그명 (kebab-case): biz-toggle-button
 - Lit 스타일 변수명 (camelCase): toggleButtonStyles
 
@@ -36,105 +37,116 @@
 ---
 # [ToggleButton] 요구사항 정의서
 
+토글 버튼(ToggleButton)은 클릭할 때마다 단일 옵션의 ON/OFF 상태를 전환(체크박스 특성)하거나, 상호 배타적인 옵션 그룹 내에서 하나를 선택(라디오버튼 특성)하는 시각적 눌림/활성화 상태를 즉각적으로 피드백하는 스위치형 인터랙션 엘리먼트입니다.
+
 ## 1. 기본 구조 및 레이아웃 (Layout Architecture)
 
 ### 1.1. 기본 구성 요소 (Core Elements)
 
-* 상태 전환을 위한 토글 스위치(Switch) 영역과 상태 레이블(Label) 영역으로 구성됩니다.
+- 버튼 컨테이너, 내부 라벨/아이콘 영역, 선택된 시각적 활성화(Pressed) 인디케이터로 구획을 구성합니다. 그룹 단위 구성 시 버튼 그룹 컨테이너를 함께 포함합니다.
 
 ### 1.2. 형태 옵션 (Variants)
 
-* `Standard`: 기본 토글 스위치 형태
-* `WithLabel`: 토글 옆에 텍스트 상태값이 표시되는 형태
+- `Standard`: 배경이 투명하며, 선택 시 배경색이 채워지는 기본 스타일
+- `Outlined`: 테두리가 존재하며, 선택 시 테두리 및 배경 강조 스타일
+- `Contained`: 상시 배경색이 있으며, 선택 시 강조 색상으로 전환되는 스타일
 
 ### 1.3. 크기 옵션 (Sizes)
 
-* `Small` (24px Height) / `Medium` (32px Height) / `Large` (40px Height)
+- `Small` / `Medium` / `Large`
 
 ### 1.4. 레이아웃 제어 (Layout Properties)
 
-* `label-position`: `left` | `right` (토글 기준 레이블 위치)
-
----
+- `full-width`: 부모 요소 너비 100% 확장 여부
+- `orientation`: 그룹 모드일 때 버튼 배치 방향 (`horizontal` | `vertical`)
 
 ## 2. 슬롯 및 하위 구성 (Slot System & Sub-components)
 
-| 슬롯명 (Slot Name) | 설명 (Description) | 비고 (Remarks) |
+| **슬롯명 (Slot Name)** | **설명 (Description)** | **비고 (Remarks)** |
 | --- | --- | --- |
-| `label-slot` | 토글 옆에 표시될 텍스트 또는 상태 레이블 |  |
-| `on-text-slot` | 토글 On 상태 시 내부 표시 텍스트 |  |
-| `off-text-slot` | 토글 Off 상태 시 내부 표시 텍스트 |  |
-
----
+| `start-slot` | 버튼 내부 좌측 주입 영역 (Prefix 아이콘 등) |  |
+| `default` (Main Slot) | 버튼 표기 텍스트 또는 콘텐츠 영역 |  |
+| `end-slot` | 버튼 내부 우측 주입 영역 (Suffix 아이콘 등) |  |
 
 ## 3. 컴포넌트 API 및 상태 (Properties, States & Events)
 
 ### 3.1. 속성 (Properties / Attributes)
 
-| 속성명 | 타입 | 기본값 | 설명 |
+| **속성명** | **타입** | **기본값** | **설명** |
 | --- | --- | --- | --- |
-| `checked` | `boolean` | `false` | 현재 토글 상태 (On/Off) |
+| `value` | `string` | `''` | 버튼의 고유 식별 값 (그룹 모드 시 사용) |
+| `pressed` | `boolean` | `false` | 단일 버튼의 선택/활성화 여부 (ON/OFF) |
+| `multiple` | `boolean` | `false` | 그룹 모드 시 다중 선택 허용 여부 |
+| `enforce-selection` | `boolean` | `false` | 그룹 모드 시 최소 1개 이상 선택 유지 여부 |
 | `disabled` | `boolean` | `false` | 비활성화 여부 |
-| `readonly` | `boolean` | `false` | 읽기 전용 (값 수정 불가) |
 
 ### 3.2. 상태 (States)
 
-* **Checked (On)**: 활성화된 상태 (시각적 하이라이트 색상 적용)
-* **Unchecked (Off)**: 비활성화된 상태
-* **Hover**: 마우스 오버 시 시각적 피드백
-* **Disabled**: 인터랙션 불가, Dim 처리
-* **Focus-visible**: 키보드 탭 이동 시 포커스 링 표시
+- **Hover**: 마우스 오버 시 시각적 피드백
+- **Focus / Focus-visible**: 키보드 포커스 진입 시 포커스 링 표시
+- **Active / Pressed**: 선택/활성화 상태 (시각적 Pressed 스타일 적용)
+- **Unpressed**: 미선택/비활성화 상태
+- **Disabled**: 비활성화 (인터랙션 불가, 시각적 Dim)
 
 ### 3.3. 이벤트 (Events)
 
-| 이벤트명 | 상세 (Detail) | 발생 시점 |
+| **이벤트명** | **상세 (Detail)** | **발생 시점** |
 | --- | --- | --- |
-| `toggle` | `{ checked: boolean }` | 클릭 또는 키보드 조작으로 상태 변경 시 발생 |
-| `change` | `{ checked: boolean }` | 상태 확정 후 외부로 방출 |
-
----
+| `change` | `{ pressed: boolean, value: string }` | 토글 상태 변경 시 방출 |
+| `toggle-group-change` | `{ value: string | string[] }` | 그룹 모드에서 선택된 값 목록이 변경될 때 방출 |
 
 ## 4. 스타일링 및 디자인 토큰 (Styling & CSS Variables)
 
 ```css
 :host {
   /* Layout & Sizing */
-  --ui-toggle-width-md: 52px;
-  --ui-toggle-height-md: 32px;
-  --ui-toggle-thumb-size: 24px;
+  --ui-toggle-btn-height-sm: 28px;
+  --ui-toggle-btn-height-md: 36px;
+  --ui-toggle-btn-height-lg: 44px;
+  --ui-toggle-btn-padding-x: 12px;
+  --ui-toggle-btn-padding-y: 6px;
+  --ui-toggle-btn-border-radius: 4px;
 
-  /* Colors */
-  --ui-toggle-bg-off: #e5e7eb;
-  --ui-toggle-bg-on: #2563eb;
-  --ui-toggle-thumb-color: #ffffff;
-  
-  /* Interactive */
-  --ui-toggle-disabled-opacity: 0.5;
-  --ui-toggle-transition-duration: 0.2s;
+  /* Colors - Unpressed */
+  --ui-toggle-btn-bg-color: #ffffff;
+  --ui-toggle-btn-border-color: #d1d5db;
+  --ui-toggle-btn-text-color: #374151;
+
+  /* Colors - Pressed (Active) */
+  --ui-toggle-btn-pressed-bg-color: #eff6ff;
+  --ui-toggle-btn-pressed-border-color: #2563eb;
+  --ui-toggle-btn-pressed-text-color: #2563eb;
+
+  /* Colors - Interactive States */
+  --ui-toggle-btn-hover-bg-color: #f3f4f6;
+  --ui-toggle-btn-focus-ring-color: rgba(37, 99, 235, 0.2);
+
+  /* Colors - Disabled */
+  --ui-toggle-btn-disabled-bg-color: #f3f4f6;
+  --ui-toggle-btn-disabled-text-color: #9ca3af;
 }
-
 ```
-
----
 
 ## 5. 웹 접근성 (Accessibility & WAI-ARIA)
 
 ### 5.1. ARIA 속성 바인딩
 
-* **`role`**: `'switch'`로 지정하여 스크린 리더에 토글 타입임을 알림
-* **`aria-checked`**: `checked` 속성값과 실시간 연동 (`true` / `false`)
-* **`aria-disabled`**: `disabled` 상태 시 연동
+- **`aria-pressed`**: 단일 토글 버튼의 ON/OFF 상태를 `'true'` / `'false'`로 동적 바인딩
+- **`role="group"`**: 토글 버튼 그룹 컨테이너에 연동
+- **`aria-label`**: 아이콘 전용 토글 버튼의 경우 용도를 설명하는 명일성 라벨 추가
 
 ### 5.2. 키보드 인터랙션 (Keyboard Navigation)
 
-* **`Space` 또는 `Enter**`: 포커스 상태에서 토글 상태 전환 (`checked` 값 반전)
+- **`Tab`**: 토글 버튼 간 순차적 포커스 이동
+- **`Enter` / `Space`**: 포커스된 토글 버튼의 선택 상태 전환 (Toggle execution)
+- **`Arrow Keys`**: 단일 선택(Radio 형태) 그룹 내에서 방위키를 통한 순환 포커스 및 즉시 선택 이동 지원
 
 ### 5.3. 스크린 리더 대응
 
-* 토글의 현재 상태(On/Off)가 변경될 때마다 시각적으로 확인 가능해야 하며, 스크린 리더가 상태 변화를 즉시 인지할 수 있도록 `aria-checked`를 활용합니다.
+- 스크린 리더가 요소에 진입할 때 `button` 역할과 함께 현재 눌림 상태(`pressed`)를 즉시 음성으로 전달할 수 있도록 WAI-ARIA 단일/그룹 표준 속성을 준수합니다.
 ---
 
-위 컨텍스트와 요구사항을 완벽히 이해했음을 확인하고, 다음 단계(코어 템플릿 및 스타일 생성) 진행 준비가 되었음을 알려주세요. 아직 코드를 작성하지 마세요.
+현 단계는 1단계입니다. 위 컨텍스트와 요구사항을 완벽히 이해했음을 확인하고, 다음 단계(코어 템플릿 및 스타일 생성) 진행 준비가 되었음을 알려주세요. 아직 코드를 작성하지 마세요.
 ````
 
 ---
@@ -150,6 +162,8 @@
 2. 템플릿 함수는 `ToggleButtonTemplate` 명칭으로 export 하세요.
 3. 요구사항 정의서 2절의 슬롯 명세(`label-slot`, `start-slot`, `end-slot`, `helper-text-slot` 등)를 올바르게 배치하세요.
 4. 속성(Properties), 상태(States), 이벤트 핸들러 바인딩 구조를 템플릿 내에 반영하세요.
+5. 템플릿 함수의 파라미터명은 'host'를 사용하고, host타입을 인터페이스로 작성해주세요. 
+6. host타입은 `ToggleButtonHost` 명칭으로 export 하세요.
 
 [작성 조건 - ToggleButton.css.ts]
 1. `import { css } from 'lit';` 구문을 작성하세요.
@@ -174,8 +188,8 @@
 1단계의 요구사항 정의서와 2단계에서 작성된 코어 템플릿/스타일을 바탕으로 웹 컴포넌트 클래스 파일(`ToggleButton.wc.ts`) 코드를 작성해 주세요.
 
 [작성 조건 - ToggleButton.wc.ts]
-1. `LitElement`를 상속받아 클래스를 구현하고, `@customElement('biz-toggle-button')` 디코레이터를 사용하여 커스텀 엘리먼트로 등록하세요.
-2. 2단계에서 생성한 `ToggleButtonTemplate` 및 `ToggleButton.css.ts`의 `toggleButtonStyles`를 임포트하세요.
+1. `LitElement`를 상속받고, 2단계에서 생성한 `ToggleButtonHost`를 implements 하여  클래스를 구현하고, `@customElement('biz-toggle-button')` 디코레이터를 사용하여 커스텀 엘리먼트로 등록하세요.
+2. 2단계에서 생성한 `ToggleButtonTemplate` 및 `ToggleButton.css.ts`의 `toggleButtonStyles`를 임포트하세요. `ToggleButtonHost`를 type 임포트하세요.
 3. 정적 클래스 속성으로 `static styles = toggleButtonStyles;` 구문을 사용하여 스타일을 연결하고, `render()` 메서드에 `ToggleButtonTemplate`을 바인딩하세요.
 4. 요구사항 정의서 3.1절의 속성(Properties/Attributes)을 Lit의 `@property` 및 `@state` 디코레이터로 정의하세요.
 5. 요구사항 정의서 3.3절의 이벤트(`input`, `change`, `clear` 등)를 발생시키는 내부 이벤트 핸들러 및 `CustomEvent` 방출 메서드를 구현하세요. (`bubbles: true`, `composed: true`, `detail` 객체 구성 준수)
@@ -209,29 +223,27 @@
 
 [출력 형식]
 - 각 파일별 경로(`src/components/ToggleButton/ToggleButton.react.ts`, `src/components/ToggleButton/index.ts`, `src/react.ts`)를 명시하고 해당 코드 블록만 출력하세요.
-- 코드를 작성한 후 5단계(Storybook 및 테스트 코드 생성) 진행 준비가 되었음을 알려주고 대기하세요.
+- 코드를 작성한 후 5단계(Storybook 생성 프롬프트) 진행 준비가 되었음을 알려주고 대기하세요.
 ````
 
 ---
 
-## [Prompt 5] 5단계: Storybook 및 테스트 코드 생성 프롬프트
+## [Prompt 5] 5단계: Storybook 생성 프롬프트
 
 ````text
 [요청 사항]
-1~4단계에서 작성된 코드와 요구사항 정의서를 바탕으로 컴포넌트 품질 관리를 위한 Storybook 문서 파일(`ToggleButton.stories.ts`)과 단위/통합 테스트 파일(`ToggleButton.test.ts`) 코드를 작성해 주세요.
+1~4단계에서 작성된 코드와 요구사항 정의서를 바탕으로 컴포넌트 품질 관리를 위한 Storybook 문서 파일(`ToggleButton.stories.ts`) 코드를 작성해 주세요.
 
 [작성 조건 - ToggleButton.stories.ts]
 1. Storybook v7+ CSF 3.0 명세를 준수하여 기본 Meta 및 Stories를 구현하세요.
-2. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 및 1.3절의 Sizes(`Small`, `Medium`, `Large`)를 시연하는 Story를 작성하세요.
-3. 요구사항 정의서 3.2절의 주요 States(`Disabled`, `Readonly`, `Error`, `Loading` 등)를 시연하는 Story를 작성하세요.
-4. `@storybook/addon-a11y` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
-
-[작성 조건 - ToggleButton.test.ts]
-1. Vitest 및 Playwright 환경에서 실행 가능한 테스트 스위트를 구현하세요.
-2. [단위 테스트]: Properties 변경에 따른 DOM 반영, 3.3절 커스텀 이벤트(`input`, `change`, `clear` 등) 방출 여부 및 `detail` 데이터 검증을 수행하세요.
-3. [통합 및 접근성 테스트]: 5.1절 ARIA 속성(`aria-invalid`, `aria-describedby` 등) 바인딩 및 5.2절 키보드 네비게이션(`Tab`, `Escape`, `Enter` 등) 동작을 브라우저 상에서 검증하는 시나리오를 구현하세요.
+2. 컴포넌트의 Host 속성 타입(e.g., `ToggleButtonHost`)에 `Required<T>`를 적용하여 모든 프로퍼티를 필수화한 후, Slot 관련 컨트롤 키를 추가한 `Args` 타입을 정의하세요.
+3. `Args` 타입을 Meta와 StoryObj 의 제네릭 타입으로 사용하시오.
+4. 요구사항 정의서 1.2절의 Variants(`Outlined`, `Filled`, `Standard`) 및 1.3절의 Sizes(`Small`, `Medium`, `Large`)를 시연하는 Story를 작성하세요.
+5. 요구사항 정의서 3.2절의 주요 States(`Disabled`, `Readonly`, `Error`, `Loading` 등)를 시연하는 Story를 작성하세요.
+6. `@storybook/addon-a11y` 연동을 고려하여 접근성 검증 요소(Label, ARIA 속성 연동 등)가 정상 반영된 Interactive Story를 구성하세요.
+7. 3단계에서 작성한 ToggleButton.ws.ts에서 dispatchEvent 를 분석하여 각 이벤트에 대한 story를 작성하세요.. action()말고 fn() 을 사용하세요. `import { fn } from 'storybook/test'`
 
 [출력 형식]
-- 각 파일별 경로(`src/components/ToggleButton/ToggleButton.stories.ts`, `src/components/ToggleButton/ToggleButton.test.ts`)를 명시하고 해당 코드 블록만 출력하세요.
+- 파일 경로(`src/components/ToggleButton/ToggleButton.stories.ts`)를 명시하고 해당 코드 블록만 출력하세요.
 - 모든 코드 작성이 완료되면 전체 개발 공정(Phase 1~5)이 성공적으로 종료되었음을 최종 안내해 주세요.
 ````

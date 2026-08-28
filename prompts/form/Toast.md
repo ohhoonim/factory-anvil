@@ -6,23 +6,22 @@
 
 ### 1.1. 기본 구성 요소 (Core Elements)
 
-- 상태 아이콘, 메시지 텍스트, 사용자 액션(버튼), 수동 닫기 버튼, 컨테이너로 구획을 구성합니다.
+* 상태 아이콘, 메시지 텍스트, 사용자 액션(버튼), 수동 닫기 버튼, 컨테이너로 구획을 구성합니다.
 
 ### 1.2. 형태 옵션 (Variants)
 
-- `Success`: 성공 결과 피드백 (초록색 계열)
-- `Info`: 일반 정보 및 상태 안내 (파란색 계열)
-- `Warning`: 주의 요구 메시지 (주황색 계열)
-- `Error`: 시스템 에러 및 실행 실패 알림 (빨간색 계열)
+* `Success`: 성공 결과 피드백 (초록색 계열)
+* `Info`: 일반 정보 및 상태 안내 (파란색 계열)
+* `Warning`: 주의 요구 메시지 (주황색 계열)
+* `Error`: 시스템 에러 및 실행 실패 알림 (빨간색 계열)
 
 ### 1.3. 크기 옵션 (Sizes)
 
-- `Small` / `Medium` / `Large`
+* `Small` / `Medium` / `Large`
 
 ### 1.4. 레이아웃 제어 (Layout Properties)
 
-- `placement`: 화면 내 노출 위치 (`top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, `bottom-right`)
-- `stacked`: 동일 위치에 복수 토스트 발생 시 적재(Queue) 방식 설정
+* `stacked`: 복수 토스트 발생 시 상위 컨테이너 또는 스택 규칙에 따른 적재(Queue) 방식 적용
 
 ## 2. 슬롯 및 하위 구성 (Slot System & Sub-components)
 
@@ -47,10 +46,10 @@
 
 ### 3.2. 상태 (States)
 
-- **Entering**: 화면 외곽에서 슬라이드/페이드로 나타나는 상태
-- **Showing**: 화면에 고정 노출된 상태
-- **Hover / Paused**: 마우스 오버 시 타이머가 일시 정지된 상태
-- **Exiting**: 지정 시간 만료 또는 수동 닫기로 사라지는 상태
+* **Entering**: 화면 외곽에서 슬라이드/페이드로 나타나는 상태
+* **Showing**: 화면에 고정 노출된 상태
+* **Hover / Paused**: 마우스 오버 시 타이머가 일시 정지된 상태
+* **Exiting**: 지정 시간 만료 또는 수동 닫기로 사라지는 상태
 
 ### 3.3. 이벤트 (Events)
 
@@ -89,22 +88,23 @@
   --ui-toast-error-border: #fecaca;
   --ui-toast-error-text: #991b1b;
 }
+
 ```
 
 ## 5. 웹 접근성 (Accessibility & WAI-ARIA)
 
 ### 5.1. ARIA 속성 바인딩
 
-- **`role="status"`**: 일반 안내(`info`, `success`) 메시지에 바인딩하여 사용자의 현재 작업을 방해하지 않고 알림
-- **`role="alert"`**: 즉각적 확인이 필요한 `error`, `warning` 메시지에 바인딩하여 즉시 음성 출력
-- **`aria-live`**: `info`/`success`는 `'polite'`, `error`/`warning`은 `'assertive'`로 동적 연동
-- **`aria-atomic="true"`**: 토스트 전체 구조를 한 번에 인지하도록 지정
+* **`role="status"`**: 일반 안내(`info`, `success`) 메시지에 바인딩하여 사용자의 현재 작업을 방해하지 않고 알림
+* **`role="alert"`**: 즉각적 확인이 필요한 `error`, `warning` 메시지에 바인딩하여 즉시 음성 출력
+* **`aria-live`**: `info`/`success`는 `'polite'`, `error`/`warning`은 `'assertive'`로 동적 연동
+* **`aria-atomic="true"`**: 토스트 전체 구조를 한 번에 인지하도록 지정
 
 ### 5.2. 키보드 인터랙션 (Keyboard Navigation)
 
-- **`Focus Bypass`**: 토스트 자체는 기본 포커스 진입 흐름을 방해하지 않음
-- **`Escape` / `Shortcut`**: 액션 버튼이 존재하는 토스트의 경우 단축키 진입 또는 `Escape` 키로 수동 닫기 제공
+* **`Focus Bypass`**: 토스트 자체는 기본 포커스 진입 흐름을 방해하지 않음
+* **`Escape` / `Shortcut**`: 액션 버튼이 존재하는 토스트의 경우 단축키 진입 또는 `Escape` 키로 수동 닫기 제공
 
 ### 5.3. 스크린 리더 대응
 
-- 스크린 리더 사용자가 메시지를 다 읽기 전에 자동 닫기(`duration`)가 작동하여 정보를 놓치지 않도록, 마우스 포커스나 스크린 리더 감지 시 일시 정지(Pause Timer) 메커니즘을 지원합니다.
+* 스크린 리더 사용자가 메시지를 다 읽기 전에 자동 닫기(`duration`)가 작동하여 정보를 놓치지 않도록, 마우스 포커스나 스크린 리더 감지 시 일시 정지(Pause Timer) 메커니즘을 지원합니다.

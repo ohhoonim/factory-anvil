@@ -7,6 +7,7 @@ export const Breadcrumb = createComponent({
   elementClass: BizBreadcrumb,
   react: React,
   events: {
-    onPathClick: 'path-click',
-  },
+    onBreadcrumbClick: 'breadcrumb-click',
+    onOverflowClick: 'overflow-click'
+  }
 });
