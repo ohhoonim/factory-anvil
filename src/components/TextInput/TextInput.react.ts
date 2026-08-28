@@ -1,6 +1,6 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { BizTextInput } from './TextInput.wc.js';
+import { BizTextInput } from './TextInput.wc.ts';
 
 export const TextInput = createComponent({
   tagName: 'biz-text-input',
@@ -11,6 +11,6 @@ export const TextInput = createComponent({
     onChange: 'change',
     onFocus: 'focus',
     onBlur: 'blur',
-    onClear: 'clear',
-  },
+    onClear: 'clear'
+  }
 });

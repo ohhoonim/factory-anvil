@@ -1,41 +1,89 @@
-import { html } from 'lit';
+import { html, type TemplateResult } from 'lit';
 
-export const TextInputTemplate = (context: any) => html`
-  <div class="biz-text-input ${context.variant || 'outlined'} ${context.size || 'medium'} ${context.fullWidth ? 'full-width' : ''} ${context.disabled ? 'disabled' : ''} ${context.readonly ? 'readonly' : ''} ${context.error ? 'error' : ''} ${context.loading ? 'loading' : ''}">
-    <div class="biz-text-input__label-wrapper">
-      <slot name="label-slot"></slot>
+export interface TextInputHost {
+  value: string;
+  type: string;
+  placeholder: string;
+  required: boolean;
+  readonly: boolean;
+  disabled: boolean;
+  error: boolean;
+  clearable: boolean;
+  variant: 'outlined' | 'filled' | 'standard';
+  size: 'small' | 'medium' | 'large';
+  fullWidth: boolean;
+  loading: boolean;
+  direction: 'vertical' | 'horizontal';
+  hasLabelSlot?: boolean;
+  handleInput: (e: InputEvent) => void;
+  handleChange: (e: Event) => void;
+  handleFocus: (e: FocusEvent) => void;
+  handleBlur: (e: FocusEvent) => void;
+  handleClear: (e: MouseEvent) => void;
+  handleKeyDown: (e: KeyboardEvent) => void;
+  handleLabelSlotChange?: (e: Event) => void;
+}
+
+export const TextInputTemplate = (host: TextInputHost): TemplateResult => {
+  const isClearableVisible = host.clearable && !host.disabled && !host.readonly && host.value.length > 0;
+
+  return html`
+    <div
+      class="biz-text-input ${host.variant} ${host.size} ${host.direction} ${host.fullWidth ? 'full-width' : ''} ${host.error ? 'error' : ''} ${host.disabled ? 'disabled' : ''} ${host.readonly ? 'readonly' : ''} ${host.loading ? 'loading' : ''}"
+    >
+      <div class="label-container">
+        <slot name="label-slot" @slotchange="${host.handleLabelSlotChange}"></slot>
+      </div>
+
+      <div class="input-body">
+        <div class="input-control">
+          <slot name="start-slot"></slot>
+
+          <input
+            id="native-input"
+            class="input-field"
+            .type="${host.type}"
+            .value="${host.value}"
+            .placeholder="${host.placeholder}"
+            ?required="${host.required}"
+            ?readonly="${host.readonly}"
+            ?disabled="${host.disabled}"
+            aria-invalid="${host.error ? 'true' : 'false'}"
+            aria-required="${host.required ? 'true' : 'false'}"
+            aria-disabled="${host.disabled ? 'true' : 'false'}"
+            aria-describedby="helper-text-container"
+            @input="${host.handleInput}"
+            @change="${host.handleChange}"
+            @focus="${host.handleFocus}"
+            @blur="${host.handleBlur}"
+            @keydown="${host.handleKeyDown}"
+          />
+
+          ${host.loading
+            ? html`<span class="spinner" aria-hidden="true"></span>`
+            : ''}
+
+          ${isClearableVisible
+            ? html`
+                <button
+                  type="button"
+                  class="clear-button"
+                  aria-label="Clear input"
+                  tabindex="-1"
+                  @click="${host.handleClear}"
+                >
+                  &times;
+                </button>
+              `
+            : ''}
+
+          <slot name="end-slot"></slot>
+        </div>
+
+        <div id="helper-text-container" class="helper-text-container">
+          <slot name="helper-text-slot"></slot>
+        </div>
+      </div>
     </div>
-    <div class="biz-text-input__control">
-      <slot name="start-slot"></slot>
-      <input
-        id="input"
-        class="biz-text-input__field"
-        type="${context.type || 'text'}"
-        .value="${context.value || ''}"
-        placeholder="${context.placeholder || ''}"
-        ?disabled="${context.disabled}"
-        ?readonly="${context.readonly}"
-        ?required="${context.required}"
-        aria-invalid="${context.error ? 'true' : 'false'}"
-        aria-required="${context.required ? 'true' : 'false'}"
-        aria-disabled="${context.disabled ? 'true' : 'false'}"
-        aria-describedby="helper-text"
-        @input="${context.handleInput}"
-        @change="${context.handleChange}"
-        @focus="${context.handleFocus}"
-        @blur="${context.handleBlur}"
-        @keydown="${context.handleKeyDown}"
-      />
-      ${context.loading ? html`<span class="biz-text-input__spinner"></span>` : ''}
-      ${context.clearable && !context.disabled && !context.readonly && context.value ? html`
-        <button type="button" class="biz-text-input__clear-btn" @click="${context.handleClear}" aria-label="Clear">
-          &times;
-        </button>
-      ` : ''}
-      <slot name="end-slot"></slot>
-    </div>
-    <div id="helper-text" class="biz-text-input__helper-wrapper">
-      <slot name="helper-text-slot"></slot>
-    </div>
-  </div>
-`;
+  `;
+};

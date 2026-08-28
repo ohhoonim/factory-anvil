@@ -1,1 +1,1 @@
-export * from './TextInput.wc';
+export { BizTextInput } from './TextInput.wc';
