@@ -1,8 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import './TextInput.wc';
+import { fn } from 'storybook/test';
+import type { TextInputHost } from './TextInput.ts';
+import './TextInput.wc.ts';
 
-const meta: Meta = {
+type Args = Required<TextInputHost> & {
+  labelSlot?: string;
+  startSlot?: string;
+  endSlot?: string;
+  helperTextSlot?: string;
+};
+
+const meta: Meta<Args> = {
   title: 'Components/Forms/TextInput',
   component: 'biz-text-input',
   tags: ['autodocs'],
@@ -10,120 +19,166 @@ const meta: Meta = {
     variant: {
       control: { type: 'select' },
       options: ['outlined', 'filled', 'standard'],
+      description: '입력 필드 스타일 형태'
     },
     size: {
       control: { type: 'select' },
       options: ['small', 'medium', 'large'],
+      description: '입력 필드 크기'
     },
-    type: { control: 'text' },
-    value: { control: 'text' },
-    placeholder: { control: 'text' },
-    disabled: { control: 'boolean' },
-    readonly: { control: 'boolean' },
-    required: { control: 'boolean' },
-    error: { control: 'boolean' },
-    clearable: { control: 'boolean' },
-    loading: { control: 'boolean' },
-    fullWidth: { control: 'boolean' },
+    value: { control: 'text', description: '입력 값' },
+    type: { control: 'text', description: 'HTML 입력 타입' },
+    placeholder: { control: 'text', description: '플레이스홀더 텍스트' },
+    required: { control: 'boolean', description: '필수 입력 여부' },
+    readonly: { control: 'boolean', description: '읽기 전용 여부' },
+    disabled: { control: 'boolean', description: '비활성화 여부' },
+    error: { control: 'boolean', description: '유효성 에러 상태 여부' },
+    clearable: { control: 'boolean', description: '초기화 버튼 노출 여부' },
+    fullWidth: { control: 'boolean', description: '부모 너비 100% 여부' },
+    loading: { control: 'boolean', description: '로딩 스피너 표시 여부' },
+    labelSlot: { control: 'text', description: 'label-slot 영역 컨텐츠' },
+    startSlot: { control: 'text', description: 'start-slot 영역 컨텐츠' },
+    endSlot: { control: 'text', description: 'end-slot 영역 컨텐츠' },
+    helperTextSlot: { control: 'text', description: 'helper-text-slot 영역 컨텐츠' },
+    direction: {
+        control: { type: 'inline-radio' },
+        options: ['vertical', 'horizontal'],
+        description: '레이아웃 방향 (세로 / 가로)'
+    }
   },
   args: {
+    value: '',
+    type: 'text',
+    placeholder: '텍스트를 입력하세요',
+    required: false,
+    readonly: false,
+    disabled: false,
+    error: false,
+    clearable: false,
     variant: 'outlined',
     size: 'medium',
-    value: '',
-    placeholder: '텍스트를 입력하세요...',
-    disabled: false,
-    readonly: false,
-    required: false,
-    error: false,
-    clearable: true,
-    loading: false,
     fullWidth: false,
+    loading: false,
+    labelSlot: '레이블',
+    startSlot: '',
+    endSlot: '',
+    helperTextSlot: '도움말 문구입니다.',
+    handleInput: fn(),
+    handleChange: fn(),
+    handleFocus: fn(),
+    handleBlur: fn(),
+    handleClear: fn(),
+    handleKeyDown: fn(),
+    direction: 'vertical',
   },
   render: (args) => html`
     <biz-text-input
-      .variant="${args.variant}"
-      .size="${args.size}"
-      .type="${args.type}"
       .value="${args.value}"
+      .type="${args.type}"
       .placeholder="${args.placeholder}"
-      ?disabled="${args.disabled}"
-      ?readonly="${args.readonly}"
       ?required="${args.required}"
+      ?readonly="${args.readonly}"
+      ?disabled="${args.disabled}"
       ?error="${args.error}"
       ?clearable="${args.clearable}"
-      ?loading="${args.loading}"
+      .variant="${args.variant}"
+      .size="${args.size}"
       ?full-width="${args.fullWidth}"
+      ?loading="${args.loading}"
+      .direction="${args.direction}"
+      @input="${args.handleInput}"
+      @change="${args.handleChange}"
+      @focus="${args.handleFocus}"
+      @blur="${args.handleBlur}"
+      @clear="${args.handleClear}"
+      @keydown="${args.handleKeyDown}"
     >
-      <label slot="label-slot" for="input">레이블</label>
-      <span slot="helper-text-slot">도움말 텍스트입니다.</span>
+      ${args.labelSlot ? html`<label slot="label-slot">${args.labelSlot}</label>` : ''}
+      ${args.startSlot ? html`<span slot="start-slot">${args.startSlot}</span>` : ''}
+      ${args.endSlot ? html`<span slot="end-slot">${args.endSlot}</span>` : ''}
+      ${args.helperTextSlot ? html`<span slot="helper-text-slot">${args.helperTextSlot}</span>` : ''}
     </biz-text-input>
-  `,
+  `
 };
 
 export default meta;
-type Story = StoryObj;
+type Story = StoryObj<Args>;
 
 export const Default: Story = {};
 
-export const Variants: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-text-input variant="outlined" placeholder="Outlined Variant">
-        <label slot="label-slot">Outlined</label>
+export const Directions: Story = {
+    args:  {
+        "fullWidth": false,
+    },
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 24px;" >
+      <biz-text-input ...${args} direction="vertical">
+        <label slot="label-slot">Vertical Direction</label>
       </biz-text-input>
-      <biz-text-input variant="filled" placeholder="Filled Variant">
-        <label slot="label-slot">Filled</label>
-      </biz-text-input>
-      <biz-text-input variant="standard" placeholder="Standard Variant">
-        <label slot="label-slot">Standard</label>
+      <biz-text-input ...${args} direction="horizontal">
+        <label slot="label-slot">Horizontal Direction</label>
       </biz-text-input>
     </div>
-  `,
+  `
+};
+
+export const Variants: Story = {
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <biz-text-input ...${args} variant="outlined">
+        <label slot="label-slot">Outlined Variant</label>
+      </biz-text-input>
+      <biz-text-input ...${args} variant="filled">
+        <label slot="label-slot">Filled Variant</label>
+      </biz-text-input>
+      <biz-text-input ...${args} variant="standard">
+        <label slot="label-slot">Standard Variant</label>
+      </biz-text-input>
+    </div>
+  `
 };
 
 export const Sizes: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-text-input size="small" placeholder="Small Size">
-        <label slot="label-slot">Small</label>
+      <biz-text-input ...${args} size="small">
+        <label slot="label-slot">Small Size</label>
       </biz-text-input>
-      <biz-text-input size="medium" placeholder="Medium Size">
-        <label slot="label-slot">Medium</label>
+      <biz-text-input ...${args} size="medium">
+        <label slot="label-slot">Medium Size</label>
       </biz-text-input>
-      <biz-text-input size="large" placeholder="Large Size">
-        <label slot="label-slot">Large</label>
+      <biz-text-input ...${args} size="large">
+        <label slot="label-slot">Large Size</label>
       </biz-text-input>
     </div>
-  `,
+  `
 };
 
 export const States: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 16px;">
-      <biz-text-input value="비활성화 상태" disabled>
-        <label slot="label-slot">Disabled</label>
+      <biz-text-input ...${args} disabled value="비활성화된 값">
+        <label slot="label-slot">Disabled State</label>
       </biz-text-input>
-      <biz-text-input value="읽기 전용 상태" readonly>
-        <label slot="label-slot">Readonly</label>
+      <biz-text-input ...${args} readonly value="읽기 전용 값">
+        <label slot="label-slot">Readonly State</label>
       </biz-text-input>
-      <biz-text-input value="잘못된 입력 값" error>
-        <label slot="label-slot">Error</label>
-        <span slot="helper-text-slot" style="color: var(--biz-text-input-error-color);">
-          유효성 검사에 실패했습니다.
-        </span>
+      <biz-text-input ...${args} error value="잘못된 입력값">
+        <label slot="label-slot">Error State</label>
+        <span slot="helper-text-slot">유효하지 않은 입력입니다.</span>
       </biz-text-input>
-      <biz-text-input loading placeholder="로딩 중...">
-        <label slot="label-slot">Loading</label>
+      <biz-text-input ...${args} loading value="처리 중...">
+        <label slot="label-slot">Loading State</label>
       </biz-text-input>
     </div>
-  `,
+  `
 };
 
-export const Accessibility: Story = {
-  render: () => html`
-    <biz-text-input required error clearable value="접근성 테스트">
-      <label slot="label-slot">필수 입력 항목</label>
-      <span slot="helper-text-slot">에러 상태 및 필수 입력 안내 메시지입니다.</span>
-    </biz-text-input>
-  `,
+export const InteractiveEvents: Story = {
+  args: {
+    clearable: true,
+    value: '초기화 가능한 텍스트',
+    labelSlot: '이벤트 검증 입력 필드',
+    helperTextSlot: '입력, 포커스, 초기화 이벤트를 테스트하세요.'
+  }
 };
