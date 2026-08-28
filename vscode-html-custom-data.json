@@ -42,24 +42,6 @@
       "references": []
     },
     {
-      "name": "biz-application-shell",
-      "description": "\n\n\n---\n\n\n",
-      "attributes": [
-        {
-          "name": "variant",
-          "values": [
-            { "name": "default" },
-            { "name": "full-width" },
-            { "name": "minimal" }
-          ]
-        },
-        { "name": "sidebar-collapsed", "values": [] },
-        { "name": "sticky-header", "values": [] },
-        { "name": "fixed-sidebar", "values": [] }
-      ],
-      "references": []
-    },
-    {
       "name": "biz-checkbox",
       "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **change** - undefined\n- **focus** - undefined\n- **blur** - undefined",
       "attributes": [
@@ -94,38 +76,20 @@
       "references": []
     },
     {
-      "name": "biz-checkbox-group",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **change** - undefined\n- **clear** - undefined",
+      "name": "biz-application-shell",
+      "description": "\n\n\n---\n\n\n",
       "attributes": [
-        { "name": "value", "values": [{ "name": "string[]" }] },
-        { "name": "name", "values": [] },
-        {
-          "name": "orientation",
-          "values": [{ "name": "vertical" }, { "name": "horizontal" }]
-        },
-        { "name": "required", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "readonly", "values": [] },
-        { "name": "error", "values": [] },
-        { "name": "min", "values": [] },
-        { "name": "max", "values": [] },
         {
           "name": "variant",
           "values": [
-            { "name": "standard" },
-            { "name": "card" },
-            { "name": "button" }
+            { "name": "default" },
+            { "name": "full-width" },
+            { "name": "minimal" }
           ]
         },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "full-width", "values": [] }
+        { "name": "sidebar-collapsed", "values": [] },
+        { "name": "sticky-header", "values": [] },
+        { "name": "fixed-sidebar", "values": [] }
       ],
       "references": []
     },
@@ -190,15 +154,27 @@
       "references": []
     },
     {
-      "name": "biz-content-container",
-      "description": "\n\n\n---\n\n\n",
+      "name": "biz-checkbox-group",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **change** - undefined\n- **clear** - undefined",
       "attributes": [
+        { "name": "value", "values": [{ "name": "string[]" }] },
+        { "name": "name", "values": [] },
+        {
+          "name": "orientation",
+          "values": [{ "name": "vertical" }, { "name": "horizontal" }]
+        },
+        { "name": "required", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "error", "values": [] },
+        { "name": "min", "values": [] },
+        { "name": "max", "values": [] },
         {
           "name": "variant",
           "values": [
             { "name": "standard" },
-            { "name": "fluid" },
-            { "name": "card" }
+            { "name": "card" },
+            { "name": "button" }
           ]
         },
         {
@@ -206,15 +182,10 @@
           "values": [
             { "name": "small" },
             { "name": "medium" },
-            { "name": "large" },
-            { "name": "full" }
+            { "name": "large" }
           ]
         },
-        { "name": "centered", "values": [] },
-        { "name": "scrollable", "values": [] },
-        { "name": "padding", "values": [] },
-        { "name": "loading", "values": [] },
-        { "name": "empty", "values": [] }
+        { "name": "full-width", "values": [] }
       ],
       "references": []
     },
@@ -248,6 +219,35 @@
           ]
         },
         { "name": "full-width", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-content-container",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [
+            { "name": "standard" },
+            { "name": "fluid" },
+            { "name": "card" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" },
+            { "name": "full" }
+          ]
+        },
+        { "name": "centered", "values": [] },
+        { "name": "scrollable", "values": [] },
+        { "name": "padding", "values": [] },
+        { "name": "loading", "values": [] },
+        { "name": "empty", "values": [] }
       ],
       "references": []
     },
