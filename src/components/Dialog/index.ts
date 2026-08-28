@@ -1,2 +1,1 @@
-export * from './Dialog';
-export * from './Dialog.wc';
+export { BizDialog } from './Dialog.wc';

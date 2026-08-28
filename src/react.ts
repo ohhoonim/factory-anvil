@@ -30,4 +30,5 @@ export * from './components/TileLayoutGrid/TileLayoutGrid.react';
 export * from './components/FormWrapper/FormWrapper.react';
 export * from './components/InlineEditWrapper/InlineEditWrapper.react';
 export * from './components/ToggleButton/ToggleButton.react';
-export * from './components/Button/Button.react';
+export * from './components/ActionButton/ActionButton.react';
+export * from './components/ToastContainer/ToastContainer.react';

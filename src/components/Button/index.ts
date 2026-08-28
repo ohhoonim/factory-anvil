@@ -1,1 +1,0 @@
-export { BizButton } from './Button.wc';
