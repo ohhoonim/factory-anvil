@@ -1,1 +1,1 @@
-export { BizTimePicker } from './TimePicker.wc.ts';
+export { BizTimePicker } from './TimePicker.wc';

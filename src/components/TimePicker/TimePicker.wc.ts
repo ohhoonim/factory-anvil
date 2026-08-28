@@ -1,439 +1,374 @@
-import { LitElement, html, type TemplateResult } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { timePickerStyles } from './TimePicker.css.ts';
-import type {
-  TimePickerTemplateContext,
-  TimeOption,
-  PeriodOption
-} from './TimePicker.ts';
-import { TimePickerTemplate } from './TimePicker.ts';
+import { timePickerStyles } from './TimePicker.css';
+import { TimePickerTemplate, type TimeOption } from './TimePicker';
+import type { TimePickerHost } from './TimePicker';
 
-/**
- * @element biz-time-picker
- * 
- * @slot label-slot
- * @slot prefix-slot
- * @slot suffix-slot
- * @slot header-slot
- * @slot option-item-slot
- * @slot footer-slot
- * @slot helper-text-slot
- */
+import { LabelSlotController, type LabelSlotHost } from '../../controllers/LabelSlot';
+
 @customElement('biz-time-picker')
-export class BizTimePicker extends LitElement {
-  static styles = timePickerStyles;
+export class BizTimePicker extends LitElement implements TimePickerHost {
+    static styles = timePickerStyles;
 
-  @property({ type: String, reflect: true }) value: string | Date | null = null;
-  @property({ type: String }) format = 'HH:mm';
-  @property({ type: Boolean, attribute: 'use12-hours' }) use12Hours = false;
-  @property({ type: Number, attribute: 'hour-step' }) hourStep = 1;
-  @property({ type: Number, attribute: 'minute-step' }) minuteStep = 1;
-  @property({ type: Number, attribute: 'second-step' }) secondStep = 1;
-  @property({ type: Boolean, attribute: 'show-seconds' }) showSeconds = false;
-  @property({ type: Function }) disabledHours: ((hour: number) => boolean) | null = null;
-  @property({ type: Function }) disabledMinutes: ((minute: number, hour: number | null) => boolean) | null = null;
-  @property({ type: Function }) disabledSeconds: ((second: number, hour: number | null, minute: number | null) => boolean) | null = null;
-  @property({ type: String }) placeholder = 'HH:mm';
-  @property({ type: Boolean }) clearable = false;
-  @property({ type: Boolean, reflect: true }) readonly = false;
-  @property({ type: Boolean, reflect: true }) disabled = false;
-  @property({ type: Boolean, reflect: true }) error = false;
-  @property({ type: String }) variant: 'outlined' | 'filled' | 'standard' = 'outlined';
-  @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
-  @property({ type: Boolean, attribute: 'full-width', reflect: true }) fullWidth = false;
+    @property({ type: String }) value: string | Date | null = null;
+    @property({ type: String }) format = 'HH:mm';
+    @property({ type: Boolean, attribute: 'use12-hours' }) use12Hours = false;
+    @property({ type: Number, attribute: 'hour-step' }) hourStep = 1;
+    @property({ type: Number, attribute: 'minute-step' }) minuteStep = 1;
+    @property({ type: Number, attribute: 'second-step' }) secondStep = 1;
+    @property({ type: Boolean, attribute: 'show-seconds' }) showSeconds = false;
+    @property({ attribute: false }) disabledHours: ((hour: number) => boolean) | null = null;
+    @property({ attribute: false }) disabledMinutes: ((hour: number, minute: number) => boolean) | null = null;
+    @property({ attribute: false }) disabledSeconds: ((hour: number, minute: number, second: number) => boolean) | null = null;
+    @property({ type: String }) placeholder = 'HH:mm';
+    @property({ type: Boolean }) clearable = false;
+    @property({ type: Boolean }) readonly = false;
+    @property({ type: Boolean }) disabled = false;
+    @property({ type: Boolean }) error = false;
+    @property({ type: String }) variant: 'outlined' | 'filled' | 'standard' = 'outlined';
+    @property({ type: String }) size: 'small' | 'medium' | 'large' = 'medium';
+    @property({ type: Boolean, attribute: 'full-width' }) fullWidth = false;
 
-  @state() private isOpen = false;
-  @state() private activeColumn: 'hour' | 'minute' | 'second' | 'period' = 'hour';
-  @state() private selectedHour: number | null = null;
-  @state() private selectedMinute: number | null = null;
-  @state() private selectedSecond: number | null = null;
-  @state() private selectedPeriod: 'AM' | 'PM' | null = null;
-  @state() private displayValue = '';
+    @state() open = false;
+    @state() focusedColumn: 'hour' | 'minute' | 'second' | 'ampm' = 'hour';
+    @state() selectedHour: number | null = null;
+    @state() selectedMinute: number | null = null;
+    @state() selectedSecond: number | null = null;
+    @state() selectedAmPm: 'AM' | 'PM' | null = null;
+    @state() inputValue = '';
 
-  private inputEl?: HTMLInputElement;
-  private panelEl?: HTMLElement;
+    // 3. has-label 속성 선언 (reflect: true 필수)
+    @property({ type: Boolean, reflect: true, attribute: 'has-label' })
+    hasLabel = false;
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    this.addEventListener('keydown', this.handleGlobalKeydown);
-    document.addEventListener('click', this.handleOutsideClick);
-  }
+    // 4. Controller 인스턴스 생성
+    private labelController = new LabelSlotController(this, 'label-slot');
 
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this.removeEventListener('keydown', this.handleGlobalKeydown);
-    document.removeEventListener('click', this.handleOutsideClick);
-  }
-
-  willUpdate(changedProperties: Map<string | number | symbol, unknown>): void {
-    if (changedProperties.has('value') || changedProperties.has('format') || changedProperties.has('use12Hours')) {
-      this.syncValueToState();
-    }
-  }
-
-  private syncValueToState(): void {
-    if (!this.value) {
-      this.displayValue = '';
-      this.selectedHour = null;
-      this.selectedMinute = null;
-      this.selectedSecond = null;
-      this.selectedPeriod = null;
-      return;
+    // 5. 슬롯 체인지 이벤트 핸들러 추가
+    handleLabelSlotChange(e: Event): void {
+        this.labelController.handleSlotChange(e);
     }
 
-    let dateObj: Date | null = null;
+    private _outsideClickListener: ((e: MouseEvent) => void) | null = null;
 
-    if (this.value instanceof Date) {
-      dateObj = this.value;
-    } else if (typeof this.value === 'string') {
-      const parts = this.value.split(':');
-      if (parts.length >= 2) {
-        const h = parseInt(parts[0], 10);
-        const m = parseInt(parts[1], 10);
-        const s = parts[2] ? parseInt(parts[2], 10) : 0;
-        if (!isNaN(h) && !isNaN(m)) {
-          dateObj = new Date();
-          dateObj.setHours(h, m, isNaN(s) ? 0 : s, 0);
+    connectedCallback() {
+        super.connectedCallback();
+        this._parseValue(this.value);
+        this._outsideClickListener = (e: MouseEvent) => {
+            if (this.open && !e.composedPath().includes(this)) {
+                this._closePanel();
+            }
+        };
+        window.addEventListener('click', this._outsideClickListener);
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this._outsideClickListener) {
+            window.removeEventListener('click', this._outsideClickListener);
         }
-      }
     }
 
-    if (dateObj) {
-      const rawHour = dateObj.getHours();
-      const rawMinute = dateObj.getMinutes();
-      const rawSecond = dateObj.getSeconds();
-
-      this.selectedMinute = rawMinute;
-      this.selectedSecond = rawSecond;
-
-      if (this.use12Hours) {
-        this.selectedPeriod = rawHour >= 12 ? 'PM' : 'AM';
-        let h12 = rawHour % 12;
-        if (h12 === 0) h12 = 12;
-        this.selectedHour = h12;
-      } else {
-        this.selectedHour = rawHour;
-        this.selectedPeriod = null;
-      }
-
-      this.displayValue = this.formatTimeDisplay(rawHour, rawMinute, rawSecond);
-    } else if (typeof this.value === 'string') {
-      this.displayValue = this.value;
-    }
-  }
-
-  private formatTimeDisplay(h24: number, m: number, s: number): string {
-    const pad = (n: number) => String(n).padStart(2, '0');
-
-    if (this.use12Hours) {
-      const period = h24 >= 12 ? 'PM' : 'AM';
-      let h12 = h24 % 12;
-      if (h12 === 0) h12 = 12;
-
-      let formatted = `${pad(h12)}:${pad(m)}`;
-      if (this.showSeconds) {
-        formatted += `:${pad(s)}`;
-      }
-      return `${formatted} ${period}`;
-    }
-
-    let formatted = `${pad(h24)}:${pad(m)}`;
-    if (this.showSeconds) {
-      formatted += `:${pad(s)}`;
-    }
-    return formatted;
-  }
-
-  private handleOutsideClick = (e: MouseEvent): void => {
-    if (!this.isOpen) return;
-    const path = e.composedPath();
-    if (!path.includes(this)) {
-      this.closePanel();
-    }
-  };
-
-  private handleGlobalKeydown = (e: KeyboardEvent): void => {
-    if (this.disabled || this.readonly) return;
-
-    if (e.key === 'Escape' && this.isOpen) {
-      e.stopPropagation();
-      this.closePanel();
-      this.inputEl?.focus();
-      return;
-    }
-
-    if (!this.isOpen) return;
-
-    const columns: ('period' | 'hour' | 'minute' | 'second')[] = [];
-    if (this.use12Hours) columns.push('period');
-    columns.push('hour', 'minute');
-    if (this.showSeconds) columns.push('second');
-
-    const currentIndex = columns.indexOf(this.activeColumn);
-
-    if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      const nextIndex = (currentIndex + 1) % columns.length;
-      this.activeColumn = columns[nextIndex];
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      const prevIndex = (currentIndex - 1 + columns.length) % columns.length;
-      this.activeColumn = columns[prevIndex];
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      this.navigateColumnOptions(e.key === 'ArrowDown' ? 1 : -1);
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      this.confirmSelection();
-    }
-  };
-
-  private navigateColumnOptions(direction: number): void {
-    if (this.activeColumn === 'hour') {
-      const options = this.generateHourOptions();
-      const currentVal = this.selectedHour ?? options[0]?.value ?? 0;
-      const idx = options.findIndex(o => o.value === currentVal);
-      const nextIdx = (idx + direction + options.length) % options.length;
-      if (!options[nextIdx].disabled) {
-        this.selectedHour = options[nextIdx].value;
-      }
-    } else if (this.activeColumn === 'minute') {
-      const options = this.generateMinuteOptions();
-      const currentVal = this.selectedMinute ?? options[0]?.value ?? 0;
-      const idx = options.findIndex(o => o.value === currentVal);
-      const nextIdx = (idx + direction + options.length) % options.length;
-      if (!options[nextIdx].disabled) {
-        this.selectedMinute = options[nextIdx].value;
-      }
-    } else if (this.activeColumn === 'second') {
-      const options = this.generateSecondOptions();
-      const currentVal = this.selectedSecond ?? options[0]?.value ?? 0;
-      const idx = options.findIndex(o => o.value === currentVal);
-      const nextIdx = (idx + direction + options.length) % options.length;
-      if (!options[nextIdx].disabled) {
-        this.selectedSecond = options[nextIdx].value;
-      }
-    } else if (this.activeColumn === 'period') {
-      const options = this.generatePeriodOptions();
-      const currentVal = this.selectedPeriod ?? 'AM';
-      const idx = options.findIndex(o => o.value === currentVal);
-      const nextIdx = (idx + direction + options.length) % options.length;
-      if (!options[nextIdx].disabled) {
-        this.selectedPeriod = options[nextIdx].value;
-      }
-    }
-  }
-
-  private togglePanel = (e?: MouseEvent): void => {
-    if (e) e.stopPropagation();
-    if (this.disabled || this.readonly) return;
-
-    if (this.isOpen) {
-      this.closePanel();
-    } else {
-      this.openPanel();
-    }
-  };
-
-  private openPanel(): void {
-    if (this.isOpen) return;
-    this.isOpen = true;
-    this.activeColumn = this.use12Hours ? 'period' : 'hour';
-    this.dispatchEvent(new CustomEvent('open', { bubbles: true, composed: true }));
-  }
-
-  private closePanel(): void {
-    if (!this.isOpen) return;
-    this.isOpen = false;
-    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
-  }
-
-  private handleInput = (e: Event): void => {
-    const input = e.target as HTMLInputElement;
-    this.displayValue = input.value;
-    this.dispatchEvent(
-      new CustomEvent('input', {
-        bubbles: true,
-        composed: true,
-        detail: { rawValue: input.value }
-      })
-    );
-  };
-
-  private handleFocus = (e: FocusEvent): void => {
-    this.dispatchEvent(new CustomEvent('focus', { bubbles: true, composed: true, detail: e }));
-  };
-
-  private handleBlur = (e: FocusEvent): void => {
-    this.dispatchEvent(new CustomEvent('blur', { bubbles: true, composed: true, detail: e }));
-  };
-
-  private handleClear = (e: MouseEvent): void => {
-    e.stopPropagation();
-    if (this.disabled || this.readonly) return;
-
-    this.value = null;
-    this.displayValue = '';
-    this.selectedHour = null;
-    this.selectedMinute = null;
-    this.selectedSecond = null;
-    this.selectedPeriod = null;
-
-    this.dispatchEvent(new CustomEvent('clear', { bubbles: true, composed: true }));
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { value: '', time: null }
-      })
-    );
-  };
-
-  private handleSelectOption = (type: 'hour' | 'minute' | 'second' | 'period', val: number | string): void => {
-    this.activeColumn = type;
-    if (type === 'hour') this.selectedHour = val as number;
-    if (type === 'minute') this.selectedMinute = val as number;
-    if (type === 'second') this.selectedSecond = val as number;
-    if (type === 'period') this.selectedPeriod = val as 'AM' | 'PM';
-  };
-
-  private handleSelectNow = (): void => {
-    const now = new Date();
-    this.commitTimeSelection(now.getHours(), now.getMinutes(), now.getSeconds());
-  };
-
-  private handleConfirm = (): void => {
-    this.confirmSelection();
-  };
-
-  private handleCancel = (): void => {
-    this.syncValueToState();
-    this.closePanel();
-  };
-
-  private confirmSelection(): void {
-    let h = this.selectedHour ?? 0;
-    const m = this.selectedMinute ?? 0;
-    const s = this.selectedSecond ?? 0;
-
-    if (this.use12Hours) {
-      if (this.selectedPeriod === 'PM' && h < 12) h += 12;
-      if (this.selectedPeriod === 'AM' && h === 12) h = 0;
-    }
-
-    this.commitTimeSelection(h, m, s);
-  }
-
-  private commitTimeSelection(h24: number, m: number, s: number): void {
-    const dateObj = new Date();
-    dateObj.setHours(h24, m, s, 0);
-
-    const formattedStr = this.formatTimeDisplay(h24, m, s);
-    this.displayValue = formattedStr;
-    this.value = formattedStr;
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          value: formattedStr,
-          time: dateObj
+    willUpdate(changedProperties: Map<string, unknown>) {
+        if (changedProperties.has('value')) {
+            this._parseValue(this.value);
         }
-      })
-    );
-
-    this.closePanel();
-  }
-
-  private generateHourOptions(): TimeOption[] {
-    const max = this.use12Hours ? 12 : 23;
-    const start = this.use12Hours ? 1 : 0;
-    const options: TimeOption[] = [];
-
-    for (let i = start; i <= max; i += this.hourStep) {
-      const isDisabled = this.disabledHours ? this.disabledHours(i) : false;
-      const label = String(i).padStart(2, '0');
-      options.push({ value: i, label, disabled: isDisabled });
     }
-    return options;
-  }
 
-  private generateMinuteOptions(): TimeOption[] {
-    const options: TimeOption[] = [];
-    for (let i = 0; i < 60; i += this.minuteStep) {
-      const isDisabled = this.disabledMinutes ? this.disabledMinutes(i, this.selectedHour) : false;
-      const label = String(i).padStart(2, '0');
-      options.push({ value: i, label, disabled: isDisabled });
+    private _parseValue(val: string | Date | null) {
+        if (!val) {
+            this.selectedHour = null;
+            this.selectedMinute = null;
+            this.selectedSecond = null;
+            this.selectedAmPm = null;
+            this.inputValue = '';
+            return;
+        }
+
+        let h = 0, m = 0, s = 0;
+        if (val instanceof Date) {
+            h = val.getHours();
+            m = val.getMinutes();
+            s = val.getSeconds();
+        } else if (typeof val === 'string') {
+            const parts = val.split(':').map((p) => parseInt(p, 10));
+            h = parts[0] || 0;
+            m = parts[1] || 0;
+            s = parts[2] || 0;
+        }
+
+        this.selectedHour = h;
+        this.selectedMinute = m;
+        this.selectedSecond = s;
+        if (this.use12Hours) {
+            this.selectedAmPm = h >= 12 ? 'PM' : 'AM';
+        }
+        this.inputValue = this._formatTimeString(h, m, s, this.selectedAmPm);
     }
-    return options;
-  }
 
-  private generateSecondOptions(): TimeOption[] {
-    const options: TimeOption[] = [];
-    for (let i = 0; i < 60; i += this.secondStep) {
-      const isDisabled = this.disabledSeconds ? this.disabledSeconds(i, this.selectedHour, this.selectedMinute) : false;
-      const label = String(i).padStart(2, '0');
-      options.push({ value: i, label, disabled: isDisabled });
+    private _formatTimeString(h: number, m: number, s: number, ampm: 'AM' | 'PM' | null): string {
+        let displayHour = h;
+        if (this.use12Hours) {
+            displayHour = h % 12;
+            if (displayHour === 0) displayHour = 12;
+        }
+
+        const pad = (num: number) => String(num).padStart(2, '0');
+        let str = `${pad(displayHour)}:${pad(m)}`;
+        if (this.showSeconds) {
+            str += `:${pad(s)}`;
+        }
+        if (this.use12Hours && ampm) {
+            str += ` ${ampm}`;
+        }
+        return str;
     }
-    return options;
-  }
 
-  private generatePeriodOptions(): PeriodOption[] {
-    return [
-      { value: 'AM', label: 'AM', disabled: false },
-      { value: 'PM', label: 'PM', disabled: false }
-    ];
-  }
+    getHourOptions(): TimeOption[] {
+        const options: TimeOption[] = [];
+        const max = this.use12Hours ? 12 : 23;
+        const min = this.use12Hours ? 1 : 0;
 
-  render(): TemplateResult {
-    const context: TimePickerTemplateContext = {
-      value: this.value,
-      displayValue: this.displayValue,
-      format: this.format,
-      use12Hours: this.use12Hours,
-      hourStep: this.hourStep,
-      minuteStep: this.minuteStep,
-      secondStep: this.secondStep,
-      showSeconds: this.showSeconds,
-      placeholder: this.placeholder,
-      clearable: this.clearable,
-      readonly: this.readonly,
-      disabled: this.disabled,
-      error: this.error,
-      variant: this.variant,
-      size: this.size,
-      fullWidth: this.fullWidth,
-      isOpen: this.isOpen,
-      activeColumn: this.activeColumn,
-      selectedHour: this.selectedHour,
-      selectedMinute: this.selectedMinute,
-      selectedSecond: this.selectedSecond,
-      selectedPeriod: this.selectedPeriod,
-      hours: this.generateHourOptions(),
-      minutes: this.generateMinuteOptions(),
-      seconds: this.generateSecondOptions(),
-      periods: this.generatePeriodOptions(),
-      onInput: this.handleInput,
-      onFocus: this.handleFocus,
-      onBlur: this.handleBlur,
-      onKeydown: this.handleGlobalKeydown,
-      onTogglePanel: this.togglePanel,
-      onClear: this.handleClear,
-      onSelectOption: this.handleSelectOption,
-      onSelectNow: this.handleSelectNow,
-      onConfirm: this.handleConfirm,
-      onCancel: this.handleCancel,
-      inputRef: (el) => { this.inputEl = el as HTMLInputElement; },
-      panelRef: (el) => { this.panelEl = el as HTMLElement; }
-    };
+        for (let i = min; i <= max; i += this.hourStep) {
+            let actualHour = i;
+            if (this.use12Hours) {
+                if (this.selectedAmPm === 'PM' && i < 12) actualHour = i + 12;
+                if (this.selectedAmPm === 'AM' && i === 12) actualHour = 0;
+            }
+            const isDisabled = this.disabledHours ? this.disabledHours(actualHour) : false;
+            options.push({
+                value: i,
+                label: String(i).padStart(2, '0'),
+                disabled: isDisabled,
+            });
+        }
+        return options;
+    }
 
-    return TimePickerTemplate(context);
-  }
+    getMinuteOptions(): TimeOption[] {
+        const options: TimeOption[] = [];
+        const h = this.selectedHour ?? 0;
+        for (let i = 0; i < 60; i += this.minuteStep) {
+            const isDisabled = this.disabledMinutes ? this.disabledMinutes(h, i) : false;
+            options.push({
+                value: i,
+                label: String(i).padStart(2, '0'),
+                disabled: isDisabled,
+            });
+        }
+        return options;
+    }
+
+    getSecondOptions(): TimeOption[] {
+        const options: TimeOption[] = [];
+        const h = this.selectedHour ?? 0;
+        const m = this.selectedMinute ?? 0;
+        for (let i = 0; i < 60; i += this.secondStep) {
+            const isDisabled = this.disabledSeconds ? this.disabledSeconds(h, m, i) : false;
+            options.push({
+                value: i,
+                label: String(i).padStart(2, '0'),
+                disabled: isDisabled,
+            });
+        }
+        return options;
+    }
+
+    getAmPmOptions(): Array<{ value: 'AM' | 'PM'; label: string; disabled: boolean }> {
+        return [
+            { value: 'AM', label: 'AM', disabled: false },
+            { value: 'PM', label: 'PM', disabled: false },
+        ];
+    }
+
+    handleInput(e: Event) {
+        const inputEl = e.target as HTMLInputElement;
+        this.inputValue = inputEl.value;
+        this.dispatchEvent(
+            new CustomEvent('input', {
+                bubbles: true,
+                composed: true,
+                detail: { rawValue: this.inputValue },
+            })
+        );
+    }
+
+    handleInputKeydown(e: KeyboardEvent) {
+        if (this.disabled || this.readonly) return;
+
+        if (e.key === 'ArrowDown' || e.key === 'Enter') {
+            if (!this.open) {
+                this._openPanel();
+                e.preventDefault();
+            }
+        } else if (e.key === 'Escape') {
+            if (this.open) {
+                this._closePanel();
+                e.preventDefault();
+            }
+        }
+    }
+
+    handleInputFocus(_e: FocusEvent) { }
+
+    handleInputBlur(_e: FocusEvent) { }
+
+    togglePanel(e: MouseEvent) {
+        e.stopPropagation();
+        if (this.disabled || this.readonly) return;
+        if (this.open) {
+            this._closePanel();
+        } else {
+            this._openPanel();
+        }
+    }
+
+    private _openPanel() {
+        this.open = true;
+        this.focusedColumn = 'hour';
+        this.dispatchEvent(
+            new CustomEvent('open', {
+                bubbles: true,
+                composed: true,
+            })
+        );
+    }
+
+    private _closePanel() {
+        this.open = false;
+        this.dispatchEvent(
+            new CustomEvent('close', {
+                bubbles: true,
+                composed: true,
+            })
+        );
+    }
+
+    handleClear(e: MouseEvent) {
+        e.stopPropagation();
+        if (this.disabled || this.readonly) return;
+
+        this.value = null;
+        this.selectedHour = null;
+        this.selectedMinute = null;
+        this.selectedSecond = null;
+        this.selectedAmPm = null;
+        this.inputValue = '';
+
+        this.dispatchEvent(
+            new CustomEvent('clear', {
+                bubbles: true,
+                composed: true,
+            })
+        );
+
+        this.dispatchEvent(
+            new CustomEvent('change', {
+                bubbles: true,
+                composed: true,
+                detail: { value: '', time: null },
+            })
+        );
+    }
+
+    handleOptionSelect(type: 'hour' | 'minute' | 'second' | 'ampm', val: number | string) {
+        if (type === 'hour') this.selectedHour = val as number;
+        if (type === 'minute') this.selectedMinute = val as number;
+        if (type === 'second') this.selectedSecond = val as number;
+        if (type === 'ampm') this.selectedAmPm = val as 'AM' | 'PM';
+
+        this._commitSelection();
+    }
+
+    handleColumnKeydown(e: KeyboardEvent, type: 'hour' | 'minute' | 'second' | 'ampm') {
+        if (e.key === 'Escape') {
+            this._closePanel();
+            const input = this.shadowRoot?.querySelector('input');
+            input?.focus();
+            return;
+        }
+
+        const columns: Array<'hour' | 'minute' | 'second' | 'ampm'> = ['hour', 'minute'];
+        if (this.showSeconds) columns.push('second');
+        if (this.use12Hours) columns.push('ampm');
+
+        const currentIndex = columns.indexOf(type);
+
+        if (e.key === 'ArrowRight') {
+            const nextIndex = (currentIndex + 1) % columns.length;
+            this.focusedColumn = columns[nextIndex];
+            this._focusColumn(this.focusedColumn);
+            e.preventDefault();
+        } else if (e.key === 'ArrowLeft') {
+            const prevIndex = (currentIndex - 1 + columns.length) % columns.length;
+            this.focusedColumn = columns[prevIndex];
+            this._focusColumn(this.focusedColumn);
+            e.preventDefault();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            this._commitSelection();
+            this._closePanel();
+            e.preventDefault();
+        }
+    }
+
+    private _focusColumn(col: 'hour' | 'minute' | 'second' | 'ampm') {
+        const colEls = this.shadowRoot?.querySelectorAll('.biz-time-picker__column');
+        if (!colEls) return;
+        const columns: Array<'hour' | 'minute' | 'second' | 'ampm'> = ['hour', 'minute'];
+        if (this.showSeconds) columns.push('second');
+        if (this.use12Hours) columns.push('ampm');
+
+        const idx = columns.indexOf(col);
+        if (idx !== -1 && colEls[idx]) {
+            (colEls[idx] as HTMLElement).focus();
+        }
+    }
+
+    handleNowClick() {
+        const now = new Date();
+        this.selectedHour = now.getHours();
+        this.selectedMinute = now.getMinutes();
+        this.selectedSecond = now.getSeconds();
+        if (this.use12Hours) {
+            this.selectedAmPm = this.selectedHour >= 12 ? 'PM' : 'AM';
+        }
+        this._commitSelection();
+        this._closePanel();
+    }
+
+    handleConfirmClick() {
+        this._commitSelection();
+        this._closePanel();
+    }
+
+    private _commitSelection() {
+        const h = this.selectedHour ?? 0;
+        const m = this.selectedMinute ?? 0;
+        const s = this.selectedSecond ?? 0;
+
+        const formatted = this._formatTimeString(h, m, s, this.selectedAmPm);
+        this.inputValue = formatted;
+        this.value = formatted;
+
+        const d = new Date();
+        d.setHours(h, m, s, 0);
+
+        this.dispatchEvent(
+            new CustomEvent('change', {
+                bubbles: true,
+                composed: true,
+                detail: { value: formatted, time: d },
+            })
+        );
+    }
+
+    render() {
+        return html`${TimePickerTemplate(this)}`;
+    }
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'biz-time-picker': BizTimePicker;
-  }
+    interface HTMLElementTagNameMap {
+        'biz-time-picker': BizTimePicker;
+    }
 }

@@ -1,10 +1,10 @@
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { BizTimePicker } from './TimePicker.wc.ts';
+import { BizTimePicker as BizTimePickerElement } from './TimePicker.wc';
 
 export const TimePicker = createComponent({
   tagName: 'biz-time-picker',
-  elementClass: BizTimePicker,
+  elementClass: BizTimePickerElement,
   react: React,
   events: {
     onChange: 'change',
@@ -12,7 +12,5 @@ export const TimePicker = createComponent({
     onOpen: 'open',
     onClose: 'close',
     onClear: 'clear',
-    onFocus: 'focus',
-    onBlur: 'blur'
-  }
+  },
 });
