@@ -1,6 +1,6 @@
 # 웹 컴포넌트 요구사항 정의서 표준 템플릿
 
-```markdown
+````markdown
 # [컴포넌트 명칭] 요구사항 정의서
 
 ## 1. 기본 구조 및 레이아웃 (Layout Architecture)
@@ -97,7 +97,7 @@
   --ui-input-disabled-bg-color: #f3f4f6;
   --ui-input-disabled-text-color: #9ca3af;
 }
-
+```
 
 ## 5. 웹 접근성 (Accessibility & WAI-ARIA)
 
@@ -114,4 +114,4 @@
 
 ### 5.3. 스크린 리더 대응
 - Label과 Input은 Shadow DOM 내부에서 명확한 바인딩(`for` & `id` 또는 감싸는 레이아웃) 구조를 유지하여 읽기 상태를 확보합니다.
-```
+````
