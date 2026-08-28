@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Elements Catalog</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --border-color: #e5e7eb;
+      --text-main: #111827;
+      --text-sub: #6b7280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; }
+
+    header { background-color: #fff; border-bottom: 1px solid var(--border-color); padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.5rem; color: var(--primary-color); }
+    header p { color: var(--text-sub); font-size: 0.9rem; margin-top: 0.25rem; }
+
+    .container { display: flex; gap: 2rem; padding: 2rem; max-width: 1400px; margin: 0 auto; }
+    
+    /* Sidebar Layout */
+    .sidebar { width: 320px; flex-shrink: 0; }
+    .search-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; margin-bottom: 1rem; }
+    .file-uploader { margin-bottom: 1rem; }
+    .file-uploader input { display: none; }
+    .file-label { display: block; text-align: center; padding: 0.5rem; background: #e0e7ff; color: #3730a3; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    
+    .comp-list { list-style: none; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; max-height: 70vh; overflow-y: auto; }
+    .comp-item { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; }
+    .comp-item:hover { background-color: #f3f4f6; }
+    .comp-item.active { background-color: #eff6ff; border-left: 4px solid var(--primary-color); }
+    .comp-item .tag-name { font-weight: 600; font-size: 0.95rem; }
+    .comp-item .class-name { font-size: 0.8rem; color: var(--text-sub); }
+
+    /* Main Content */
+    .content { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; }
+    .section-title { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem 0; border-bottom: 2px solid var(--border-color); padding-bottom: 0.4rem; }
+    .comp-description { color: var(--text-sub); margin-bottom: 1rem; font-size: 0.95rem; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--border-color); }
+    th { background-color: #f9fafb; font-weight: 600; color: var(--text-sub); }
+    
+    .badge { display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background-color: #e0e7ff; color: #3730a3; }
+    .badge-event { background-color: #fef3c7; color: #92400e; }
+    .badge-slot { background-color: #d1fae5; color: #065f46; }
+    code { background: #f3f4f6; padding: 0.15rem 0.3rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Custom Elements Catalog Explorer</h1>
+    <p>custom-elements.json 명세를 로드하고 검색 및 탐색합니다.</p>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="file-uploader">
+        <label for="json-file" class="file-label">📂 custom-elements.json 파일 선택</label>
+        <input type="file" id="json-file" accept=".json">
+      </div>
+      <input type="text" id="search" class="search-input" placeholder="컴포넌트 검색 (태그/클래스명)...">
+      <ul id="component-list" class="comp-list"></ul>
+    </aside>
+
+    <main class="content" id="detail-panel">
+      <p style="color: var(--text-sub);">좌측 목록에서 컴포넌트를 선택하거나 custom-elements.json 파일을 업로드하세요.</p>
+    </main>
+  </div>
+
+  <script>
+    // Sample Fallback Data
+    const sampleManifest = {
+      "modules": [
+        {
+          "path": "src/components/button/button.js",
+          "declarations": [
+            {
+              "name": "CustomButton",
+              "tagName": "custom-button",
+              "customElement": true,
+              "description": "다양한 스타일 및 상태를 지원하는 공통 버튼 컴포넌트입니다.",
+              "attributes": [
+                { "name": "variant", "type": { "text": "'primary' | 'secondary' | 'text'" }, "default": "'primary'", "description": "버튼 스타일 유형" },
+                { "name": "disabled", "type": { "text": "boolean" }, "default": "false", "description": "비활성화 여부" }
+              ],
+              "events": [
+                { "name": "btn-click", "type": { "text": "CustomEvent<void>" }, "description": "버튼 클릭 시 발생하는 이벤트" }
+              ],
+              "slots": [
+                { "name": "", "description": "버튼 내부 콘텐츠" }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    let components = [];
+
+    // Manifest 데이터 파싱 함수
+    function parseManifest(data) {
+      components = [];
+      if (!data.modules) return;
+
+      data.modules.forEach(mod => {
+        if (mod.declarations) {
+          mod.declarations.forEach(decl => {
+            if (decl.customElement || decl.tagName) {
+              components.push({
+                ...decl,
+                path: mod.path
+              });
+            }
+          });
+        }
+      });
+    }
+
+    const listEl = document.getElementById('component-list');
+    const detailEl = document.getElementById('detail-panel');
+    const searchEl = document.getElementById('search');
+    const fileEl = document.getElementById('json-file');
+
+    // 컴포넌트 목록 출력
+    function renderList(filter = '') {
+      listEl.innerHTML = '';
+      const filtered = components.filter(c => 
+        (c.tagName && c.tagName.toLowerCase().includes(filter.toLowerCase())) ||
+        (c.name && c.name.toLowerCase().includes(filter.toLowerCase()))
+      );
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<li style="padding: 1rem; color: var(--text-sub); text-align: center;">검색 결과가 없습니다.</li>';
+        return;
+      }
+
+      filtered.forEach((comp, idx) => {
+        const li = document.createElement('li');
+        li.className = `comp-item ${idx === 0 ? 'active' : ''}`;
+        li.innerHTML = `
+          <div class="tag-name">&lt;${comp.tagName || 'anonymous'}&gt;</div>
+          <div class="class-name">${comp.name}</div>
+        `;
+        li.onclick = () => {
+          document.querySelectorAll('.comp-item').forEach(el => el.classList.remove('active'));
+          li.classList.add('active');
+          renderDetail(comp);
+        };
+        listEl.appendChild(li);
+      });
+
+      if (filtered.length > 0) {
+        renderDetail(filtered[0]);
+      }
+    }
+
+    // 상세 정보 출력
+    function renderDetail(comp) {
+      let attrsHtml = comp.attributes && comp.attributes.length ? `
+        <h3 class="section-title">Attributes / Properties</h3>
+        <table>
+          <thead>
+            <tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            ${comp.attributes.map(a => `
+              <tr>
+                <td><code>${a.name}</code></td>
+                <td><span class="badge">${escapeHtml(a.type?.text || 'any')}</span></td>
+                <td><code>${a.default !== undefined ? a.default : '-'}</code></td>
+                <td>${a.description || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      ` : '';
+
+      let eventsHtml = comp.events && comp.events.length ? `
+        <h3 class="section-title">Events</h3>
+        <table>
+          <thead>
+            <tr><th>Event Name</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            ${comp.events.map(e => `
+              <tr>
+                <td><code>${e.name}</code></td>
+                <td><span class="badge badge-event">${escapeHtml(e.type?.text || 'CustomEvent')}</span></td>
+                <td>${e.description || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      ` : '';
+
+      let slotsHtml = comp.slots && comp.slots.length ? `
+        <h3 class="section-title">Slots</h3>
+        <table>
+          <thead>
+            <tr><th>Slot Name</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            ${comp.slots.map(s => `
+              <tr>
+                <td><span class="badge badge-slot">${s.name || 'default'}</span></td>
+                <td>${s.description || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      ` : '';
+
+      detailEl.innerHTML = `
+        <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem;">&lt;${comp.tagName || 'anonymous'}&gt;</h2>
+        <p style="color: var(--text-sub); font-size: 0.85rem; margin-bottom: 1rem;">
+          Class: <code>${comp.name}</code> | Path: <code>${comp.path}</code>
+        </p>
+        ${comp.description ? `<p class="comp-description">${comp.description}</p>` : ''}
+        ${attrsHtml}
+        ${eventsHtml}
+        ${slotsHtml}
+      `;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // 파일 로드 이벤트
+    fileEl.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const json = JSON.parse(event.target.result);
+          parseManifest(json);
+          renderList();
+        } catch (err) {
+          alert('유효한 JSON 파일이 아닙니다.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // 자동 검색 처리 (원격 manifest 파일이 동일 경로에 있는 경우)
+    async function loadDefaultManifest() {
+      try {
+        const res = await fetch('./custom-elements.json');
+        if (res.ok) {
+          const json = await res.json();
+          parseManifest(json);
+        } else {
+          parseManifest(sampleManifest);
+        }
+      } catch (e) {
+        parseManifest(sampleManifest);
+      }
+      renderList();
+    }
+
+    // 실시간 검색
+    searchEl.addEventListener('input', (e) => renderList(e.target.value));
+
+    // 초기화 실행
+    loadDefaultManifest();
+  </script>
+</body>
+</html>

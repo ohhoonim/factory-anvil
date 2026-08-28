@@ -370,14 +370,6 @@
           "name": "*",
           "declaration": {
             "name": "*",
-            "module": "src/components/DataGrid/index"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "*",
-          "declaration": {
-            "name": "*",
             "module": "src/components/DatePicker/index"
           }
         },
@@ -1272,307 +1264,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ApplicationShell/ApplicationShell.css.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "applicationShellStyles",
-          "default": "css` :host { --biz-application-shell-header-height: 64px; --biz-application-shell-footer-height: 48px; --biz-application-shell-sidebar-width: 256px; --biz-application-shell-sidebar-collapsed-width: 64px; --biz-application-shell-bg-color: #f9fafb; --biz-application-shell-header-bg: #ffffff; --biz-application-shell-sidebar-bg: #1f2937; --biz-application-shell-footer-bg: #ffffff; --biz-application-shell-border-color: #e5e7eb; --biz-application-shell-header-z-index: 100; --biz-application-shell-sidebar-z-index: 90; --biz-application-shell-overlay-z-index: 200; display: block; box-sizing: border-box; width: 100%; height: 100%; } *, *::before, *::after { box-sizing: border-box; } .biz-application-shell__skip-link { position: absolute; top: -100px; left: 0; background: #000000; color: #ffffff; padding: 8px 16px; z-index: 1000; text-decoration: none; } .biz-application-shell__skip-link:focus { top: 0; } .biz-application-shell { display: flex; flex-direction: column; min-height: 100vh; background-color: var(--biz-application-shell-bg-color); } .biz-application-shell--sticky-header .biz-application-shell__header { position: sticky; top: 0; z-index: var(--biz-application-shell-header-z-index); } .biz-application-shell__header { height: var(--biz-application-shell-header-height); background-color: var(--biz-application-shell-header-bg); border-bottom: 1px solid var(--biz-application-shell-border-color); } .biz-application-shell__body { display: flex; flex: 1; position: relative; } .biz-application-shell__sidebar { width: var(--biz-application-shell-sidebar-width); background-color: var(--biz-application-shell-sidebar-bg); border-right: 1px solid var(--biz-application-shell-border-color); transition: width 0.3s ease; } .biz-application-shell--fixed-sidebar .biz-application-shell__sidebar { position: sticky; top: var(--biz-application-shell-header-height); height: calc(100vh - var(--biz-application-shell-header-height)); overflow-y: auto; z-index: var(--biz-application-shell-sidebar-z-index); } .biz-application-shell--sidebar-collapsed .biz-application-shell__sidebar { width: var(--biz-application-shell-sidebar-collapsed-width); } .biz-application-shell__content { flex: 1; overflow-y: auto; outline: none; } .biz-application-shell__footer { height: var(--biz-application-shell-footer-height); background-color: var(--biz-application-shell-footer-bg); border-top: 1px solid var(--biz-application-shell-border-color); } .biz-application-shell--variant-full-width .biz-application-shell__sidebar { display: none; } .biz-application-shell--variant-minimal .biz-application-shell__header, .biz-application-shell--variant-minimal .biz-application-shell__footer, .biz-application-shell--variant-minimal .biz-application-shell__sidebar { display: none; } .biz-application-shell__overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: calc(var(--biz-application-shell-overlay-z-index) - 1); } `"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "applicationShellStyles",
-          "declaration": {
-            "name": "applicationShellStyles",
-            "module": "src/components/ApplicationShell/ApplicationShell.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ApplicationShell/ApplicationShell.react.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "ApplicationShell"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "ApplicationShell",
-          "declaration": {
-            "name": "ApplicationShell",
-            "module": "src/components/ApplicationShell/ApplicationShell.react.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ApplicationShell/ApplicationShell.stories.ts",
-      "declarations": [
-        {
-          "kind": "variable",
-          "name": "meta",
-          "type": {
-            "text": "Meta<Args>"
-          },
-          "default": "{ title: 'Components/Layout/ApplicationShell', component: 'biz-application-shell', tags: ['autodocs'], argTypes: { toggleSidebar: { name: 'toggleSidebar()', description: 'sidebar 상태를 토글해준다', control: false, table: {category: 'method', type: { summary: '() => void'}} }, variant: { control: 'select', options: ['default', 'full-width', 'minimal'], description: '레이아웃 형태 옵션' }, sidebarCollapsed: { control: 'boolean', description: '사이드바 축소 상태 여부', }, stickyHeader: { table: {disable: true}, }, fixedSidebar: { table: {disable: true}, }, 'sidebar-collapsed': { table: { disable: true } }, 'sticky-header': { control: 'boolean', description: '헤더 상단 고정 여부', }, 'fixed-sidebar': { control: 'boolean', description: '사이드바 좌측 고정 및 내부 스크롤 적용 여부', }, headerSlot: { name: \"header-slot\", control: { type: 'text' }, description: '레이아웃 상단 헤더', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, sidebarSlot: { name: \"sidebar-slot\", control: { type: 'text' }, description: '왼쪽 메뉴', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, contentSlot: { name: \"content-slot\", control: { type: 'text' }, description: '컨텐츠 영역', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, footerSlot: { name: \"footer-slot\", control: { type: 'text' }, description: '하단 footer 영역', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, }, args: { variant: 'default', sidebarCollapsed: false, stickyHeader: true, fixedSidebar: true, headerSlot: '<div style=\"padding: 1rem; font-weight: bold;\">Header Content</div>', sidebarSlot: `<div slot=\"sidebar-slot\"> <div style=\"width:100%; height: 100vh;padding: 1rem; color: #fff;\"> <nav aria-label=\"Main Navigation\"> <ul> <li><a href=\"#link1\" style=\"color: #fff;\">Menu Item 1</a></li> <li><a href=\"#link2\" style=\"color: #fff;\">Menu Item 2</a></li> </ul> </nav> </div>` , contentSlot: ` <div slot=\"content-slot\" style=\"padding: 2rem;\"> <h1>Main Content Area</h1> <p>This is the main content of the application shell.</p> </div>`, footerSlot: `<div style=\"padding: 1rem; text-align: center;\">Footer Content</div>`, }, render: (args) => html` <biz-application-shell .variant=${args.variant} ?sidebar-collapsed=${args.sidebarCollapsed} ?sticky-header=${args.stickyHeader} ?fixed-sidebar=${args.fixedSidebar} > ${args.headerSlot ? html`<div slot=\"header-slot\">${unsafeHTML(args.headerSlot)}</div>` : ''} ${args.sidebarSlot ? html`<div slot=\"sidebar-slot\">${unsafeHTML(args.sidebarSlot)}</div>` : ''} ${args.contentSlot ? html`<div slot=\"content-slot\">${unsafeHTML(args.contentSlot)}</div>` : ''} ${args.footerSlot ? html`<div slot=\"footer-slot\">${unsafeHTML(args.footerSlot)}</div>` : ''} </biz-application-shell> ` }"
-        },
-        {
-          "kind": "variable",
-          "name": "Default",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { stickyHeader: true, sidebarCollapsed: false } }"
-        },
-        {
-          "kind": "variable",
-          "name": "FullWidth",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { variant: 'full-width' } }"
-        },
-        {
-          "kind": "variable",
-          "name": "Minimal",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { variant: 'minimal' } }"
-        },
-        {
-          "kind": "variable",
-          "name": "SidebarCollapsed",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { sidebarCollapsed: true } }"
-        },
-        {
-          "kind": "variable",
-          "name": "MethodExample",
-          "type": {
-            "text": "StoryObj"
-          },
-          "default": "{ render: () => { const handleToggle = () => { const shell = document.querySelector<BizApplicationShell>('biz-application-shell'); shell?.toggleSidebar(); }; return html` <button @click=${handleToggle} style=\"margin-bottom: 1rem;\"> 외부에서 toggleSidebar() 호출 </button> <biz-application-shell></biz-application-shell> `; }, play: async ({ canvasElement }) => { const canvas = within(canvasElement); const button = canvas.getByRole('button', { name: '외부에서 toggleSidebar() 호출' }); const shell = canvasElement.querySelector<BizApplicationShell>('biz-application-shell')!; // 초기 상태 검증 expect(shell.sidebarCollapsed).toBe(false); // 버튼 클릭 및 Lit 비동기 업데이트 대기 await userEvent.click(button); await shell.updateComplete; // toggleSidebar() 실행 후 상태 검증 expect(shell.sidebarCollapsed).toBe(true); expect(shell.hasAttribute('sidebar-collapsed')).toBe(true); // 재클릭 테스트 await userEvent.click(button); await shell.updateComplete; expect(shell.sidebarCollapsed).toBe(false); expect(shell.hasAttribute('sidebar-collapsed')).toBe(false); }, }"
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "default",
-          "declaration": {
-            "name": "meta",
-            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Default",
-          "declaration": {
-            "name": "Default",
-            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "FullWidth",
-          "declaration": {
-            "name": "FullWidth",
-            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Minimal",
-          "declaration": {
-            "name": "Minimal",
-            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "SidebarCollapsed",
-          "declaration": {
-            "name": "SidebarCollapsed",
-            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "MethodExample",
-          "declaration": {
-            "name": "MethodExample",
-            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ApplicationShell/ApplicationShell.ts",
-      "declarations": [
-        {
-          "kind": "function",
-          "name": "ApplicationShellTemplate",
-          "parameters": [
-            {
-              "name": "host",
-              "type": {
-                "text": "ApplicationShellHost"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "ApplicationShellTemplate",
-          "declaration": {
-            "name": "ApplicationShellTemplate",
-            "module": "src/components/ApplicationShell/ApplicationShell.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ApplicationShell/ApplicationShell.wc.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "",
-          "name": "BizApplicationShell",
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'full-width' | 'minimal'"
-              },
-              "default": "'default'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "sidebarCollapsed",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "sidebar-collapsed",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "stickyHeader",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "attribute": "sticky-header"
-            },
-            {
-              "kind": "field",
-              "name": "fixedSidebar",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "attribute": "fixed-sidebar"
-            },
-            {
-              "kind": "method",
-              "name": "toggleSidebar",
-              "privacy": "public"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'full-width' | 'minimal'"
-              },
-              "default": "'default'",
-              "fieldName": "variant"
-            },
-            {
-              "name": "sidebar-collapsed",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "sidebarCollapsed"
-            },
-            {
-              "name": "sticky-header",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "fieldName": "stickyHeader"
-            },
-            {
-              "name": "fixed-sidebar",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "fieldName": "fixedSidebar"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "biz-application-shell",
-          "customElement": true
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "BizApplicationShell",
-          "declaration": {
-            "name": "BizApplicationShell",
-            "module": "src/components/ApplicationShell/ApplicationShell.wc.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "biz-application-shell",
-          "declaration": {
-            "name": "BizApplicationShell",
-            "module": "src/components/ApplicationShell/ApplicationShell.wc.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/ApplicationShell/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "ApplicationShellWc",
-          "declaration": {
-            "name": "BizApplicationShell",
-            "module": "./ApplicationShell.wc"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/Checkbox/Checkbox.css.ts",
       "declarations": [
         {
@@ -2118,56 +1809,56 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.css.ts",
+      "path": "src/components/ApplicationShell/ApplicationShell.css.ts",
       "declarations": [
         {
           "kind": "variable",
-          "name": "checkboxGroupStyles",
-          "default": "css` :host { /* Layout & Sizing */ --biz-checkbox-group-gap-sm: 8px; --biz-checkbox-group-gap-md: 12px; --biz-checkbox-group-gap-lg: 16px; --biz-checkbox-group-label-margin-bottom: 8px; /* Colors - Base */ --biz-checkbox-group-label-color: #111827; --biz-checkbox-group-helper-text-color: #6b7280; /* Colors - Error & Disabled */ --biz-checkbox-group-error-color: #dc2626; --biz-checkbox-group-disabled-opacity: 0.5; display: inline-block; box-sizing: border-box; } :host([full-width]) { display: block; width: 100%; } .biz-checkbox-group { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; } .biz-checkbox-group__label { padding: 0; margin-bottom: var(--biz-checkbox-group-label-margin-bottom); color: var(--biz-checkbox-group-label-color); font-weight: 600; } .biz-checkbox-group__container { display: flex; box-sizing: border-box; } /* Orientation */ .biz-checkbox-group--vertical .biz-checkbox-group__container { flex-direction: column; } .biz-checkbox-group--horizontal .biz-checkbox-group__container { flex-direction: row; flex-wrap: wrap; } /* Sizes */ .biz-checkbox-group--small .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-sm); font-size: 0.875rem; } .biz-checkbox-group--medium .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-md); font-size: 1rem; } .biz-checkbox-group--large .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-lg); font-size: 1.125rem; } /* Variants */ .biz-checkbox-group--standard { /* Standard Layout Default */ } .biz-checkbox-group--card .biz-checkbox-group__container { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); } .biz-checkbox-group--button .biz-checkbox-group__container { gap: 0; } /* States */ .biz-checkbox-group--disabled { opacity: var(--biz-checkbox-group-disabled-opacity); cursor: not-allowed; } .biz-checkbox-group--readonly { cursor: default; } .biz-checkbox-group--error .biz-checkbox-group__label { color: var(--biz-checkbox-group-error-color); } .biz-checkbox-group__helper-text { margin-top: 4px; color: var(--biz-checkbox-group-helper-text-color); font-size: 0.875rem; } .biz-checkbox-group--error .biz-checkbox-group__helper-text { color: var(--biz-checkbox-group-error-color); } `"
+          "name": "applicationShellStyles",
+          "default": "css` :host { --biz-application-shell-header-height: 64px; --biz-application-shell-footer-height: 48px; --biz-application-shell-sidebar-width: 256px; --biz-application-shell-sidebar-collapsed-width: 64px; --biz-application-shell-bg-color: #f9fafb; --biz-application-shell-header-bg: #ffffff; --biz-application-shell-sidebar-bg: #1f2937; --biz-application-shell-footer-bg: #ffffff; --biz-application-shell-border-color: #e5e7eb; --biz-application-shell-header-z-index: 100; --biz-application-shell-sidebar-z-index: 90; --biz-application-shell-overlay-z-index: 200; display: block; box-sizing: border-box; width: 100%; height: 100%; } *, *::before, *::after { box-sizing: border-box; } .biz-application-shell__skip-link { position: absolute; top: -100px; left: 0; background: #000000; color: #ffffff; padding: 8px 16px; z-index: 1000; text-decoration: none; } .biz-application-shell__skip-link:focus { top: 0; } .biz-application-shell { display: flex; flex-direction: column; min-height: 100vh; background-color: var(--biz-application-shell-bg-color); } .biz-application-shell--sticky-header .biz-application-shell__header { position: sticky; top: 0; z-index: var(--biz-application-shell-header-z-index); } .biz-application-shell__header { height: var(--biz-application-shell-header-height); background-color: var(--biz-application-shell-header-bg); border-bottom: 1px solid var(--biz-application-shell-border-color); } .biz-application-shell__body { display: flex; flex: 1; position: relative; } .biz-application-shell__sidebar { width: var(--biz-application-shell-sidebar-width); background-color: var(--biz-application-shell-sidebar-bg); border-right: 1px solid var(--biz-application-shell-border-color); transition: width 0.3s ease; } .biz-application-shell--fixed-sidebar .biz-application-shell__sidebar { position: sticky; top: var(--biz-application-shell-header-height); height: calc(100vh - var(--biz-application-shell-header-height)); overflow-y: auto; z-index: var(--biz-application-shell-sidebar-z-index); } .biz-application-shell--sidebar-collapsed .biz-application-shell__sidebar { width: var(--biz-application-shell-sidebar-collapsed-width); } .biz-application-shell__content { flex: 1; overflow-y: auto; outline: none; } .biz-application-shell__footer { height: var(--biz-application-shell-footer-height); background-color: var(--biz-application-shell-footer-bg); border-top: 1px solid var(--biz-application-shell-border-color); } .biz-application-shell--variant-full-width .biz-application-shell__sidebar { display: none; } .biz-application-shell--variant-minimal .biz-application-shell__header, .biz-application-shell--variant-minimal .biz-application-shell__footer, .biz-application-shell--variant-minimal .biz-application-shell__sidebar { display: none; } .biz-application-shell__overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: calc(var(--biz-application-shell-overlay-z-index) - 1); } `"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "checkboxGroupStyles",
+          "name": "applicationShellStyles",
           "declaration": {
-            "name": "checkboxGroupStyles",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.css.ts"
+            "name": "applicationShellStyles",
+            "module": "src/components/ApplicationShell/ApplicationShell.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.react.ts",
+      "path": "src/components/ApplicationShell/ApplicationShell.react.ts",
       "declarations": [
         {
           "kind": "variable",
-          "name": "CheckboxGroup"
+          "name": "ApplicationShell"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "CheckboxGroup",
+          "name": "ApplicationShell",
           "declaration": {
-            "name": "CheckboxGroup",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.react.ts"
+            "name": "ApplicationShell",
+            "module": "src/components/ApplicationShell/ApplicationShell.react.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.stories.ts",
+      "path": "src/components/ApplicationShell/ApplicationShell.stories.ts",
       "declarations": [
         {
           "kind": "variable",
           "name": "meta",
           "type": {
-            "text": "Meta<CheckboxGroupArgs>"
+            "text": "Meta<Args>"
           },
-          "default": "{ title: 'Components/Forms/CheckboxGroup', component: 'biz-checkbox-group', tags: ['autodocs'], argTypes: { variant: { control: 'select', options: ['standard', 'card', 'button'], }, size: { control: 'select', options: ['small', 'medium', 'large'], }, orientation: { control: 'radio', options: ['vertical', 'horizontal'], }, value: { control: 'object' }, name: { control: 'text' }, required: { control: 'boolean', description: '체크 해제를 못하게 막는 인터랙션 잠금이 아니라, \"제출 시점에 최소 1개는 선택되어 있어야 한다\"'}, disabled: { control: 'boolean' }, readonly: { control: 'boolean' }, error: { control: 'boolean' }, min: { control: 'number', description: '최소 선택 개수' }, max: { control: 'number' , descript: '최대 선택 개수'}, fullWidth: { control: 'boolean' }, labelSlot: { control: 'text' }, defaultSlot: { control: 'text' }, helperTextSlot: { control: 'text' }, }, args: { value: ['opt1'], name: 'frameworks', orientation: 'vertical', required: false, disabled: false, readonly: false, error: false, min: 0, max: Infinity, variant: 'standard', size: 'medium', fullWidth: false, labelSlot: '좋아하는 프레임워크 선택', defaultSlot: ` <label><input type=\"checkbox\" value=\"opt1\"> Lit</label> <label><input type=\"checkbox\" value=\"opt2\"> React</label> <label><input type=\"checkbox\" value=\"opt3\"> Vue</label> `, helperTextSlot: '하나 이상 선택할 수 있습니다.', onChange: fn(), onClear: fn(), }, render: (args) => html` <biz-checkbox-group .value=${args.value} .name=${args.name} .orientation=${args.orientation} ?required=${args.required} ?disabled=${args.disabled} ?readonly=${args.readonly} ?error=${args.error} .min=${args.min} .max=${args.max} .variant=${args.variant} .size=${args.size} ?full-width=${args.fullWidth} @change=${args.onChange} @clear=${args.onClear} > <span slot=\"label-slot\">${args.labelSlot}</span> ${unsafeHTML(args.defaultSlot)} <span slot=\"helper-text-slot\">${unsafeHTML(args.helperTextSlot)}</span> </biz-checkbox-group> `, }"
+          "default": "{ title: 'Components/Layout/ApplicationShell', component: 'biz-application-shell', tags: ['autodocs'], argTypes: { toggleSidebar: { name: 'toggleSidebar()', description: 'sidebar 상태를 토글해준다', control: false, table: {category: 'method', type: { summary: '() => void'}} }, variant: { control: 'select', options: ['default', 'full-width', 'minimal'], description: '레이아웃 형태 옵션' }, sidebarCollapsed: { control: 'boolean', description: '사이드바 축소 상태 여부', }, stickyHeader: { table: {disable: true}, }, fixedSidebar: { table: {disable: true}, }, 'sidebar-collapsed': { table: { disable: true } }, 'sticky-header': { control: 'boolean', description: '헤더 상단 고정 여부', }, 'fixed-sidebar': { control: 'boolean', description: '사이드바 좌측 고정 및 내부 스크롤 적용 여부', }, headerSlot: { name: \"header-slot\", control: { type: 'text' }, description: '레이아웃 상단 헤더', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, sidebarSlot: { name: \"sidebar-slot\", control: { type: 'text' }, description: '왼쪽 메뉴', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, contentSlot: { name: \"content-slot\", control: { type: 'text' }, description: '컨텐츠 영역', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, footerSlot: { name: \"footer-slot\", control: { type: 'text' }, description: '하단 footer 영역', table: { category: 'slots', type: { summary: 'string | HTMLElement' } }, }, }, args: { variant: 'default', sidebarCollapsed: false, stickyHeader: true, fixedSidebar: true, headerSlot: '<div style=\"padding: 1rem; font-weight: bold;\">Header Content</div>', sidebarSlot: `<div slot=\"sidebar-slot\"> <div style=\"width:100%; height: 100vh;padding: 1rem; color: #fff;\"> <nav aria-label=\"Main Navigation\"> <ul> <li><a href=\"#link1\" style=\"color: #fff;\">Menu Item 1</a></li> <li><a href=\"#link2\" style=\"color: #fff;\">Menu Item 2</a></li> </ul> </nav> </div>` , contentSlot: ` <div slot=\"content-slot\" style=\"padding: 2rem;\"> <h1>Main Content Area</h1> <p>This is the main content of the application shell.</p> </div>`, footerSlot: `<div style=\"padding: 1rem; text-align: center;\">Footer Content</div>`, }, render: (args) => html` <biz-application-shell .variant=${args.variant} ?sidebar-collapsed=${args.sidebarCollapsed} ?sticky-header=${args.stickyHeader} ?fixed-sidebar=${args.fixedSidebar} > ${args.headerSlot ? html`<div slot=\"header-slot\">${unsafeHTML(args.headerSlot)}</div>` : ''} ${args.sidebarSlot ? html`<div slot=\"sidebar-slot\">${unsafeHTML(args.sidebarSlot)}</div>` : ''} ${args.contentSlot ? html`<div slot=\"content-slot\">${unsafeHTML(args.contentSlot)}</div>` : ''} ${args.footerSlot ? html`<div slot=\"footer-slot\">${unsafeHTML(args.footerSlot)}</div>` : ''} </biz-application-shell> ` }"
         },
         {
           "kind": "variable",
@@ -2175,103 +1866,39 @@
           "type": {
             "text": "Story"
           },
-          "default": "{}"
+          "default": "{ args: { stickyHeader: true, sidebarCollapsed: false } }"
         },
         {
           "kind": "variable",
-          "name": "VariantStandard",
+          "name": "FullWidth",
           "type": {
             "text": "Story"
           },
-          "default": "{ args: { variant: 'standard', }, }"
+          "default": "{ args: { variant: 'full-width' } }"
         },
         {
           "kind": "variable",
-          "name": "VariantCard",
+          "name": "Minimal",
           "type": {
             "text": "Story"
           },
-          "default": "{ args: { variant: 'card', }, }"
+          "default": "{ args: { variant: 'minimal' } }"
         },
         {
           "kind": "variable",
-          "name": "VariantButton",
+          "name": "SidebarCollapsed",
           "type": {
             "text": "Story"
           },
-          "default": "{ args: { variant: 'button', }, }"
+          "default": "{ args: { sidebarCollapsed: true } }"
         },
         {
           "kind": "variable",
-          "name": "SizeSmall",
+          "name": "MethodExample",
           "type": {
-            "text": "Story"
+            "text": "StoryObj"
           },
-          "default": "{ args: { size: 'small', }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "SizeMedium",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { size: 'medium', }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "SizeLarge",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { size: 'large', }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "HorizontalLayout",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { orientation: 'horizontal', }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "Disabled",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { disabled: true, }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "Readonly",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { readonly: true, }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "ErrorState",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { error: true, helperTextSlot: '최소 1개 이상의 항목을 선택해야 합니다.', }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "EventChange",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { onChange: fn( e => { alert(JSON.stringify(e.detail)); }), labelSlot: '체크사항이 변경되면 그룹내 체크 목록을 리턴합니다. ', }, play: async ({ canvasElement, args }) => { const canvas = within(canvasElement); const checkboxes = canvasElement.querySelectorAll('input[type=\"checkbox\"]'); if (checkboxes.length > 1) { await userEvent.click(checkboxes[1]); await expect(args.onChange).toHaveBeenCalled(); } }, }"
-        },
-        {
-          "kind": "variable",
-          "name": "EventClear",
-          "type": {
-            "text": "Story"
-          },
-          "default": "{ args: { onClear: fn(), labelSlot: ` biz-checkbox-group의 clear() 함수를 호출하면 전부 체크 해제되면서 change 이벤트가 발생합니다. `, helperTextSlot: ` <pre> const group = document.querySelector('biz-checkbox-group') group.clear() </pre> `, }, play: async ({ canvasElement, args }) => { const group = canvasElement.querySelector('biz-checkbox-group') as any; if (group && typeof group.clear === 'function') { group.clear(); await expect(args.onClear).toHaveBeenCalled(); } }, }"
+          "default": "{ render: () => { const handleToggle = () => { const shell = document.querySelector<BizApplicationShell>('biz-application-shell'); shell?.toggleSidebar(); }; return html` <button @click=${handleToggle} style=\"margin-bottom: 1rem;\"> 외부에서 toggleSidebar() 호출 </button> <biz-application-shell></biz-application-shell> `; }, play: async ({ canvasElement }) => { const canvas = within(canvasElement); const button = canvas.getByRole('button', { name: '외부에서 toggleSidebar() 호출' }); const shell = canvasElement.querySelector<BizApplicationShell>('biz-application-shell')!; // 초기 상태 검증 expect(shell.sidebarCollapsed).toBe(false); // 버튼 클릭 및 Lit 비동기 업데이트 대기 await userEvent.click(button); await shell.updateComplete; // toggleSidebar() 실행 후 상태 검증 expect(shell.sidebarCollapsed).toBe(true); expect(shell.hasAttribute('sidebar-collapsed')).toBe(true); // 재클릭 테스트 await userEvent.click(button); await shell.updateComplete; expect(shell.sidebarCollapsed).toBe(false); expect(shell.hasAttribute('sidebar-collapsed')).toBe(false); }, }"
         }
       ],
       "exports": [
@@ -2280,7 +1907,7 @@
           "name": "default",
           "declaration": {
             "name": "meta",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
           }
         },
         {
@@ -2288,119 +1915,55 @@
           "name": "Default",
           "declaration": {
             "name": "Default",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "VariantStandard",
+          "name": "FullWidth",
           "declaration": {
-            "name": "VariantStandard",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+            "name": "FullWidth",
+            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "VariantCard",
+          "name": "Minimal",
           "declaration": {
-            "name": "VariantCard",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+            "name": "Minimal",
+            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "VariantButton",
+          "name": "SidebarCollapsed",
           "declaration": {
-            "name": "VariantButton",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+            "name": "SidebarCollapsed",
+            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "SizeSmall",
+          "name": "MethodExample",
           "declaration": {
-            "name": "SizeSmall",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "SizeMedium",
-          "declaration": {
-            "name": "SizeMedium",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "SizeLarge",
-          "declaration": {
-            "name": "SizeLarge",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "HorizontalLayout",
-          "declaration": {
-            "name": "HorizontalLayout",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Disabled",
-          "declaration": {
-            "name": "Disabled",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "Readonly",
-          "declaration": {
-            "name": "Readonly",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "ErrorState",
-          "declaration": {
-            "name": "ErrorState",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "EventChange",
-          "declaration": {
-            "name": "EventChange",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
-          }
-        },
-        {
-          "kind": "js",
-          "name": "EventClear",
-          "declaration": {
-            "name": "EventClear",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+            "name": "MethodExample",
+            "module": "src/components/ApplicationShell/ApplicationShell.stories.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.ts",
+      "path": "src/components/ApplicationShell/ApplicationShell.ts",
       "declarations": [
         {
           "kind": "function",
-          "name": "CheckboxGroupTemplate",
+          "name": "ApplicationShellTemplate",
           "parameters": [
             {
               "name": "host",
               "type": {
-                "text": "CheckboxGroupHost"
+                "text": "ApplicationShellHost"
               }
             }
           ]
@@ -2409,366 +1972,138 @@
       "exports": [
         {
           "kind": "js",
-          "name": "CheckboxGroupTemplate",
+          "name": "ApplicationShellTemplate",
           "declaration": {
-            "name": "CheckboxGroupTemplate",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.ts"
+            "name": "ApplicationShellTemplate",
+            "module": "src/components/ApplicationShell/ApplicationShell.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/CheckboxGroup.wc.ts",
+      "path": "src/components/ApplicationShell/ApplicationShell.wc.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "",
-          "name": "BizCheckboxGroup",
+          "name": "BizApplicationShell",
           "members": [
-            {
-              "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "default": "true"
-            },
-            {
-              "kind": "field",
-              "name": "internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "attribute": "orientation"
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "required"
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "disabled"
-            },
-            {
-              "kind": "field",
-              "name": "readonly",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "readonly"
-            },
-            {
-              "kind": "field",
-              "name": "error",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "error"
-            },
-            {
-              "kind": "field",
-              "name": "min",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "attribute": "min"
-            },
-            {
-              "kind": "field",
-              "name": "max",
-              "type": {
-                "text": "number"
-              },
-              "default": "Infinity",
-              "attribute": "max"
-            },
             {
               "kind": "field",
               "name": "variant",
               "type": {
-                "text": "'standard' | 'card' | 'button'"
+                "text": "'default' | 'full-width' | 'minimal'"
               },
-              "default": "'standard'",
+              "default": "'default'",
               "attribute": "variant"
             },
             {
               "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
-              "name": "fullWidth",
+              "name": "sidebarCollapsed",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "attribute": "full-width"
+              "attribute": "sidebar-collapsed",
+              "reflects": true
             },
             {
               "kind": "field",
-              "name": "checkboxes",
+              "name": "stickyHeader",
               "type": {
-                "text": "HTMLInputElement[]"
+                "text": "boolean"
               },
-              "privacy": "private",
-              "readonly": true
+              "default": "true",
+              "attribute": "sticky-header"
             },
             {
-              "kind": "method",
-              "name": "handleSlotChange",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "syncCheckboxes",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "validateForm",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "handleCheckboxChange",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
+              "kind": "field",
+              "name": "fixedSidebar",
+              "type": {
+                "text": "boolean"
               },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ]
+              "default": "true",
+              "attribute": "fixed-sidebar"
             },
             {
               "kind": "method",
-              "name": "clear",
-              "privacy": "public",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            }
-          ],
-          "events": [
-            {
-              "name": "change",
-              "type": {
-                "text": "CustomEvent"
-              }
-            },
-            {
-              "name": "clear",
-              "type": {
-                "text": "CustomEvent"
-              }
+              "name": "toggleSidebar",
+              "privacy": "public"
             }
           ],
           "attributes": [
             {
-              "name": "value",
-              "type": {
-                "text": "string[]"
-              },
-              "default": "[]",
-              "fieldName": "value"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "fieldName": "name"
-            },
-            {
-              "name": "orientation",
-              "type": {
-                "text": "'vertical' | 'horizontal'"
-              },
-              "default": "'vertical'",
-              "fieldName": "orientation"
-            },
-            {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "required"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "disabled"
-            },
-            {
-              "name": "readonly",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "readonly"
-            },
-            {
-              "name": "error",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "error"
-            },
-            {
-              "name": "min",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "fieldName": "min"
-            },
-            {
-              "name": "max",
-              "type": {
-                "text": "number"
-              },
-              "default": "Infinity",
-              "fieldName": "max"
-            },
-            {
               "name": "variant",
               "type": {
-                "text": "'standard' | 'card' | 'button'"
+                "text": "'default' | 'full-width' | 'minimal'"
               },
-              "default": "'standard'",
+              "default": "'default'",
               "fieldName": "variant"
             },
             {
-              "name": "size",
-              "type": {
-                "text": "'small' | 'medium' | 'large'"
-              },
-              "default": "'medium'",
-              "fieldName": "size"
-            },
-            {
-              "name": "full-width",
+              "name": "sidebar-collapsed",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "fieldName": "fullWidth"
+              "fieldName": "sidebarCollapsed"
+            },
+            {
+              "name": "sticky-header",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "fieldName": "stickyHeader"
+            },
+            {
+              "name": "fixed-sidebar",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "fieldName": "fixedSidebar"
             }
           ],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
           },
-          "tagName": "biz-checkbox-group",
+          "tagName": "biz-application-shell",
           "customElement": true
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "BizCheckboxGroup",
+          "name": "BizApplicationShell",
           "declaration": {
-            "name": "BizCheckboxGroup",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
+            "name": "BizApplicationShell",
+            "module": "src/components/ApplicationShell/ApplicationShell.wc.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "biz-checkbox-group",
+          "name": "biz-application-shell",
           "declaration": {
-            "name": "BizCheckboxGroup",
-            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
+            "name": "BizApplicationShell",
+            "module": "src/components/ApplicationShell/ApplicationShell.wc.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/CheckboxGroup/index.ts",
+      "path": "src/components/ApplicationShell/index.ts",
       "declarations": [],
       "exports": [
         {
           "kind": "js",
-          "name": "BizCheckboxGroup",
+          "name": "ApplicationShellWc",
           "declaration": {
-            "name": "BizCheckboxGroup",
-            "module": "./CheckboxGroup.wc"
+            "name": "BizApplicationShell",
+            "module": "./ApplicationShell.wc"
           }
         }
       ]
@@ -3686,56 +3021,56 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ContentContainer/ContentContainer.css.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.css.ts",
       "declarations": [
         {
           "kind": "variable",
-          "name": "contentContainerStyles",
-          "default": "css` :host { /* Layout & Sizing Tokens */ --biz-content-container-max-width-sm: 800px; --biz-content-container-max-width-md: 1200px; --biz-content-container-max-width-lg: 1600px; --biz-content-container-padding-x: 24px; --biz-content-container-padding-y: 24px; /* Colors Tokens */ --biz-content-container-bg-color: #f9fafb; --biz-content-container-card-bg-color: #ffffff; --biz-content-container-border-color: #e5e7eb; --biz-content-container-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); --biz-content-container-text-color: #111827; --biz-content-container-empty-text-color: #6b7280; --biz-content-container-spinner-color: #3b82f6; display: block; width: 100%; box-sizing: border-box; } *, *::before, *::after { box-sizing: inherit; } .biz-content-container { display: flex; flex-direction: column; width: 100%; margin: 0 auto; background-color: var(--biz-content-container-bg-color); color: var(--biz-content-container-text-color); transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; } /* Variants */ .biz-content-container--standard { background-color: var(--biz-content-container-bg-color); } .biz-content-container--fluid { background-color: var(--biz-content-container-bg-color); max-width: 100% !important; } .biz-content-container--card { background-color: var(--biz-content-container-card-bg-color); border: 1px solid var(--biz-content-container-border-color); border-radius: 8px; box-shadow: var(--biz-content-container-shadow); } /* Sizes (Max-Width) */ .biz-content-container--small { max-width: var(--biz-content-container-max-width-sm); } .biz-content-container--medium { max-width: var(--biz-content-container-max-width-md); } .biz-content-container--large { max-width: var(--biz-content-container-max-width-lg); } .biz-content-container--full { max-width: 100%; } /* Layout Control Options */ .biz-content-container--centered { margin-left: auto; margin-right: auto; } .biz-content-container--scrollable { overflow-y: auto; max-height: 100%; } .biz-content-container--padding { padding: var(--biz-content-container-padding-y) var(--biz-content-container-padding-x); } /* States */ .biz-content-container--loading { pointer-events: none; opacity: 0.8; } .biz-content-container__loading-state, .biz-content-container__empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; width: 100%; } .biz-content-container__empty-text { color: var(--biz-content-container-empty-text-color); font-size: 0.875rem; } .biz-content-container__spinner { width: 32px; height: 32px; border: 3px solid var(--biz-content-container-border-color); border-top-color: var(--biz-content-container-spinner-color); border-radius: 50%; animation: biz-content-container-spin 1s linear infinite; } @keyframes biz-content-container-spin { to { transform: rotate(360deg); } } .biz-content-container__sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; } .biz-content-container__body { flex: 1 1 auto; } `"
+          "name": "checkboxGroupStyles",
+          "default": "css` :host { /* Layout & Sizing */ --biz-checkbox-group-gap-sm: 8px; --biz-checkbox-group-gap-md: 12px; --biz-checkbox-group-gap-lg: 16px; --biz-checkbox-group-label-margin-bottom: 8px; /* Colors - Base */ --biz-checkbox-group-label-color: #111827; --biz-checkbox-group-helper-text-color: #6b7280; /* Colors - Error & Disabled */ --biz-checkbox-group-error-color: #dc2626; --biz-checkbox-group-disabled-opacity: 0.5; display: inline-block; box-sizing: border-box; } :host([full-width]) { display: block; width: 100%; } .biz-checkbox-group { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; } .biz-checkbox-group__label { padding: 0; margin-bottom: var(--biz-checkbox-group-label-margin-bottom); color: var(--biz-checkbox-group-label-color); font-weight: 600; } .biz-checkbox-group__container { display: flex; box-sizing: border-box; } /* Orientation */ .biz-checkbox-group--vertical .biz-checkbox-group__container { flex-direction: column; } .biz-checkbox-group--horizontal .biz-checkbox-group__container { flex-direction: row; flex-wrap: wrap; } /* Sizes */ .biz-checkbox-group--small .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-sm); font-size: 0.875rem; } .biz-checkbox-group--medium .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-md); font-size: 1rem; } .biz-checkbox-group--large .biz-checkbox-group__container { gap: var(--biz-checkbox-group-gap-lg); font-size: 1.125rem; } /* Variants */ .biz-checkbox-group--standard { /* Standard Layout Default */ } .biz-checkbox-group--card .biz-checkbox-group__container { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); } .biz-checkbox-group--button .biz-checkbox-group__container { gap: 0; } /* States */ .biz-checkbox-group--disabled { opacity: var(--biz-checkbox-group-disabled-opacity); cursor: not-allowed; } .biz-checkbox-group--readonly { cursor: default; } .biz-checkbox-group--error .biz-checkbox-group__label { color: var(--biz-checkbox-group-error-color); } .biz-checkbox-group__helper-text { margin-top: 4px; color: var(--biz-checkbox-group-helper-text-color); font-size: 0.875rem; } .biz-checkbox-group--error .biz-checkbox-group__helper-text { color: var(--biz-checkbox-group-error-color); } `"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "contentContainerStyles",
+          "name": "checkboxGroupStyles",
           "declaration": {
-            "name": "contentContainerStyles",
-            "module": "src/components/ContentContainer/ContentContainer.css.ts"
+            "name": "checkboxGroupStyles",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ContentContainer/ContentContainer.react.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.react.ts",
       "declarations": [
         {
           "kind": "variable",
-          "name": "ContentContainer"
+          "name": "CheckboxGroup"
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "ContentContainer",
+          "name": "CheckboxGroup",
           "declaration": {
-            "name": "ContentContainer",
-            "module": "src/components/ContentContainer/ContentContainer.react.ts"
+            "name": "CheckboxGroup",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.react.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ContentContainer/ContentContainer.stories.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.stories.ts",
       "declarations": [
         {
           "kind": "variable",
           "name": "meta",
           "type": {
-            "text": "Meta<Args>"
+            "text": "Meta<CheckboxGroupArgs>"
           },
-          "default": "{ title: 'Components/Layout/ContentContainer', component: 'biz-content-container', tags: ['autodocs'], argTypes: { variant: { control: 'select', options: ['standard', 'fluid', 'card'], description: `- \\`Standard\\`: 여백 및 최대 너비가 제한된 표준 업무 화면 스타일 - \\`Fluid\\`: 최대 너비 제한 없이 부모 영역을 전체 사용하는 스타일 - \\`Card\\`: 독립된 배경 영역 및 그림자 효과가 적용된 스타일`, }, size: { control: 'select', options: ['small', 'medium', 'large', 'full'], }, centered: { control: 'boolean' }, scrollable: { control: 'boolean', description: '컨테이너 내부 자체 스크롤 적용 여부' }, padding: { control: 'boolean', description: '내부 패딩 활성화 여부' }, loading: { control: 'boolean' }, empty: { control: 'boolean' }, default: { name: 'default slot', description: '실제 업무 화면 콘텐츠 주입 영역', control: 'text', table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} }, headerSlot: { name: 'header-slot', description: '컨테이너 상단 고정 영역 (PageHeader 등)', control: {type: 'text'}, table: { category: 'slots', type: {summary: 'string | HTMLElement'} } }, footerSlot: { name: 'footer-slot', description: '컨테이너 하단 고정 영역', control: {type: 'text'}, table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} }, loadingSlot: { name: 'loading-slot', description: 'loading == true 일 때', control: {type: 'text'}, table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} }, emptySlot: { name: 'empty-slot', description: 'loading=false && empty=true 일 때', control: {type: 'text'}, table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} } }, args: { variant: 'standard', size: 'medium', centered: false, scrollable: false, padding: true, loading: false, empty: false, default: `<p>기본 콘텐츠 영역입니다. 업무 화면에 필요한 컴포넌트들을 이 위치에 배치합니다.</p>`, headerSlot: `<h2 style=\"margin: 0; font-size: 1.25rem;\">페이지 타이틀</h2>`, footerSlot: `<button type=\"button\">확인</button>`, }, }"
+          "default": "{ title: 'Components/Forms/CheckboxGroup', component: 'biz-checkbox-group', tags: ['autodocs'], argTypes: { variant: { control: 'select', options: ['standard', 'card', 'button'], }, size: { control: 'select', options: ['small', 'medium', 'large'], }, orientation: { control: 'radio', options: ['vertical', 'horizontal'], }, value: { control: 'object' }, name: { control: 'text' }, required: { control: 'boolean', description: '체크 해제를 못하게 막는 인터랙션 잠금이 아니라, \"제출 시점에 최소 1개는 선택되어 있어야 한다\"'}, disabled: { control: 'boolean' }, readonly: { control: 'boolean' }, error: { control: 'boolean' }, min: { control: 'number', description: '최소 선택 개수' }, max: { control: 'number' , descript: '최대 선택 개수'}, fullWidth: { control: 'boolean' }, labelSlot: { control: 'text' }, defaultSlot: { control: 'text' }, helperTextSlot: { control: 'text' }, }, args: { value: ['opt1'], name: 'frameworks', orientation: 'vertical', required: false, disabled: false, readonly: false, error: false, min: 0, max: Infinity, variant: 'standard', size: 'medium', fullWidth: false, labelSlot: '좋아하는 프레임워크 선택', defaultSlot: ` <label><input type=\"checkbox\" value=\"opt1\"> Lit</label> <label><input type=\"checkbox\" value=\"opt2\"> React</label> <label><input type=\"checkbox\" value=\"opt3\"> Vue</label> `, helperTextSlot: '하나 이상 선택할 수 있습니다.', onChange: fn(), onClear: fn(), }, render: (args) => html` <biz-checkbox-group .value=${args.value} .name=${args.name} .orientation=${args.orientation} ?required=${args.required} ?disabled=${args.disabled} ?readonly=${args.readonly} ?error=${args.error} .min=${args.min} .max=${args.max} .variant=${args.variant} .size=${args.size} ?full-width=${args.fullWidth} @change=${args.onChange} @clear=${args.onClear} > <span slot=\"label-slot\">${args.labelSlot}</span> ${unsafeHTML(args.defaultSlot)} <span slot=\"helper-text-slot\">${unsafeHTML(args.helperTextSlot)}</span> </biz-checkbox-group> `, }"
         },
         {
           "kind": "variable",
@@ -3743,47 +3078,103 @@
           "type": {
             "text": "Story"
           },
-          "default": "{ render: (args) => html` <biz-content-container .variant=\"${args.variant}\" .size=\"${args.size}\" ?centered=\"${args.centered}\" ?scrollable=\"${args.scrollable}\" ?padding=\"${args.padding}\" ?loading=\"${args.loading}\" ?empty=\"${args.empty}\" > <div slot=\"header-slot\" style=\"padding: 16px; border-bottom: 1px solid #e5e7eb;\"> ${unsafeHTML(args.headerSlot)} </div> <div style=\"padding: 16px;\"> ${unsafeHTML(args.default)} </div> <div slot=\"footer-slot\" style=\"padding: 16px; border-top: 1px solid #e5e7eb; text-align: right;\"> ${unsafeHTML(args.footerSlot)} </div> </biz-content-container> `, }"
+          "default": "{}"
         },
         {
           "kind": "variable",
-          "name": "Variants",
+          "name": "VariantStandard",
           "type": {
             "text": "Story"
           },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <div> <h3>Standard Variant</h3> <biz-content-container variant=\"standard\"> <p>Standard 형태의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Fluid Variant</h3> <biz-content-container variant=\"fluid\"> <p>Fluid 형태의 컨테이너입니다. 최대 너비 제한 없이 가득 차게 설정됩니다.</p> </biz-content-container> </div> <div> <h3>Card Variant</h3> <biz-content-container variant=\"card\"> <p>Card 형태의 컨테이너입니다. 배경색, 테두리, 그림자 효과가 적용됩니다.</p> </biz-content-container> </div> </div> `, }"
+          "default": "{ args: { variant: 'standard', }, }"
         },
         {
           "kind": "variable",
-          "name": "Sizes",
+          "name": "VariantCard",
           "type": {
             "text": "Story"
           },
-          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <div> <h3>Small Size (800px)</h3> <biz-content-container variant=\"card\" size=\"small\"> <p>Small 크기의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Medium Size (1200px)</h3> <biz-content-container variant=\"card\" size=\"medium\"> <p>Medium 크기의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Large Size (1600px)</h3> <biz-content-container variant=\"card\" size=\"large\"> <p>Large 크기의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Full Size (100%)</h3> <biz-content-container variant=\"card\" size=\"full\"> <p>Full 크기의 컨테이너입니다.</p> </biz-content-container> </div> </div> `, }"
+          "default": "{ args: { variant: 'card', }, }"
         },
         {
           "kind": "variable",
-          "name": "LoadingState",
+          "name": "VariantButton",
           "type": {
             "text": "Story"
           },
-          "default": "{ args: { loading: true, }, render: (args) => html` <biz-content-container ?loading=\"${args.loading}\" variant=\"card\"> <p>로딩 중 상태에서는 본문 대신 로딩 스피너와 스크린 리더용 안내 텍스트가 표시됩니다.</p> </biz-content-container> `, }"
+          "default": "{ args: { variant: 'button', }, }"
         },
         {
           "kind": "variable",
-          "name": "EmptyState",
+          "name": "SizeSmall",
           "type": {
             "text": "Story"
           },
-          "default": "{ args: { empty: true, }, render: (args) => html` <biz-content-container ?empty=\"${args.empty}\" variant=\"card\"> <p>콘텐츠가 없는 상태 시 기본 안내 문구가 표시됩니다.</p> </biz-content-container> `, }"
+          "default": "{ args: { size: 'small', }, }"
         },
         {
           "kind": "variable",
-          "name": "AccessibilityAndInteractive",
+          "name": "SizeMedium",
           "type": {
             "text": "Story"
           },
-          "default": "{ args: { scrollable: true, variant: 'card', }, render: (args) => html` <biz-content-container .variant=\"${args.variant}\" ?scrollable=\"${args.scrollable}\" style=\"height: 200px;\" > <div slot=\"header-slot\" style=\"padding: 12px; background: #f3f4f6;\"> <h3 style=\"margin: 0;\">스크롤 및 접근성 테스트</h3> </div> <div style=\"height: 400px; padding: 16px;\"> <p>Tab 키를 눌러 컨테이너에 포커스한 후 PageUp/PageDown 및 방향키로 스크롤을 제어할 수 있습니다.</p> <p>자체 스크롤 활성화 시 tabindex=\"0\"이 부여되며 role=\"main\" 레이아웃을 준수합니다.</p> </div> </biz-content-container> `, }"
+          "default": "{ args: { size: 'medium', }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "SizeLarge",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { size: 'large', }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "HorizontalLayout",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { orientation: 'horizontal', }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Disabled",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { disabled: true, }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Readonly",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { readonly: true, }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "ErrorState",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { error: true, helperTextSlot: '최소 1개 이상의 항목을 선택해야 합니다.', }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "EventChange",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { onChange: fn( e => { alert(JSON.stringify(e.detail)); }), labelSlot: '체크사항이 변경되면 그룹내 체크 목록을 리턴합니다. ', }, play: async ({ canvasElement, args }) => { const canvas = within(canvasElement); const checkboxes = canvasElement.querySelectorAll('input[type=\"checkbox\"]'); if (checkboxes.length > 1) { await userEvent.click(checkboxes[1]); await expect(args.onChange).toHaveBeenCalled(); } }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "EventClear",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { onClear: fn(), labelSlot: ` biz-checkbox-group의 clear() 함수를 호출하면 전부 체크 해제되면서 change 이벤트가 발생합니다. `, helperTextSlot: ` <pre> const group = document.querySelector('biz-checkbox-group') group.clear() </pre> `, }, play: async ({ canvasElement, args }) => { const group = canvasElement.querySelector('biz-checkbox-group') as any; if (group && typeof group.clear === 'function') { group.clear(); await expect(args.onClear).toHaveBeenCalled(); } }, }"
         }
       ],
       "exports": [
@@ -3792,7 +3183,7 @@
           "name": "default",
           "declaration": {
             "name": "meta",
-            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
@@ -3800,63 +3191,119 @@
           "name": "Default",
           "declaration": {
             "name": "Default",
-            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "Variants",
+          "name": "VariantStandard",
           "declaration": {
-            "name": "Variants",
-            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+            "name": "VariantStandard",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "Sizes",
+          "name": "VariantCard",
           "declaration": {
-            "name": "Sizes",
-            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+            "name": "VariantCard",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "LoadingState",
+          "name": "VariantButton",
           "declaration": {
-            "name": "LoadingState",
-            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+            "name": "VariantButton",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "EmptyState",
+          "name": "SizeSmall",
           "declaration": {
-            "name": "EmptyState",
-            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+            "name": "SizeSmall",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         },
         {
           "kind": "js",
-          "name": "AccessibilityAndInteractive",
+          "name": "SizeMedium",
           "declaration": {
-            "name": "AccessibilityAndInteractive",
-            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+            "name": "SizeMedium",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "SizeLarge",
+          "declaration": {
+            "name": "SizeLarge",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "HorizontalLayout",
+          "declaration": {
+            "name": "HorizontalLayout",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Disabled",
+          "declaration": {
+            "name": "Disabled",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Readonly",
+          "declaration": {
+            "name": "Readonly",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ErrorState",
+          "declaration": {
+            "name": "ErrorState",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "EventChange",
+          "declaration": {
+            "name": "EventChange",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "EventClear",
+          "declaration": {
+            "name": "EventClear",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.stories.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ContentContainer/ContentContainer.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.ts",
       "declarations": [
         {
           "kind": "function",
-          "name": "ContentContainerTemplate",
+          "name": "CheckboxGroupTemplate",
           "parameters": [
             {
               "name": "host",
               "type": {
-                "text": "ContentContainerHost"
+                "text": "CheckboxGroupHost"
               }
             }
           ]
@@ -3865,28 +3312,126 @@
       "exports": [
         {
           "kind": "js",
-          "name": "ContentContainerTemplate",
+          "name": "CheckboxGroupTemplate",
           "declaration": {
-            "name": "ContentContainerTemplate",
-            "module": "src/components/ContentContainer/ContentContainer.ts"
+            "name": "CheckboxGroupTemplate",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ContentContainer/ContentContainer.wc.ts",
+      "path": "src/components/CheckboxGroup/CheckboxGroup.wc.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "",
-          "name": "ContentContainer",
+          "name": "BizCheckboxGroup",
           "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "attribute": "orientation"
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "required"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "readonly"
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "error"
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "attribute": "min"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "Infinity",
+              "attribute": "max"
+            },
             {
               "kind": "field",
               "name": "variant",
               "type": {
-                "text": "'standard' | 'fluid' | 'card'"
+                "text": "'standard' | 'card' | 'button'"
               },
               "default": "'standard'",
               "attribute": "variant"
@@ -3895,72 +3440,179 @@
               "kind": "field",
               "name": "size",
               "type": {
-                "text": "'small' | 'medium' | 'large' | 'full'"
+                "text": "'small' | 'medium' | 'large'"
               },
               "default": "'medium'",
               "attribute": "size"
             },
             {
               "kind": "field",
-              "name": "centered",
+              "name": "fullWidth",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "attribute": "centered"
+              "attribute": "full-width"
             },
             {
               "kind": "field",
-              "name": "scrollable",
+              "name": "checkboxes",
               "type": {
-                "text": "boolean"
+                "text": "HTMLInputElement[]"
               },
-              "default": "false",
-              "attribute": "scrollable"
+              "privacy": "private",
+              "readonly": true
             },
             {
-              "kind": "field",
-              "name": "padding",
+              "kind": "method",
+              "name": "handleSlotChange",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncCheckboxes",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "validateForm",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "handleCheckboxChange",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "clear",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
               "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "attribute": "padding"
+                "text": "CustomEvent"
+              }
             },
             {
-              "kind": "field",
-              "name": "loading",
+              "name": "clear",
               "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "loading"
-            },
-            {
-              "kind": "field",
-              "name": "empty",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "empty"
-            },
-            {
-              "kind": "field",
-              "name": "handleScroll",
-              "privacy": "public"
-            },
-            {
-              "kind": "field",
-              "name": "handleKeyDown",
-              "privacy": "private"
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
             {
+              "name": "value",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "fieldName": "value"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "name"
+            },
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "fieldName": "orientation"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "required"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "readonly"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "error"
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "fieldName": "min"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "Infinity",
+              "fieldName": "max"
+            },
+            {
               "name": "variant",
               "type": {
-                "text": "'standard' | 'fluid' | 'card'"
+                "text": "'standard' | 'card' | 'button'"
               },
               "default": "'standard'",
               "fieldName": "variant"
@@ -3968,90 +3620,58 @@
             {
               "name": "size",
               "type": {
-                "text": "'small' | 'medium' | 'large' | 'full'"
+                "text": "'small' | 'medium' | 'large'"
               },
               "default": "'medium'",
               "fieldName": "size"
             },
             {
-              "name": "centered",
+              "name": "full-width",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "fieldName": "centered"
-            },
-            {
-              "name": "scrollable",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "scrollable"
-            },
-            {
-              "name": "padding",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "fieldName": "padding"
-            },
-            {
-              "name": "loading",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "loading"
-            },
-            {
-              "name": "empty",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "fieldName": "empty"
+              "fieldName": "fullWidth"
             }
           ],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
           },
-          "tagName": "biz-content-container",
+          "tagName": "biz-checkbox-group",
           "customElement": true
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "ContentContainer",
+          "name": "BizCheckboxGroup",
           "declaration": {
-            "name": "ContentContainer",
-            "module": "src/components/ContentContainer/ContentContainer.wc.ts"
+            "name": "BizCheckboxGroup",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "biz-content-container",
+          "name": "biz-checkbox-group",
           "declaration": {
-            "name": "ContentContainer",
-            "module": "src/components/ContentContainer/ContentContainer.wc.ts"
+            "name": "BizCheckboxGroup",
+            "module": "src/components/CheckboxGroup/CheckboxGroup.wc.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/ContentContainer/index.ts",
+      "path": "src/components/CheckboxGroup/index.ts",
       "declarations": [],
       "exports": [
         {
           "kind": "js",
-          "name": "*",
+          "name": "BizCheckboxGroup",
           "declaration": {
-            "name": "*",
-            "module": "src/components/ContentContainer/ContentContainer.wc"
+            "name": "BizCheckboxGroup",
+            "module": "./CheckboxGroup.wc"
           }
         }
       ]
@@ -4836,6 +4456,378 @@
           "declaration": {
             "name": "BizChip",
             "module": "./Chip.wc.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ContentContainer/ContentContainer.css.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "contentContainerStyles",
+          "default": "css` :host { /* Layout & Sizing Tokens */ --biz-content-container-max-width-sm: 800px; --biz-content-container-max-width-md: 1200px; --biz-content-container-max-width-lg: 1600px; --biz-content-container-padding-x: 24px; --biz-content-container-padding-y: 24px; /* Colors Tokens */ --biz-content-container-bg-color: #f9fafb; --biz-content-container-card-bg-color: #ffffff; --biz-content-container-border-color: #e5e7eb; --biz-content-container-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); --biz-content-container-text-color: #111827; --biz-content-container-empty-text-color: #6b7280; --biz-content-container-spinner-color: #3b82f6; display: block; width: 100%; box-sizing: border-box; } *, *::before, *::after { box-sizing: inherit; } .biz-content-container { display: flex; flex-direction: column; width: 100%; margin: 0 auto; background-color: var(--biz-content-container-bg-color); color: var(--biz-content-container-text-color); transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; } /* Variants */ .biz-content-container--standard { background-color: var(--biz-content-container-bg-color); } .biz-content-container--fluid { background-color: var(--biz-content-container-bg-color); max-width: 100% !important; } .biz-content-container--card { background-color: var(--biz-content-container-card-bg-color); border: 1px solid var(--biz-content-container-border-color); border-radius: 8px; box-shadow: var(--biz-content-container-shadow); } /* Sizes (Max-Width) */ .biz-content-container--small { max-width: var(--biz-content-container-max-width-sm); } .biz-content-container--medium { max-width: var(--biz-content-container-max-width-md); } .biz-content-container--large { max-width: var(--biz-content-container-max-width-lg); } .biz-content-container--full { max-width: 100%; } /* Layout Control Options */ .biz-content-container--centered { margin-left: auto; margin-right: auto; } .biz-content-container--scrollable { overflow-y: auto; max-height: 100%; } .biz-content-container--padding { padding: var(--biz-content-container-padding-y) var(--biz-content-container-padding-x); } /* States */ .biz-content-container--loading { pointer-events: none; opacity: 0.8; } .biz-content-container__loading-state, .biz-content-container__empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; width: 100%; } .biz-content-container__empty-text { color: var(--biz-content-container-empty-text-color); font-size: 0.875rem; } .biz-content-container__spinner { width: 32px; height: 32px; border: 3px solid var(--biz-content-container-border-color); border-top-color: var(--biz-content-container-spinner-color); border-radius: 50%; animation: biz-content-container-spin 1s linear infinite; } @keyframes biz-content-container-spin { to { transform: rotate(360deg); } } .biz-content-container__sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; } .biz-content-container__body { flex: 1 1 auto; } `"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "contentContainerStyles",
+          "declaration": {
+            "name": "contentContainerStyles",
+            "module": "src/components/ContentContainer/ContentContainer.css.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ContentContainer/ContentContainer.react.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "ContentContainer"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ContentContainer",
+          "declaration": {
+            "name": "ContentContainer",
+            "module": "src/components/ContentContainer/ContentContainer.react.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ContentContainer/ContentContainer.stories.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "meta",
+          "type": {
+            "text": "Meta<Args>"
+          },
+          "default": "{ title: 'Components/Layout/ContentContainer', component: 'biz-content-container', tags: ['autodocs'], argTypes: { variant: { control: 'select', options: ['standard', 'fluid', 'card'], description: `- \\`Standard\\`: 여백 및 최대 너비가 제한된 표준 업무 화면 스타일 - \\`Fluid\\`: 최대 너비 제한 없이 부모 영역을 전체 사용하는 스타일 - \\`Card\\`: 독립된 배경 영역 및 그림자 효과가 적용된 스타일`, }, size: { control: 'select', options: ['small', 'medium', 'large', 'full'], }, centered: { control: 'boolean' }, scrollable: { control: 'boolean', description: '컨테이너 내부 자체 스크롤 적용 여부' }, padding: { control: 'boolean', description: '내부 패딩 활성화 여부' }, loading: { control: 'boolean' }, empty: { control: 'boolean' }, default: { name: 'default slot', description: '실제 업무 화면 콘텐츠 주입 영역', control: 'text', table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} }, headerSlot: { name: 'header-slot', description: '컨테이너 상단 고정 영역 (PageHeader 등)', control: {type: 'text'}, table: { category: 'slots', type: {summary: 'string | HTMLElement'} } }, footerSlot: { name: 'footer-slot', description: '컨테이너 하단 고정 영역', control: {type: 'text'}, table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} }, loadingSlot: { name: 'loading-slot', description: 'loading == true 일 때', control: {type: 'text'}, table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} }, emptySlot: { name: 'empty-slot', description: 'loading=false && empty=true 일 때', control: {type: 'text'}, table: { category: 'slots' , type: {summary: 'string | HTMLElement'}} } }, args: { variant: 'standard', size: 'medium', centered: false, scrollable: false, padding: true, loading: false, empty: false, default: `<p>기본 콘텐츠 영역입니다. 업무 화면에 필요한 컴포넌트들을 이 위치에 배치합니다.</p>`, headerSlot: `<h2 style=\"margin: 0; font-size: 1.25rem;\">페이지 타이틀</h2>`, footerSlot: `<button type=\"button\">확인</button>`, }, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Default",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: (args) => html` <biz-content-container .variant=\"${args.variant}\" .size=\"${args.size}\" ?centered=\"${args.centered}\" ?scrollable=\"${args.scrollable}\" ?padding=\"${args.padding}\" ?loading=\"${args.loading}\" ?empty=\"${args.empty}\" > <div slot=\"header-slot\" style=\"padding: 16px; border-bottom: 1px solid #e5e7eb;\"> ${unsafeHTML(args.headerSlot)} </div> <div style=\"padding: 16px;\"> ${unsafeHTML(args.default)} </div> <div slot=\"footer-slot\" style=\"padding: 16px; border-top: 1px solid #e5e7eb; text-align: right;\"> ${unsafeHTML(args.footerSlot)} </div> </biz-content-container> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Variants",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <div> <h3>Standard Variant</h3> <biz-content-container variant=\"standard\"> <p>Standard 형태의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Fluid Variant</h3> <biz-content-container variant=\"fluid\"> <p>Fluid 형태의 컨테이너입니다. 최대 너비 제한 없이 가득 차게 설정됩니다.</p> </biz-content-container> </div> <div> <h3>Card Variant</h3> <biz-content-container variant=\"card\"> <p>Card 형태의 컨테이너입니다. 배경색, 테두리, 그림자 효과가 적용됩니다.</p> </biz-content-container> </div> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "Sizes",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ render: () => html` <div style=\"display: flex; flex-direction: column; gap: 24px;\"> <div> <h3>Small Size (800px)</h3> <biz-content-container variant=\"card\" size=\"small\"> <p>Small 크기의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Medium Size (1200px)</h3> <biz-content-container variant=\"card\" size=\"medium\"> <p>Medium 크기의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Large Size (1600px)</h3> <biz-content-container variant=\"card\" size=\"large\"> <p>Large 크기의 컨테이너입니다.</p> </biz-content-container> </div> <div> <h3>Full Size (100%)</h3> <biz-content-container variant=\"card\" size=\"full\"> <p>Full 크기의 컨테이너입니다.</p> </biz-content-container> </div> </div> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "LoadingState",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { loading: true, }, render: (args) => html` <biz-content-container ?loading=\"${args.loading}\" variant=\"card\"> <p>로딩 중 상태에서는 본문 대신 로딩 스피너와 스크린 리더용 안내 텍스트가 표시됩니다.</p> </biz-content-container> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "EmptyState",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { empty: true, }, render: (args) => html` <biz-content-container ?empty=\"${args.empty}\" variant=\"card\"> <p>콘텐츠가 없는 상태 시 기본 안내 문구가 표시됩니다.</p> </biz-content-container> `, }"
+        },
+        {
+          "kind": "variable",
+          "name": "AccessibilityAndInteractive",
+          "type": {
+            "text": "Story"
+          },
+          "default": "{ args: { scrollable: true, variant: 'card', }, render: (args) => html` <biz-content-container .variant=\"${args.variant}\" ?scrollable=\"${args.scrollable}\" style=\"height: 200px;\" > <div slot=\"header-slot\" style=\"padding: 12px; background: #f3f4f6;\"> <h3 style=\"margin: 0;\">스크롤 및 접근성 테스트</h3> </div> <div style=\"height: 400px; padding: 16px;\"> <p>Tab 키를 눌러 컨테이너에 포커스한 후 PageUp/PageDown 및 방향키로 스크롤을 제어할 수 있습니다.</p> <p>자체 스크롤 활성화 시 tabindex=\"0\"이 부여되며 role=\"main\" 레이아웃을 준수합니다.</p> </div> </biz-content-container> `, }"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "meta",
+            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Default",
+          "declaration": {
+            "name": "Default",
+            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Variants",
+          "declaration": {
+            "name": "Variants",
+            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Sizes",
+          "declaration": {
+            "name": "Sizes",
+            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "LoadingState",
+          "declaration": {
+            "name": "LoadingState",
+            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "EmptyState",
+          "declaration": {
+            "name": "EmptyState",
+            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "AccessibilityAndInteractive",
+          "declaration": {
+            "name": "AccessibilityAndInteractive",
+            "module": "src/components/ContentContainer/ContentContainer.stories.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ContentContainer/ContentContainer.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "ContentContainerTemplate",
+          "parameters": [
+            {
+              "name": "host",
+              "type": {
+                "text": "ContentContainerHost"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ContentContainerTemplate",
+          "declaration": {
+            "name": "ContentContainerTemplate",
+            "module": "src/components/ContentContainer/ContentContainer.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ContentContainer/ContentContainer.wc.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "ContentContainer",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'standard' | 'fluid' | 'card'"
+              },
+              "default": "'standard'",
+              "attribute": "variant"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large' | 'full'"
+              },
+              "default": "'medium'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "centered",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "centered"
+            },
+            {
+              "kind": "field",
+              "name": "scrollable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "scrollable"
+            },
+            {
+              "kind": "field",
+              "name": "padding",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "attribute": "padding"
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "loading"
+            },
+            {
+              "kind": "field",
+              "name": "empty",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "empty"
+            },
+            {
+              "kind": "field",
+              "name": "handleScroll",
+              "privacy": "public"
+            },
+            {
+              "kind": "field",
+              "name": "handleKeyDown",
+              "privacy": "private"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'standard' | 'fluid' | 'card'"
+              },
+              "default": "'standard'",
+              "fieldName": "variant"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'small' | 'medium' | 'large' | 'full'"
+              },
+              "default": "'medium'",
+              "fieldName": "size"
+            },
+            {
+              "name": "centered",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "centered"
+            },
+            {
+              "name": "scrollable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "scrollable"
+            },
+            {
+              "name": "padding",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "fieldName": "padding"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "loading"
+            },
+            {
+              "name": "empty",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "empty"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "biz-content-container",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ContentContainer",
+          "declaration": {
+            "name": "ContentContainer",
+            "module": "src/components/ContentContainer/ContentContainer.wc.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "biz-content-container",
+          "declaration": {
+            "name": "ContentContainer",
+            "module": "src/components/ContentContainer/ContentContainer.wc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/ContentContainer/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/components/ContentContainer/ContentContainer.wc"
           }
         }
       ]
