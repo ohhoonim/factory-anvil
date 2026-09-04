@@ -32,3 +32,4 @@ export * from './components/InlineEditWrapper/InlineEditWrapper.react';
 export * from './components/ToggleButton/ToggleButton.react';
 export * from './components/ActionButton/ActionButton.react';
 export * from './components/ToastContainer/ToastContainer.react';
+export * from './components/DataGrid/DataGrid.react';
