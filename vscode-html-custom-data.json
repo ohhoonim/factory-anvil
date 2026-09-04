@@ -2,6 +2,24 @@
   "version": 1.1,
   "tags": [
     {
+      "name": "biz-application-shell",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [
+            { "name": "default" },
+            { "name": "full-width" },
+            { "name": "minimal" }
+          ]
+        },
+        { "name": "sidebar-collapsed", "values": [] },
+        { "name": "sticky-header", "values": [] },
+        { "name": "fixed-sidebar", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-action-button",
       "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **action-click** - undefined\n- **item-select** - undefined\n- **dropdown-toggle** - undefined",
       "attributes": [
@@ -76,24 +94,6 @@
       "references": []
     },
     {
-      "name": "biz-application-shell",
-      "description": "\n\n\n---\n\n\n",
-      "attributes": [
-        {
-          "name": "variant",
-          "values": [
-            { "name": "default" },
-            { "name": "full-width" },
-            { "name": "minimal" }
-          ]
-        },
-        { "name": "sidebar-collapsed", "values": [] },
-        { "name": "sticky-header", "values": [] },
-        { "name": "fixed-sidebar", "values": [] }
-      ],
-      "references": []
-    },
-    {
       "name": "biz-breadcrumb",
       "description": "\n\n\n---\n\n\n",
       "attributes": [
@@ -121,35 +121,6 @@
         { "name": "disabled", "values": [] },
         { "name": "full-width", "values": [] },
         { "name": "wrap", "values": [] }
-      ],
-      "references": []
-    },
-    {
-      "name": "biz-card-container",
-      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **card-click** - undefined",
-      "attributes": [
-        {
-          "name": "variant",
-          "values": [
-            { "name": "outlined" },
-            { "name": "filled" },
-            { "name": "elevated" }
-          ]
-        },
-        {
-          "name": "size",
-          "values": [
-            { "name": "small" },
-            { "name": "medium" },
-            { "name": "large" }
-          ]
-        },
-        { "name": "full-width", "values": [] },
-        { "name": "bordered-divider", "values": [] },
-        { "name": "hoverable", "values": [] },
-        { "name": "disabled", "values": [] },
-        { "name": "loading", "values": [] },
-        { "name": "aria-labelledby", "values": [] }
       ],
       "references": []
     },
@@ -223,6 +194,35 @@
       "references": []
     },
     {
+      "name": "biz-card-container",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **card-click** - undefined",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "elevated" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "full-width", "values": [] },
+        { "name": "bordered-divider", "values": [] },
+        { "name": "hoverable", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "loading", "values": [] },
+        { "name": "aria-labelledby", "values": [] }
+      ],
+      "references": []
+    },
+    {
       "name": "biz-content-container",
       "description": "\n\n\n---\n\n\n",
       "attributes": [
@@ -248,6 +248,42 @@
         { "name": "padding", "values": [] },
         { "name": "loading", "values": [] },
         { "name": "empty", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "biz-data-grid",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [
+            { "name": "outlined" },
+            { "name": "filled" },
+            { "name": "standard" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [
+            { "name": "small" },
+            { "name": "medium" },
+            { "name": "large" }
+          ]
+        },
+        { "name": "full-width", "values": [] },
+        { "name": "disabled", "values": [] },
+        { "name": "readonly", "values": [] },
+        { "name": "error", "values": [] },
+        { "name": "loading", "values": [] },
+        {
+          "name": "rawData",
+          "values": [{ "name": "Array<Record<string" }, { "name": "unknown>>" }]
+        },
+        { "name": "columns", "values": [{ "name": "Array<ColumnDef>" }] },
+        { "name": "rowHeight", "values": [] },
+        { "name": "vBuffer", "values": [] },
+        { "name": "hBuffer", "values": [] }
       ],
       "references": []
     },
@@ -1245,6 +1281,261 @@
       "name": "shop-cart",
       "description": "\n\n\n---\n\n\n",
       "attributes": [{ "name": "items", "values": [{ "name": "CartItem[]" }] }],
+      "references": []
+    },
+    {
+      "name": "grid-column-resizer",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "columnKey", "values": [] },
+        { "name": "currentWidth", "values": [] },
+        { "name": "minWidth", "values": [] },
+        { "name": "maxWidth", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-cell",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "columnKey", "values": [] },
+        { "name": "rowIndex", "values": [] },
+        { "name": "displayValue", "values": [] },
+        { "name": "dataType", "values": [{ "name": "EditorDataType" }] },
+        { "name": "editable", "values": [] },
+        { "name": "isDirty", "values": [] },
+        { "name": "isSelected", "values": [] },
+        {
+          "name": "align",
+          "values": [
+            { "name": "left" },
+            { "name": "center" },
+            { "name": "right" }
+          ]
+        },
+        { "name": "width", "values": [] },
+        { "name": "valiedateRules", "values": [{ "name": "ValidationRule" }] },
+        { "name": "options", "values": [{ "name": "SelectOption[]" }] }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-data-grid",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        {
+          "name": "data",
+          "values": [{ "name": "Array<Record<string" }, { "name": "any>>" }]
+        },
+        { "name": "columns", "values": [{ "name": "Array<ColumnDef>" }] },
+        { "name": "rowHeight", "values": [] },
+        { "name": "pageSize", "values": [] },
+        { "name": "currentPage", "values": [] },
+        { "name": "storageKey", "values": [] },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "default" },
+            { "name": "bordered" },
+            { "name": "borderless" }
+          ]
+        },
+        {
+          "name": "size",
+          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-editor",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **validation-error** - undefined\n- **cell-commit** - undefined\n- **cell-cancel** - undefined",
+      "attributes": [
+        { "name": "columnKey", "values": [] },
+        { "name": "rowIndex", "values": [] },
+        { "name": "type", "values": [] },
+        { "name": "options", "values": [{ "name": "SelectOption[]" }] },
+        { "name": "validationRules", "values": [{ "name": "ValidationRule" }] }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-footer",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **footer-cell-click** - undefined\n- **summary-bar-click** - undefined",
+      "attributes": [
+        {
+          "name": "variant",
+          "values": [{ "name": "default" }, { "name": "compact" }]
+        },
+        {
+          "name": "size",
+          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
+        },
+        { "name": "columns", "values": [{ "name": "ColumnDef[]" }] },
+        {
+          "name": "summaryData",
+          "values": [{ "name": "Record<string" }, { "name": "any>" }]
+        },
+        { "name": "totalCount", "values": [] },
+        { "name": "filteredCount", "values": [] },
+        { "name": "selectedCount", "values": [] },
+        { "name": "scrollLeft", "values": [] },
+        { "name": "totalWidth", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-footer-cell",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "columnKey", "values": [] },
+        { "name": "aggregateFunc", "values": [] },
+        {
+          "name": "align",
+          "values": [
+            { "name": "left" },
+            { "name": "center" },
+            { "name": "right" }
+          ]
+        },
+        {
+          "name": "variant",
+          "values": [
+            { "name": "default" },
+            { "name": "positive" },
+            { "name": "negative" }
+          ]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-header-cell",
+      "description": "\n\n\n---\n\n\n\n\n### **Events:**\n - **header-cell-click** - undefined\n- **filter-trigger-click** - undefined\n- **column-drag-start** - undefined\n- **column-drag-over** - undefined",
+      "attributes": [
+        { "name": "columnKey", "values": [] },
+        { "name": "label", "values": [] },
+        { "name": "sortable", "values": [] },
+        {
+          "name": "sortDirection",
+          "values": [{ "name": "ASC" }, { "name": "DESC" }]
+        },
+        { "name": "filterable", "values": [] },
+        { "name": "isFiltered", "values": [] },
+        { "name": "reorderable", "values": [] },
+        {
+          "name": "size",
+          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
+        },
+        {
+          "name": "align",
+          "values": [
+            { "name": "left" },
+            { "name": "center" },
+            { "name": "right" }
+          ]
+        },
+        { "name": "width", "values": [] }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-info",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "totalCount", "values": [] },
+        { "name": "filteredCount", "values": [] },
+        { "name": "renderedRange", "values": [{ "name": "RenderedRange" }] },
+        { "name": "selectedRowCount", "values": [] },
+        { "name": "selectedCellCount", "values": [] },
+        { "name": "dirtyRowCount", "values": [] },
+        { "name": "dirtyCellCount", "values": [] },
+        { "name": "sortState", "values": [{ "name": "SortItem[]" }] },
+        {
+          "name": "variant",
+          "values": [{ "name": "default" }, { "name": "compact" }]
+        },
+        { "name": "size", "values": [{ "name": "sm" }, { "name": "md" }] },
+        {
+          "name": "position",
+          "values": [{ "name": "top" }, { "name": "bottom" }]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-pagination",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "currentPage", "values": [] },
+        { "name": "pageSize", "values": [] },
+        { "name": "totalCount", "values": [] },
+        { "name": "pageSizeOptions", "values": [{ "name": "number[]" }] },
+        { "name": "maxPageButtons", "values": [] },
+        { "name": "disabled", "values": [] },
+        {
+          "name": "variant",
+          "values": [{ "name": "default" }, { "name": "compact" }]
+        },
+        { "name": "size", "values": [{ "name": "sm" }, { "name": "md" }] },
+        {
+          "name": "align",
+          "values": [
+            { "name": "left" },
+            { "name": "center" },
+            { "name": "right" },
+            { "name": "space-between" }
+          ]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-header",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "columns", "values": [{ "name": "ColumnDef[]" }] },
+        { "name": "colOffsets", "values": [{ "name": "number[]" }] },
+        { "name": "totalWidth", "values": [] },
+        { "name": "scrollLeft", "values": [] },
+        {
+          "name": "variant",
+          "values": [{ "name": "default" }, { "name": "sticky" }]
+        },
+        {
+          "name": "size",
+          "values": [{ "name": "sm" }, { "name": "md" }, { "name": "lg" }]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-viewport",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "phantomWidth", "values": [] },
+        { "name": "phantomHeight", "values": [] },
+        { "name": "rowHeight", "values": [] },
+        { "name": "striped", "values": [] },
+        { "name": "selectionRange", "values": [{ "name": "SelectionRange" }] }
+      ],
+      "references": []
+    },
+    {
+      "name": "grid-row",
+      "description": "\n\n\n---\n\n\n",
+      "attributes": [
+        { "name": "rowIndex", "values": [] },
+        { "name": "rowData", "values": [{ "name": "Record<string, any>" }] },
+        {
+          "name": "dataType",
+          "values": [{ "name": "Record<string, EditorDataType>" }]
+        },
+        { "name": "isActive", "values": [] },
+        { "name": "isDirty", "values": [] },
+        { "name": "isSelected", "values": [] },
+        { "name": "editable", "values": [] }
+      ],
       "references": []
     }
   ]

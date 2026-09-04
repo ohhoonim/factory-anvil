@@ -6,7 +6,7 @@ export * from './Checkbox/index';
 export * from './CheckboxGroup/index';
 export * from './Chip/index';
 export * from './ContentContainer/index';
-// export * from './DataGrid/index';
+export * from './DataGrid/index';
 export * from './DatePicker/index';
 export * from './DateRangePicker/index';
 export * from './DateTimePicker/index';
